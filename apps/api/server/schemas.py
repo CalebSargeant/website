@@ -1,12 +1,22 @@
-"""API request/response schemas.
+"""API request/response schemas (the HTTP edge).
 
-Two-layer contract in action:
-  * SHARED `Item` shape is imported (never redefined) from the local Pydantic
-    contract, which itself re-exports it from `platform_schemas`.
-  * NEW `Widget` / `WidgetCreate` shapes come from the local contract too.
-Nothing is inlined here.
+Domain shapes come from the local contract (`app_schemas`) — re-exported here so
+routes never redefine them. Only thin request/response envelopes specific to an
+endpoint live here.
 """
 
-from app_schemas import Item, Widget, WidgetCreate
+from __future__ import annotations
 
-__all__ = ["Item", "Widget", "WidgetCreate"]
+# Re-export the domain contract (single source of truth) for route handlers.
+from app_schemas import Resume
+from pydantic import BaseModel, Field
+
+__all__ = ["Resume", "AskRequest", "AskResponse"]
+
+
+class AskRequest(BaseModel):
+    question: str = Field(min_length=1, max_length=500)
+
+
+class AskResponse(BaseModel):
+    answer: str

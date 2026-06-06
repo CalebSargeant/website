@@ -1,13 +1,45 @@
 """LOCAL Pydantic contract for this repo's NEW entities.
 
-Mirrors the zod shapes in ``packages/schemas/src/index.ts`` (same dual-shape
-pattern). Shared shapes are imported from ``platform_schemas`` and re-exported,
-never redefined.
+The product's single source of truth is the **résumé/profile** model below
+(JSON Resume-aligned). Shared platform shapes are re-exported when referenced;
+the import is guarded because the upstream `platform_schemas` package is not yet
+published (see CLAUDE.md — sourcing is unresolved).
 """
 
-# Re-export the SHARED `Item` shape so the foreign reference type isn't duplicated.
-from platform_schemas import Item
+from __future__ import annotations
 
-from .widget import Widget, WidgetCreate
+from .resume import (
+    Basics,
+    Certificate,
+    Education,
+    Location,
+    Profile,
+    ProfileLink,
+    Project,
+    Resume,
+    Skill,
+    Work,
+)
 
-__all__ = ["Item", "Widget", "WidgetCreate"]
+# Re-export the SHARED `Item` shape where referenced. Guarded so the local
+# contract still imports while upstream sourcing is unresolved.
+try:  # pragma: no cover - depends on unpublished upstream
+    from platform_schemas import Item, ItemCreate
+except ModuleNotFoundError:  # upstream not yet sourced
+    Item = None  # type: ignore[assignment]
+    ItemCreate = None  # type: ignore[assignment]
+
+__all__ = [
+    "Basics",
+    "Certificate",
+    "Education",
+    "Item",
+    "ItemCreate",
+    "Location",
+    "Profile",
+    "ProfileLink",
+    "Project",
+    "Resume",
+    "Skill",
+    "Work",
+]

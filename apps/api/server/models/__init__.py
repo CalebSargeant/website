@@ -1,4 +1,6 @@
-from .base import Base
-from .widget import Widget
+"""SQLAlchemy models. The current product (résumé/CV) is file-based, so there are
+no models yet — `Base` is kept for when persistent entities are added."""
 
-__all__ = ["Base", "Widget"]
+from .base import Base
+
+__all__ = ["Base"]

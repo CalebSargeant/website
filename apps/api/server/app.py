@@ -2,24 +2,26 @@
 
 from __future__ import annotations
 
-from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from server.config import settings
-from server.routes.widgets import router as widgets_router
+from server.routes.ask import router as ask_router
+from server.routes.cv import router as cv_router
+from server.routes.github import router as github_router
+from server.routes.profile import router as profile_router
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
-    # Startup/shutdown hooks (warm caches, etc.) go here.
     yield
 
 
 app = FastAPI(
-    title="Golden Stack Consumer API",
+    title="calebsargeant.com API",
     version="0.1.0",
     lifespan=lifespan,
 )
@@ -32,7 +34,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(widgets_router)
+app.include_router(profile_router)
+app.include_router(cv_router)
+app.include_router(github_router)
+app.include_router(ask_router)
 
 
 @app.get("/health", tags=["meta"])

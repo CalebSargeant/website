@@ -1,0 +1,78 @@
+{
+  "$note": "PLACEHOLDER CONTENT — replace fields with your real info. This file is the single source of truth: the website, the generated CV, and the LinkedIn sync all read from here.",
+  "basics": {
+    "name": "Caleb Sargeant",
+    "label": "Cloud & Platform Engineer",
+    "email": "caleb@magmamoose.com",
+    "phone": "",
+    "url": "https://www.calebsargeant.com",
+    "summary": "Cloud and platform engineer focused on building reliable, secure, automated infrastructure. I like turning manual ops into self-service platforms and shipping developer tooling that gets out of the way.",
+    "location": { "city": "Cape Town", "region": "Western Cape", "countryCode": "ZA" },
+    "profiles": [
+      { "network": "GitHub", "username": "CalebSargeant", "url": "https://github.com/CalebSargeant" },
+      { "network": "LinkedIn", "username": "calebsargeant", "url": "https://www.linkedin.com/in/calebsargeant" }
+    ]
+  },
+  "work": [
+    {
+      "name": "MagmaMoose",
+      "position": "Founder / Principal Engineer",
+      "url": "https://magmamoose.com",
+      "location": "Remote",
+      "startDate": "2023-01",
+      "endDate": "",
+      "summary": "Building the 'Golden Stack' — shared platform building blocks and products on top of them.",
+      "highlights": [
+        "Designed a monorepo of reusable platform packages (schemas, UI, config, API client) consumed by standalone products.",
+        "Shipped Cloudflare Workers for token brokering and commit signing.",
+        "Built a MikroTik fleet-management control plane with a Python agent."
+      ],
+      "tech": ["TypeScript", "Python", "Cloudflare Workers", "FastAPI", "Terraform", "PostgreSQL"]
+    },
+    {
+      "name": "Example Corp",
+      "position": "Senior DevOps Engineer",
+      "url": "https://example.com",
+      "location": "Cape Town, ZA",
+      "startDate": "2020-03",
+      "endDate": "2022-12",
+      "summary": "Owned cloud infrastructure and CI/CD for a multi-team SaaS product.",
+      "highlights": [
+        "Migrated workloads to Kubernetes, cutting deploy times from hours to minutes.",
+        "Introduced infrastructure-as-code, bringing 100% of environments under Terraform.",
+        "Reduced cloud spend ~30% through rightsizing and autoscaling."
+      ],
+      "tech": ["AWS", "Kubernetes", "Terraform", "GitHub Actions", "Datadog"]
+    }
+  ],
+  "education": [
+    {
+      "institution": "University of Example",
+      "area": "Computer Science",
+      "studyType": "BSc",
+      "startDate": "2014",
+      "endDate": "2017",
+      "score": "",
+      "courses": []
+    }
+  ],
+  "skills": [
+    { "name": "Cloud & Infra", "level": "Expert", "keywords": ["AWS", "Cloudflare", "Kubernetes", "Terraform"] },
+    { "name": "Backend", "level": "Advanced", "keywords": ["Python", "FastAPI", "PostgreSQL", "Node.js"] },
+    { "name": "Frontend", "level": "Intermediate", "keywords": ["TypeScript", "React", "Vite"] },
+    { "name": "Security & Reliability", "level": "Advanced", "keywords": ["IAM", "Observability", "CI/CD", "SRE"] }
+  ],
+  "projects": [
+    {
+      "name": "Golden Stack",
+      "description": "A set of opinionated, reusable full-stack building blocks (schemas, UI, config, API client) that products consume instead of reinventing.",
+      "url": "https://github.com/MagmaMoose/platform",
+      "highlights": ["Two-layer contract discipline", "Shared zod + Pydantic schemas"],
+      "keywords": ["pnpm", "Turborepo", "uv", "FastAPI"]
+    }
+  ],
+  "certificates": [
+    { "name": "AWS Certified Solutions Architect", "date": "2021-06", "issuer": "Amazon Web Services", "url": "" }
+  ],
+  "meta": { "lastUpdated": "2026-06-06", "version": "1" }
+}

@@ -13,6 +13,12 @@ dependencies = [
     "pydantic-settings==2.7.0",
     "httpx==0.28.1",
     "structlog==24.4.0",
+    # CV generation (pure-Python PDF — no system libraries needed).
+    "reportlab==4.2.5",
+    # "Ask my CV" assistant (Claude API).
+    "anthropic==0.42.0",
+    # email validation for the résumé contract.
+    "email-validator==2.2.0",
     # LOCAL contract (Pydantic side); it re-exports the SHARED platform_schemas Item.
     "app-schemas",
 ]

@@ -1,41 +1,54 @@
-# Architecture — Golden Stack Consumer (calebsargeant.com)
+# Architecture — calebsargeant.com
 
 A self-contained full-stack product that **consumes** the Golden Stack building blocks
-from `MagmaMoose/platform` and **builds** its own backend + contract + API client.
+from `MagmaMoose/platform` and **builds** its own backend, contract, and clients on top.
+The site is the **single source of truth**: `content/profile.json` drives the rendered
+site, the generated CV, and the LinkedIn sync.
 
 ```
-apps/web  ─┐                         ┌─ packages/schemas  (NEW shapes: Widget; re-exports shared Item)
-apps/mobile┼─ packages/api-client ──►├─ apps/api (FastAPI, own DB + routes)
-           │  (one client, one URL)   └─ services/upstream.py ──► MagmaMoose/platform API (httpx, server-to-server)
-           └─ @platform/ui (web only)
+content/profile.json  ──►  apps/api (FastAPI)  ──►  GET /profile   (drives the site)
+   (the SSOT)                                  ──►  GET /cv         (PDF / JSON Resume, generated live)
+                                               ──►  GET /github/stats
+                                               ──►  POST /ask       (Ask-my-CV, Claude API)
+apps/web / apps/mobile  ──►  packages/api-client (one client, one base URL)
+tools/linkedin/*        ──►  keep LinkedIn in step with profile.json
 ```
 
-## The vertical slice (this session)
+## Single source of truth
 
-A **new** local entity `Widget` (`id`, `name`, `item_id` → shared `Item`, `created_at`):
+- **`content/profile.json`** — JSON Resume-aligned résumé you edit. Validated on load
+  against the local Pydantic contract.
+- **`packages/schemas`** — `Resume`/`Basics`/`Work`/`Education`/`Skill`/`Project`/
+  `Certificate` shapes (zod + Pydantic), mirrored field-for-field. Still re-exports the
+  shared `Item` from `@platform/schemas` for the two-layer pattern.
 
-1. **`packages/schemas`** — zod `Widget`/`WidgetCreate` + Pydantic `Widget`/`WidgetCreate`,
-   each re-exporting the shared `Item` from `@platform/schemas` / `platform_schemas`.
-2. **`apps/api`** — `GET`/`POST /widgets` (SQLAlchemy 2.0 async + psycopg 3), Pydantic v2
-   importing the shared `Item`, one Alembic migration (`0001_create_widgets`), one pytest test.
-3. **`packages/api-client`** — typed client + TanStack Query hooks against this repo's API.
-4. **`apps/web`** — one screen (lists/creates widgets) via the local hook + `@platform/ui`.
-5. **`apps/mobile`** — the same screen via the **same** hook, UI from RN primitives + NativeWind.
+## CV generation
 
-## Decisions
+`apps/api` `GET /cv?format=pdf|json` builds the CV on the fly from `profile.json`:
+- **PDF** via `reportlab` (pure-Python — no system libraries, runs in any container).
+- **JSON** is JSON Resume-compatible, so the same data works with that theme ecosystem.
+Edit the JSON → the site, the PDF, and the LinkedIn text all update. No stale artifact.
 
-- **Upstream-API mode: single backend (default).** Frontends use one base URL; the backend
-  reaches `MagmaMoose/platform` server-to-server and validates against `platform_schemas`.
-- **Two-layer contract:** shared shapes consumed (never redefined); new shapes defined once
-  in `packages/schemas`; nothing inlined in an app/service.
+## Wow factor
 
-## Known open items (need a decision)
+- **Ask my CV** (`POST /ask`) — a tiny RAG: the whole résumé is sent to the Claude API
+  with instructions to answer only from it. Needs `APP_ANTHROPIC_API_KEY`.
+- **Live GitHub stats** (`GET /github/stats`) — repos/stars/followers/top languages.
+- **3D career timeline** — `react-three-fiber` hero on the web app (drag to orbit).
 
-- **Upstream sourcing.** Every `@platform/*` package and `platform_schemas` is `private: true`
-  / `0.0.0` and **unpublished**. `pnpm install` / `uv sync` cannot resolve them yet. Pick a
-  distribution path (GitHub Packages registry, git dependency, or submodule) before the slice
-  can build/run end-to-end.
-- **Tooling gaps upstream.** `@platform/config` ships tsconfig + prettier + vitest but **no
-  eslint / tailwind** preset, so `packages/config` adds those locally (clearly marked).
-- **Site mimicry.** The product is themed for calebsargeant.com but does not yet reproduce the
-  live site's content/design — scope TBD.
+## LinkedIn sync (see tools/linkedin/README.md)
+
+There is **no supported API** for an individual to programmatically edit their own
+profile positions (the Profile Edit API is a gated Partner program). So:
+- `generate_sections.py` — copy-paste-ready Headline/About/Experience (ToS-safe). **Recommended.**
+- `import_linkedin_export.py` — seed `profile.json` from your LinkedIn data export (ToS-safe).
+- `push_playwright.py` — opt-in browser automation for Headline+About (**against LinkedIn ToS**, off by default).
+
+## Known open items
+
+- **Upstream sourcing.** Every `@platform/*` package is `private:true` / `0.0.0` and
+  unpublished, so the **JS workspace** (`pnpm install`) can't resolve them yet. The
+  **Python backend** (profile + CV + GitHub + Ask-my-CV) is decoupled from the unpublished
+  upstream and **runs + tests green today**.
+- The `apps/api` Postgres/Alembic scaffold is retained for future persistent entities; the
+  résumé product itself is intentionally file-based.
