@@ -1,0 +1,44 @@
+# Pre-commit hooks. JS format flows through @platform/config (prettier) + local eslint;
+# Python lint/format is Ruff only; security via bandit + pip-audit.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^apps/api/
+      - id: ruff-format
+        files: ^apps/api/
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.0
+    hooks:
+      - id: bandit
+        args: ["-c", "apps/api/pyproject.toml"]
+        additional_dependencies: ["bandit[toml]"]
+        files: ^apps/api/
+
+  - repo: local
+    hooks:
+      - id: pip-audit
+        name: pip-audit (apps/api)
+        entry: bash -c 'cd apps/api && uv run pip-audit'
+        language: system
+        pass_filenames: false
+        files: ^apps/api/(pyproject\.toml|uv\.lock)$
+
+      - id: eslint
+        name: eslint (workspace)
+        entry: pnpm -w lint
+        language: system
+        pass_filenames: false
+        files: \.(ts|tsx)$

@@ -1,0 +1,8 @@
+{
+  "//": "Extends the upstream shared tsconfig. Add only repo-wide overrides here.",
+  "extends": "@platform/config/tsconfig.base.json",
+  "compilerOptions": {
+    "strict": true,
+    "skipLibCheck": true
+  }
+}

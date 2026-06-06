@@ -1,0 +1,51 @@
+[project]
+name = "app-api"
+version = "0.1.0"
+description = "This repo's OWN FastAPI backend — own DB + routes. Reaches the Golden Stack platform server-to-server (httpx)."
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.115.6",
+    "uvicorn[standard]==0.34.0",
+    "sqlalchemy==2.0.36",
+    "alembic==1.14.0",
+    "psycopg[binary]==3.2.3",
+    "pydantic==2.10.4",
+    "pydantic-settings==2.7.0",
+    "httpx==0.28.1",
+    "structlog==24.4.0",
+    # LOCAL contract (Pydantic side); it re-exports the SHARED platform_schemas Item.
+    "app-schemas",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==8.3.4",
+    "pytest-asyncio==0.25.0",
+    "aiosqlite==0.20.0",
+    "ruff==0.8.4",
+    "bandit[toml]==1.8.0",
+    "pip-audit==2.7.3",
+]
+
+# Local path source for the LOCAL Pydantic contract. uv manages deps; mise pins versions.
+[tool.uv.sources]
+app-schemas = { path = "../../packages/schemas/python", editable = true }
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["."]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC", "SIM"]
+
+[tool.bandit]
+exclude_dirs = ["tests", "database/migrations"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]

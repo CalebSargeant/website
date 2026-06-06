@@ -1,0 +1,23 @@
+{
+  "name": "@app/root",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Golden Stack Consumer — self-contained full-stack product (web + mobile + own FastAPI) reusing published Golden Stack building blocks.",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=9.15.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "2.3.3",
+    "typescript": "5.7.2",
+    "prettier": "3.4.2"
+  }
+}
