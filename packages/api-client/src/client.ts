@@ -28,6 +28,8 @@ export interface ApiClient {
   cvUrl(format?: "pdf" | "json"): string;
   /** Fetch the generated CV as a Blob (for programmatic download). */
   getCvBlob(format?: "pdf" | "json"): Promise<Blob>;
+  /** Tailor the CV to a job description and fetch the resulting PDF Blob. */
+  tailorCvBlob(jobDescription: string, format?: "pdf" | "json"): Promise<Blob>;
 }
 
 export interface ApiClientOptions {
@@ -72,6 +74,15 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
     getCvBlob: async (format = "pdf") => {
       const res = await fetchImpl(`${root}/cv?format=${format}`, { headers: { ...getAuthHeader?.() } });
       if (!res.ok) throw new HttpError(res.status, `GET /cv → ${res.status}`);
+      return res.blob();
+    },
+    tailorCvBlob: async (jobDescription, format = "pdf") => {
+      const res = await fetchImpl(`${root}/cv/tailor?format=${format}`, {
+        method: "POST",
+        headers: { "content-type": "application/json", ...getAuthHeader?.() },
+        body: JSON.stringify({ job_description: jobDescription }),
+      });
+      if (!res.ok) throw new HttpError(res.status, `POST /cv/tailor → ${res.status}`);
       return res.blob();
     },
   };

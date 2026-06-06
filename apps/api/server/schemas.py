@@ -11,7 +11,7 @@ from __future__ import annotations
 from app_schemas import Resume
 from pydantic import BaseModel, Field
 
-__all__ = ["Resume", "AskRequest", "AskResponse"]
+__all__ = ["Resume", "AskRequest", "AskResponse", "TailorRequest"]
 
 
 class AskRequest(BaseModel):
@@ -20,3 +20,7 @@ class AskRequest(BaseModel):
 
 class AskResponse(BaseModel):
     answer: str
+
+
+class TailorRequest(BaseModel):
+    job_description: str = Field(min_length=20, max_length=20000)

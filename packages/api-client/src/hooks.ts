@@ -29,6 +29,15 @@ export function useAskCv(client: ApiClient): UseMutationResult<string, Error, st
   return useMutation({ mutationFn: (question: string) => client.askCv(question) });
 }
 
+function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 /** Generate + download the CV in the browser. */
 export function useGenerateCv(
   client: ApiClient,
@@ -36,12 +45,17 @@ export function useGenerateCv(
   return useMutation({
     mutationFn: async (format = "pdf") => {
       const blob = await client.getCvBlob(format);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = format === "json" ? "cv.json" : "cv.pdf";
-      a.click();
-      URL.revokeObjectURL(url);
+      downloadBlob(blob, format === "json" ? "cv.json" : "cv.pdf");
+    },
+  });
+}
+
+/** Tailor the CV to a pasted job description, then download the tailored PDF. */
+export function useTailorCv(client: ApiClient): UseMutationResult<void, Error, string> {
+  return useMutation({
+    mutationFn: async (jobDescription: string) => {
+      const blob = await client.tailorCvBlob(jobDescription, "pdf");
+      downloadBlob(blob, "cv_tailored.pdf");
     },
   });
 }

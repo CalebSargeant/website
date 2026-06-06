@@ -26,3 +26,16 @@ async def test_cv_json_endpoint(client: AsyncClient) -> None:
     assert res.status_code == 200
     body = res.json()
     assert body["basics"]["name"]
+
+
+def test_extract_json_tolerates_prose_and_fences() -> None:
+    from services.tailor import _extract_json
+
+    raw = 'Here is the tailored résumé:\n```json\n{"basics": {"name": "X"}}\n```\nDone.'
+    assert _extract_json(raw) == {"basics": {"name": "X"}}
+
+
+async def test_tailor_requires_api_key(client: AsyncClient) -> None:
+    # No ANTHROPIC key configured in tests -> graceful 503, not a crash.
+    res = await client.post("/cv/tailor", json={"job_description": "x" * 40})
+    assert res.status_code == 503

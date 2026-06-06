@@ -31,8 +31,13 @@ Edit the JSON → the site, the PDF, and the LinkedIn text all update. No stale 
 
 ## Wow factor
 
+- **Tailor my CV to a job** (`POST /cv/tailor`) — paste a job description; Claude reorders
+  and rewords the résumé to emphasise relevant experience (strictly no fabrication) and a
+  tailored PDF is generated. Turns the single source of truth into infinite targeted CVs.
 - **Ask my CV** (`POST /ask`) — a tiny RAG: the whole résumé is sent to the Claude API
   with instructions to answer only from it. Needs `APP_ANTHROPIC_API_KEY`.
+- **⌘K command palette** (web, `cmdk`) — download/tailor CV, ask, jump to sections, links.
+- **Terminal mode** (web) — a typeable CLI (`help`, `experience`, `cv`, `ask <q>`, `sudo hire`).
 - **Live GitHub stats** (`GET /github/stats`) — repos/stars/followers/top languages.
 - **3D career timeline** — `react-three-fiber` hero on the web app (drag to orbit).
 
