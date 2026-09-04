@@ -962,6 +962,50 @@ body.menu-open .nav-toggle > span:nth-child(3) { transform: translateY(-6px) rot
 .term-dot:nth-of-type(2) { background: #FEBC2E; }
 .term-dot:nth-of-type(3) { background: #28C840; }
 
+/* ── link / activity readout ─────────────────────────────────────────────
+   The LED on an ethernet port, doing the job it actually does: --lit is driven
+   from real character events in site.js, one pulse per character, decaying over
+   ~150ms. At the typewriter's ~28ms a character that reads as mostly-lit with
+   small dips, which is what a NIC under sustained load looks like, because it
+   is the same mechanism. It is not a loop and it is not random: when the last
+   line lands, .is-linked takes over and it sits steady for good.
+
+   Deliberately NOT an ambient flicker. Nothing on this page should blink
+   forever, both because peripheral vision cannot ignore it and because a light
+   reporting nothing is exactly the fake telemetry this site's whole premise is
+   against. See .claude/decisions/2026-09-05-terminal-activity-led.md. */
+.term-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--fg-mute);
+  flex: none;
+}
+
+.term-led {
+  --lit: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+  /* Resting state is a dark, unlit lamp, so the pulse reads as the lamp coming
+     on rather than as a dot changing colour. */
+  background: color-mix(in oklab, var(--live) calc(14% + var(--lit) * 86%), transparent);
+  box-shadow: 0 0 calc(2px + var(--lit) * 7px)
+              color-mix(in oklab, var(--live) calc(var(--lit) * 70%), transparent);
+  transition: background 150ms linear, box-shadow 150ms linear;
+}
+
+/* Link up, no traffic: steady and dim, the way a port sits when it is connected
+   and idle. This is the state it spends the rest of the visit in. */
+.term-link.is-linked .term-led {
+  --lit: 0.42;
+  transition: background 400ms var(--ease), box-shadow 400ms var(--ease);
+}
+
 .term-title {
   font-family: var(--font-mono);
   font-size: 11.5px;
@@ -2385,6 +2429,10 @@ dialog.cmdk:not([open]) { display: none; }
 
   .timeline::after { display: none; }
   .btn-sig::after { display: none; }
+
+  /* No pulse; the typewriter fills instantly under reduced motion, so the lamp
+     goes straight to its steady linked state. */
+  .term-led { --lit: 0.42; transition: none; }
 
   /* The caret would otherwise sit at whichever half of the blink it froze on. */
   [data-typewriter].is-typing::after,
