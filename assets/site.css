@@ -681,7 +681,7 @@ body.menu-open .nav-toggle > span:nth-child(3) { transform: translateY(-6px) rot
   cursor: pointer;
   background: transparent;
   color: var(--fg);
-  transform: translate(var(--mx, 0px), calc(var(--my, 0px) + var(--btn-lift)));
+  transform: translateY(var(--btn-lift));
   transition: transform var(--dur) var(--ease),
               background var(--dur) var(--ease),
               border-color var(--dur) var(--ease),
@@ -691,10 +691,6 @@ body.menu-open .nav-toggle > span:nth-child(3) { transform: translateY(-6px) rot
 
 .btn:hover { --btn-lift: -2px; }
 .btn:active { --btn-lift: 0px; }
-
-/* site.js writes --mx / --my on the magnetic ones; the transform above already
-   reads them, so there is nothing extra to switch on here. */
-.btn[data-magnetic] { will-change: transform; }
 
 /* The label is --ink and the fill is pushed 20% towards --fg, which is the only
    formulation that clears 4.5:1 across the whole gradient in both themes: raw
@@ -1648,9 +1644,10 @@ dialog.cmdk:not([open]) { display: none; }
 }
 
 .cv-toolbar .kicker { margin-right: 4px; }
-/* Pushes .cv-actions to the right edge of the row. Aimed at the children of
-   the inner wrap, not of the bar: the bar's only child is that wrap. */
-.cv-toolbar-in > :last-child { margin-left: auto; }
+/* Pushes the actions to the right edge of the first row. Named explicitly
+   rather than :last-child, because the note now follows them in source order
+   and sits on its own row underneath. */
+.cv-toolbar-in > .cv-actions { margin-left: auto; }
 
 .cv-doc {
   background: var(--ink-2);
@@ -1726,15 +1723,18 @@ dialog.cmdk:not([open]) { display: none; }
   min-width: 0;
 }
 
+
 .cv-filter-btns {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-/* Explanatory, not instructional: it must not compete with the buttons. */
+/* Explanatory, not instructional: it must not compete with the buttons. Its own
+   row under both, so its length can never size the row above it. */
 .cv-filter-note {
-  flex-basis: 100%;
+  flex: 1 0 100%;
+  margin: 0;
   font-size: 12px;
   color: var(--fg-mute);
 }
@@ -1743,6 +1743,7 @@ dialog.cmdk:not([open]) { display: none; }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  flex: 0 0 auto;
   gap: 10px;
   margin-left: auto;
 }
@@ -2107,30 +2108,54 @@ dialog.cmdk:not([open]) { display: none; }
   transform: rotate(45deg) translate(1px, 1px);
 }
 
-/* Negative z-index keeps it above the ambient ground and below every word on
-   the page, so it can never intercept a pointer or wash out text. */
-.cursor-glow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  width: 420px;
-  height: 420px;
-  margin: -210px 0 0 -210px;
+/* ── Portraits ───────────────────────────────────────────────────────────── */
+
+/* One photo, two sizes, both circular. width/height are on the elements so the
+   space is reserved before the file lands: this is the largest image on either
+   page and a late reflow here would move the whole hero. */
+.hero-portrait,
+.cv-portrait {
   border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(circle,
-    color-mix(in oklab, var(--sig) 16%, transparent) 0%, transparent 62%);
-  opacity: 0;
-  transition: opacity 500ms var(--ease);
-  will-change: transform;
+  object-fit: cover;
+  flex: none;
+  background: var(--ink-3);
 }
 
-.cursor-glow.on,
-.cursor-glow.is-visible { opacity: 1; }
+.hero-intro {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
 
-@media (pointer: coarse), (hover: none) {
-  .cursor-glow { display: none; }
+.hero-portrait {
+  width: 64px;
+  height: 64px;
+  /* A hairline plus the accent ring, so the photo reads as part of the system
+     rather than as a picture dropped onto it. */
+  border: 1px solid var(--line-2);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--sig) 12%, transparent);
+}
+
+.cv-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 26px;
+  flex-wrap: wrap;
+}
+
+.cv-head-text { flex: 1 1 320px; min-width: 0; }
+
+.cv-portrait {
+  width: 112px;
+  height: 112px;
+  border: 1px solid var(--line-2);
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--sig) 10%, transparent);
+}
+
+@media (max-width: 560px) {
+  .cv-portrait { width: 84px; height: 84px; }
+  .hero-portrait { width: 52px; height: 52px; }
 }
 
 
@@ -2285,7 +2310,7 @@ dialog.cmdk:not([open]) { display: none; }
   .skill { grid-template-columns: minmax(0, 1fr) 70px 38px; gap: 10px; }
 
   .cv-toolbar { top: 58px; }
-  .cv-toolbar-in > :last-child { margin-left: 0; }
+  .cv-toolbar-in > .cv-actions { margin-left: 0; }
 
   .foot-inner { flex-direction: column; align-items: flex-start; }
   .foot-links { margin-left: 0; }
@@ -2355,7 +2380,6 @@ dialog.cmdk:not([open]) { display: none; }
   }
 
   .timeline::after { display: none; }
-  .cursor-glow { display: none; }
   .btn-sig::after { display: none; }
 
   /* The caret would otherwise sit at whichever half of the blink it froze on. */
@@ -2382,7 +2406,6 @@ dialog.cmdk:not([open]) { display: none; }
   .cv-toolbar,
   .scroll-progress,
   .to-top,
-  .cursor-glow,
   .skip-link,
   .filter-row,
   .term,

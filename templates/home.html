@@ -79,9 +79,13 @@
   <canvas id="hero-net" aria-hidden="true"></canvas>
 
   <div class="wrap hero-inner">
-    {% if profile.availability.show %}
-    <p class="hero-badge pill-live reveal">{{ profile.availability.text }}</p>
-    {% endif %}
+    <div class="hero-intro reveal">
+      <img class="hero-portrait" src="/assets/img/caleb-320.jpg" alt="Caleb Sargeant"
+           width="64" height="64" decoding="async" fetchpriority="high">
+      {% if profile.availability.show %}
+      <p class="hero-badge pill-live">{{ profile.availability.text }}</p>
+      {% endif %}
+    </div>
 
     <h1 class="reveal" style="--d: 1">Networks, platforms and the <span class="grad-text">glue between them.</span></h1>
 
@@ -90,7 +94,7 @@
     <p class="lead reveal" style="--d: 2">{{ profile.summary.split('. ')[:2] | join('. ') }}.</p>
 
     <div class="cta-row reveal" style="--d: 3">
-      <a class="btn btn-sig" data-magnetic href="/cv/">View the CV</a>
+      <a class="btn btn-sig" href="/cv/">View the CV</a>
       <a class="btn btn-ghost" href="{{ pdfs.cv }}" download>Download PDF</a>
       <a class="btn btn-quiet" href="{{ profile.links.github }}" rel="me noopener" target="_blank">GitHub</a>
     </div>
@@ -293,7 +297,7 @@
       </div>
 
       <div class="cta-row">
-        <a class="btn btn-sig" data-magnetic href="{{ profile.links.booking }}" rel="noopener" target="_blank">Book a call</a>
+        <a class="btn btn-sig" href="{{ profile.links.booking }}" rel="noopener" target="_blank">Book a call</a>
         <a class="btn btn-ghost" href="mailto:{{ profile.contact.email }}">{{ profile.contact.email }}</a>
         <a class="btn btn-quiet" href="tel:{{ profile.contact.phone_href }}">{{ profile.contact.phone }}</a>
       </div>

@@ -6,6 +6,9 @@
  * to its parent with DPR scaling, nodes in --sig, packets in --sig-2, edges
  * near 10% alpha, at most 34 nodes, stops on visibilitychange, and under
  * prefers-reduced-motion paints one static frame and never starts the loop.
+ *
+ * Nothing here tracks the pointer. See .claude/decisions/ - the graph drifts on
+ * its own timing and is not a thing you can push around.
  */
 (function () {
   'use strict';
@@ -15,7 +18,7 @@
   // Tuning. Distances in CSS pixels, speeds per second unless the name says ms.
   var NODE_MIN = 28, NODE_MAX = 34, AREA_PER_NODE = 22000;
   var HUB_SHARE = 0.14, EDGES_PER_NODE = 1.8, DEG_MAX = 4, DEG_MAX_HUB = 6;
-  var LEASH = 26, SPEED_MIN = 2, SPEED_MAX = 5, POINTER_R = 160;
+  var LEASH = 26, SPEED_MIN = 2, SPEED_MAX = 5;
   var PACKET_MIN_MS = 700, PACKET_MAX_MS = 1400, DEATH_CHANCE = 0.08;
   var PULSE_MS = 600, PULSE_R = 16, EDGE_ALPHA = 0.10;
   var TRAIL_TAU_MS = 130;   // packet trail decay, see settled()
@@ -33,11 +36,9 @@
     var W = 0, H = 0;
     var nodes = [], edgeA = [], edgeB = [], adj = [], packets = [];
     var built = false, running = false, raf = 0, last = 0;
-    var visible = !document.hidden, onScreen = true, rect = null;
-    var pointer = { x: 0, y: 0, active: false };
+    var visible = !document.hidden, onScreen = true;
     var col = { sig: 'rgb(56,225,255)', sig2: 'rgb(76,111,255)' };
     var motionQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
-    var fineQ = window.matchMedia ? window.matchMedia('(pointer: fine)') : null;
     var reduced = !!(motionQ && motionQ.matches);
 
     // Tokens are authored as hex in site.css. Anything else (a future rgb()
@@ -78,7 +79,6 @@
           n.x *= sx; n.hx *= sx; n.y *= sy; n.hy *= sy;
         }
       }
-      rect = canvas.getBoundingClientRect();
       return true;
     }
 
@@ -127,7 +127,7 @@
           x: pts[i * 2], y: pts[i * 2 + 1],
           hx: pts[i * 2], hy: pts[i * 2 + 1],   // home slot, the leash anchor
           vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
-          r: 1.7, hub: false, deg: 0, glow: 0, pulse: 0
+          r: 1.7, hub: false, deg: 0, pulse: 0
         });
       }
 
@@ -215,26 +215,15 @@
         if (n.y < 4) { n.y = 4; n.vy = -n.vy; } else if (n.y > H - 4) { n.y = H - 4; n.vy = -n.vy; }
 
         // Leash: a soft pull back to the poisson slot once a node strays. Without
-        // it the pointer slowly herds everything into a clump it never leaves.
+        // it the drift compounds and the graph slowly collapses into a clump.
         var dx = n.x - n.hx, dy = n.y - n.hy, d = Math.sqrt(dx * dx + dy * dy);
         if (d > LEASH) {
           var over = (d - LEASH) / LEASH;
           n.vx -= (dx / d) * over * 7 * dt; n.vy -= (dy / d) * over * 7 * dt;
         }
 
-        // Pointer: a lean toward the cursor and a brightness lift. A hint that
-        // the graph noticed you, not a physics toy.
-        var glow = 0;
-        if (pointer.active) {
-          var px = pointer.x - n.x, py = pointer.y - n.y, pd = Math.sqrt(px * px + py * py);
-          if (pd < POINTER_R && pd > 0.5) {
-            glow = 1 - pd / POINTER_R;
-            n.vx += (px / pd) * glow * 9 * dt; n.vy += (py / pd) * glow * 9 * dt;
-          }
-        }
-        n.glow += (glow - n.glow) * Math.min(1, dt * 6);
-
-        // Speed ceiling, or the pointer would inject energy indefinitely.
+        // Speed ceiling. The leash can only ever add energy, so without this a
+        // node that keeps overshooting its slot accelerates indefinitely.
         var sp = Math.sqrt(n.vx * n.vx + n.vy * n.vy), cap = SPEED_MAX * 1.6;
         if (sp > cap) { n.vx *= cap / sp; n.vy *= cap / sp; }
 
@@ -270,13 +259,8 @@
       ctx.strokeStyle = col.sig;
       ctx.lineWidth = 1;
       for (var i = 0; i < edgeA.length; i++) {
-        var a = nodes[edgeA[i]], b = nodes[edgeB[i]], alpha = EDGE_ALPHA;
-        if (pointer.active) {
-          var mx = (a.x + b.x) * 0.5 - pointer.x, my = (a.y + b.y) * 0.5 - pointer.y;
-          var md = Math.sqrt(mx * mx + my * my);
-          if (md < POINTER_R) alpha += (1 - md / POINTER_R) * 0.09;
-        }
-        ctx.globalAlpha = settled(alpha, fade);
+        var a = nodes[edgeA[i]], b = nodes[edgeB[i]];
+        ctx.globalAlpha = settled(EDGE_ALPHA, fade);
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
       }
     }
@@ -288,10 +272,10 @@
         var n = nodes[i];
         var lit = animated && n.pulse > 0 ? (n.pulse / PULSE_MS) * 0.25 : 0;
         if (n.hub) {                            // soft halo, hubs only
-          ctx.globalAlpha = settled(0.09 + n.glow * 0.06, fade);
+          ctx.globalAlpha = settled(0.09, fade);
           ctx.beginPath(); ctx.arc(n.x, n.y, n.r * 3.2, 0, TAU); ctx.fill();
         }
-        ctx.globalAlpha = settled(Math.min(1, (n.hub ? 0.8 : 0.48) + n.glow * 0.3 + lit), fade);
+        ctx.globalAlpha = settled(Math.min(1, (n.hub ? 0.8 : 0.48) + lit), fade);
         ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, TAU); ctx.fill();
 
         if (!animated || n.pulse <= 0) continue;
@@ -406,18 +390,6 @@
     document.addEventListener('themechange', readTheme);
     if (window.MutationObserver) {
       new window.MutationObserver(readTheme).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
-    }
-
-    if (fineQ && fineQ.matches) {
-      window.addEventListener('pointermove', function (e) {
-        if (!rect) return;
-        var x = e.clientX - rect.left, y = e.clientY - rect.top;
-        pointer.active = x >= 0 && y >= 0 && x <= W && y <= H;
-        pointer.x = x; pointer.y = y;
-      }, { passive: true });
-      // Cached, so the pointermove handler never triggers a layout read.
-      window.addEventListener('scroll', function () { rect = canvas.getBoundingClientRect(); }, { passive: true });
-      window.addEventListener('blur', function () { pointer.active = false; });
     }
 
     if (motionQ) {

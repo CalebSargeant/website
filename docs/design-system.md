@@ -91,8 +91,8 @@ Fonts come from Google Fonts (`Space Grotesk` 400/500/600/700, `JetBrains Mono`
 and toggles `.menu-open`.
 
 **Buttons**, `.btn` base; variants `.btn-sig` (gradient fill), `.btn-ghost`
-(hairline), `.btn-quiet` (text only). `.btn[data-magnetic]` gets pointer-follow
-from `site.js`.
+(hairline), `.btn-quiet` (text only). Buttons lift 2px on hover and nothing
+more: see section 4 on why nothing here follows the pointer.
 
 **Kicker / chips**, `.kicker` (mono, uppercase, tracked), `.chip` (small mono
 pill), `.chip-row`, `.pill-live` (green dot + label).
@@ -147,15 +147,19 @@ never blank.
 | Count-up | reveal | `[data-count-to]`, 1100ms ease-out |
 | Spine draw | scroll | `#spine-path` `stroke-dashoffset` mapped to timeline scroll progress |
 | Skill fill | reveal | width transitions to `level/5*100%` |
-| Cursor glow | pointer move | fine pointer only; rAF-throttled |
-| Magnetic button | pointer move | translate ≤6px toward pointer |
 | Scroll rail | scroll | `.scroll-progress` width = read percentage |
 | Theme swap | click | `View Transition API` when available, else instant |
+
+**Nothing on the page tracks the pointer.** No spotlight, no magnetic buttons,
+no cursor-reactive canvas. Hover is the only thing that lights an element, and
+it does so with fixed offsets. This has been settled and is recorded in
+`.claude/decisions/2026-09-05-no-pointer-tracking.md`; a change that reintroduces
+a pointer-following effect should be reverted rather than reviewed.
 
 `hero-net.js` contract: canvas `#hero-net`, sized to its parent with DPR
 scaling, nodes drawn in `--sig`, packets in `--sig-2`, edges at 10% alpha. It
 must cap at ~34 nodes, stop on `visibilitychange`, and no-op entirely under
-reduced motion after painting one static frame.
+reduced motion after painting one static frame. It ignores the pointer.
 
 ---
 

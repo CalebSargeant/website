@@ -57,7 +57,6 @@
   function media(q) { return mq ? mq(q).matches : false; }
 
   var REDUCE = media('(prefers-reduced-motion: reduce)');
-  var FINE_POINTER = media('(hover: hover) and (pointer: fine)');
   var HAS_IO = 'IntersectionObserver' in window;
   var root = document.documentElement;
 
@@ -749,80 +748,7 @@
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   }
 
-  /* ── 10. cursor glow ───────────────────────────────────────────────── */
-
-  function initCursorGlow() {
-    if (!FINE_POINTER || REDUCE) return;   // never on touch, never against a stated preference
-
-    var glow = document.createElement('div');
-    glow.className = 'cursor-glow';
-    glow.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(glow);
-
-    var x = 0, y = 0, queued = false;
-    on(document, 'mousemove', function (e) {
-      x = e.clientX; y = e.clientY;
-      if (queued) return;
-      queued = true;
-      window.requestAnimationFrame(function () {
-        queued = false;
-        glow.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
-        glow.style.opacity = '1';
-      });
-    }, true);
-
-    on(document, 'mouseleave', function () { glow.style.opacity = '0'; }, true);
-  }
-
-  /* ── 11. magnetic buttons ──────────────────────────────────────────── */
-
-  function initMagnetic() {
-    if (!FINE_POINTER || REDUCE) return;
-
-    var els = [];
-    each($$('[data-magnetic]'), function (el) { els.push({ el: el, rect: null }); });
-    if (!els.length) return;
-
-    function measure() {
-      for (var i = 0; i < els.length; i++) els[i].rect = els[i].el.getBoundingClientRect();
-    }
-    measure();
-    onScroll(measure);
-    on(window, 'resize', measure, true);
-    // Fonts landing late move buttons out from under their cached rect.
-    if (document.fonts && document.fonts.ready) swallow(document.fonts.ready.then(measure));
-
-    var queued = false, mx = 0, my = 0;
-    on(document, 'mousemove', function (e) {
-      mx = e.clientX; my = e.clientY;
-      if (queued) return;
-      queued = true;
-      window.requestAnimationFrame(apply);
-    }, true);
-
-    function apply() {
-      queued = false;
-      for (var i = 0; i < els.length; i++) {
-        var item = els[i], r = item.rect;
-        if (!r || !r.width) continue;
-        var cx = r.left + r.width / 2;
-        var cy = r.top + r.height / 2;
-        var near = mx > r.left - 40 && mx < r.right + 40 && my > r.top - 40 && my < r.bottom + 40;
-        var dx = 0, dy = 0;
-        if (near) {
-          dx = clamp((mx - cx) / (r.width / 2 + 40), -1, 1) * 6;
-          dy = clamp((my - cy) / (r.height / 2 + 40), -1, 1) * 6;
-        }
-        // `translate` rather than `transform`, so a CSS hover lift or scale on
-        // the same element keeps working instead of being overwritten.
-        item.el.style.translate = dx.toFixed(2) + 'px ' + dy.toFixed(2) + 'px';
-        item.el.style.setProperty('--mx', dx.toFixed(2) + 'px');
-        item.el.style.setProperty('--my', dy.toFixed(2) + 'px');
-      }
-    }
-  }
-
-  /* ── 12. filters (skill matrix, CV focus) ──────────────────────────── */
+  /* ── 10. filters (skill matrix, CV focus) ──────────────────────────── */
 
   function initFilters() {
     var buttons = $$('[data-filter]');
@@ -895,8 +821,6 @@
     safe('spine', initSpine);
     safe('theme', initTheme);
     safe('cmdk', initCmdk);
-    safe('cursor glow', initCursorGlow);
-    safe('magnetic', initMagnetic);
     safe('filters', initFilters);
     safe('year', initYear);
     safe('copy', initCopy);
