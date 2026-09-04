@@ -5,44 +5,18 @@
   The home page is the only page that writes prose of its own. Everything
   factual on it still comes from data/, and the copy below only ever frames it.
 
-  Two lookup tables live here rather than in data/*.yml on purpose:
-    * focus_copy   one sentence per focus area. It is voice, not fact, and it
-                   has to change whenever the sentence reads badly, which is
-                   not the same cadence as the CV.
-    * group_focus  maps a skill group's icon to the focus tags the filter row
-                   uses. data/skills.yml deliberately has no focus field, so
-                   the mapping has to be made somewhere; here is the only place
-                   it is needed.
+  The four "what I do" paragraphs are voice, not fact, so they are ui strings in
+  data/i18n/<code>.yml under whatdo.* rather than entries in data/*.yml: they
+  have to change whenever a sentence reads badly, which is not the cadence the
+  CV data changes on, and every language needs its own.
+
+  group_focus stays a lookup table here because it is a mapping between two
+  existing vocabularies (a skill group's icon and the filter's focus tags) with
+  no text in it. data/skills.yml deliberately has no focus field, so the mapping
+  has to be made somewhere, and this is the only place it is needed.
 #}
 
 {% block content %}
-{% set focus_copy = {
-  "platform": {
-    "title": "Platform engineering",
-    "body": "Kubernetes, Terraform and GitOps, and the internal platform on top of them, so a
-             product team can bootstrap its own environments and repositories without waiting
-             on me to do it by hand."
-  },
-  "cloud": {
-    "title": "Cloud infrastructure",
-    "body": "Azure and AWS built as code rather than clicked together: AKS and EKS, networking,
-             identity, and the unglamorous work of lifecycle rules and right-sized instances
-             that keeps the monthly bill defensible."
-  },
-  "network": {
-    "title": "Networks",
-    "body": "Routing, switching, firewalls and VPNs on Cisco, MikroTik and FortiGate, from a
-             global multi-datacentre network on BGP and HSRP down to a single remote camera that
-             has to come back on its own after a reboot."
-  },
-  "security": {
-    "title": "Security",
-    "body": "Hardening, identity and the application-security toolchain: SSO, MFA and PKI on one
-             side, Dependency-Track, SonarQube, Trivy and ZAP wired into CI on the other, with
-             findings tracked until they are actually closed."
-  }
-} %}
-
 {% set group_focus = {
   "layers":   "platform",
   "cloud":    "cloud platform",
@@ -80,27 +54,29 @@
 
   <div class="wrap hero-inner">
     <div class="hero-intro reveal">
-      <img class="hero-portrait" src="/assets/img/caleb-320.jpg" alt="Caleb Sargeant"
+      <img class="hero-portrait" src="/assets/img/caleb-320.jpg" alt="{{ profile.name }}"
            width="96" height="96" decoding="async" fetchpriority="high">
       {% if profile.availability.show %}
       <p class="hero-badge pill-live">{{ profile.availability.text }}</p>
       {% endif %}
     </div>
 
-    <h1 class="reveal" style="--d: 1">Networks, platforms and the <span class="grad-text">glue between them.</span></h1>
+    <h1 class="reveal" style="--d: 1">{{ t('hero.title_before') }} <span class="grad-text">{{ t('hero.title_accent') }}</span></h1>
 
     {# The first two sentences of the one summary in data/profile.yml. Trimmed
        here rather than duplicated there, so the CV and the site cannot drift. #}
     <p class="lead reveal" style="--d: 2">{{ profile.summary.split('. ')[:2] | join('. ') }}.</p>
 
     <div class="cta-row reveal" style="--d: 3">
-      <a class="btn btn-sig" data-magnetic href="/cv/">View the CV</a>
-      <a class="btn btn-ghost" href="{{ pdfs.cv }}" download>Download PDF</a>
+      <a class="btn btn-sig" data-magnetic href="{{ url('/cv/') }}">{{ t('cta.view_cv') }}</a>
+      <a class="btn btn-ghost" href="{{ pdfs.cv }}" download>{{ t('cta.download_pdf') }}</a>
       <a class="btn btn-quiet" href="{{ profile.links.github }}" rel="me noopener" target="_blank">GitHub</a>
     </div>
 
     {# Each typed line carries its text as content as well as in data-typewriter:
-       site.js retypes it, and with JavaScript off the terminal still reads. #}
+       site.js retypes it, and with JavaScript off the terminal still reads.
+       The shell prompt and the two command words are not translated: they are
+       what someone would actually type, in any language. #}
     <div class="hero-terminal term reveal" style="--d: 4">
       <div class="term-bar">
         <span class="term-dots" aria-hidden="true"></span>
@@ -120,8 +96,9 @@
         <p class="term-line">
           <span class="term-out" data-typewriter="{{ profile.headline }}, {{ profile.location }}">{{ profile.headline }}, {{ profile.location }}</span>
         </p>
+        {% set term_years = t('hero.term.years', years=years_experience, start=career_start_year) %}
         <p class="term-line">
-          <span class="term-out" data-typewriter="{{ years_experience }} years in IT, since {{ career_start_year }}">{{ years_experience }} years in IT, since {{ career_start_year }}</span>
+          <span class="term-out" data-typewriter="{{ term_years }}">{{ term_years }}</span>
         </p>
         <p class="term-line">
           <span class="term-ps1">caleb@eindhoven:~$</span>
@@ -155,15 +132,15 @@
 <section class="section" id="now">
   <div class="wrap">
     <div class="section-head reveal">
-      <p class="kicker">Now</p>
-      <h2>What I am on at the moment</h2>
-      <p class="lead">The seats I currently hold, and what I am studying around them.</p>
+      <p class="kicker">{{ t('now.kicker') }}</p>
+      <h2>{{ t('now.title') }}</h2>
+      <p class="lead">{{ t('now.lead') }}</p>
     </div>
 
     <div class="grid-2">
       {% for role in current_roles %}
       <article class="card reveal" style="--d: {{ loop.index0 }}" data-focus="{{ role.focus | join(' ') }}">
-        <p class="kicker mono">{{ role.start_label }} to present · {{ role.duration }} · {{ role.type }}</p>
+        <p class="kicker mono">{{ t('now.range_present', start=role.start_label) }} · {{ role.duration }} · {{ role.type }}</p>
         <h3>{{ role.title }}</h3>
         <p class="mono">{{ role.company }} · {{ role.location }}</p>
         <p>{{ role.summary }}</p>
@@ -180,7 +157,7 @@
 
     {% if in_progress %}
     <div class="reveal">
-      <p class="kicker">Currently studying</p>
+      <p class="kicker">{{ t('common.currently_studying') }}</p>
       <div class="chip-row">
         {% for item in in_progress %}
         <span class="chip">{{ item }}</span>
@@ -195,18 +172,17 @@
 <section class="section" id="what-i-do">
   <div class="wrap">
     <div class="section-head reveal">
-      <p class="kicker">What I do</p>
-      <h2>Four things, and the overlap between them</h2>
-      <p class="lead">Most of my work sits where two of these meet, which is usually where
-        things break.</p>
+      <p class="kicker">{{ t('whatdo.kicker') }}</p>
+      <h2>{{ t('whatdo.title') }}</h2>
+      <p class="lead">{{ t('whatdo.lead') }}</p>
     </div>
 
     <div class="grid-2">
       {% for area in focus_areas %}
       <article class="card reveal" style="--d: {{ loop.index0 }}" data-focus="{{ area }}">
         {{ focus_icon(area) }}
-        <h3>{{ focus_copy[area].title }}</h3>
-        <p>{{ focus_copy[area].body }}</p>
+        <h3>{{ t('whatdo.' ~ area ~ '.title') }}</h3>
+        <p>{{ t('whatdo.' ~ area ~ '.body') }}</p>
       </article>
       {% endfor %}
     </div>
@@ -217,16 +193,15 @@
 <section class="section" id="skills">
   <div class="wrap">
     <div class="section-head reveal">
-      <p class="kicker">Skills</p>
-      <h2>Rated the way I would rate a colleague</h2>
-      <p class="lead">Five is daily and deep. Three means it is running in production and I would
-        keep the documentation open. The years are how long the thing has been in my hands.</p>
+      <p class="kicker">{{ t('skills.kicker') }}</p>
+      <h2>{{ t('skills.title') }}</h2>
+      <p class="lead">{{ t('skills.lead') }}</p>
     </div>
 
-    <div class="filter-row reveal" role="group" aria-label="Filter skills by area" data-filter-root="#skills-matrix">
-      <button type="button" class="filter-btn" data-filter="all" aria-pressed="true">All</button>
+    <div class="filter-row reveal" role="group" aria-label="{{ t('skills.filter_aria') }}" data-filter-root="#skills-matrix">
+      <button type="button" class="filter-btn" data-filter="all" aria-pressed="true">{{ t('filter.all') }}</button>
       {% for area in focus_areas %}
-      <button type="button" class="filter-btn" data-filter="{{ area }}" aria-pressed="false">{{ area | capitalize }}</button>
+      <button type="button" class="filter-btn" data-filter="{{ area }}" aria-pressed="false">{{ t('focus.' ~ area) }}</button>
       {% endfor %}
     </div>
 
@@ -239,11 +214,11 @@
           <span class="skill-name">{{ skill.name }}</span>
           {# --level is a hedge: the fill can be sized from CSS alone if site.js
              never runs, while data-level stays the documented hook. #}
-          <span class="skill-meter" role="img" aria-label="Level {{ skill.level }} of 5">
+          <span class="skill-meter" role="img" aria-label="{{ t('skills.level_aria', level=skill.level) }}">
             <span class="skill-fill" data-level="{{ skill.level }}" style="--level: {{ skill.level }}"></span>
           </span>
           {% if skill.get('years') %}
-          <span class="skill-years mono">{{ skill.years }} yr</span>
+          <span class="skill-years mono">{{ t('common.years_short', n=skill.years) }}</span>
           {% endif %}
         </div>
         {% endfor %}
@@ -252,7 +227,7 @@
     </div>
 
     <div class="reveal">
-      <p class="kicker">Also worth saying</p>
+      <p class="kicker">{{ t('skills.soft_kicker') }}</p>
       <div class="chip-row">
         {% for item in soft_skills %}
         <span class="chip">{{ item }}</span>
@@ -266,17 +241,15 @@
 <section class="section" id="career">
   <div class="wrap">
     <div class="section-head reveal">
-      <p class="kicker">Career</p>
-      <h2>The last four seats</h2>
-      <p class="lead">{{ roles | length }} roles since {{ roles[-1].start_year }}, from an
-        MSP helpdesk to platform engineering. The full timeline, with every duty, is on the
-        experience page.</p>
+      <p class="kicker">{{ t('career.kicker') }}</p>
+      <h2>{{ t('career.title') }}</h2>
+      <p class="lead">{{ t('career.lead', roles=roles | length, year=roles[-1].start_year) }}</p>
     </div>
 
     <div class="grid-2">
       {% for role in roles[:4] %}
       <article class="card reveal" style="--d: {{ loop.index0 }}" data-focus="{{ role.focus | join(' ') }}">
-        <p class="kicker mono">{{ role.start_short }} to {{ role.end_short }} · {{ role.duration }}</p>
+        <p class="kicker mono">{{ role.start_short }} {{ t('common.to') }} {{ role.end_short }} · {{ role.duration }}</p>
         <h3>{{ role.title }}</h3>
         <p class="mono">{{ role.company }} · {{ role.location }}</p>
         <p>{{ role.summary }}</p>
@@ -285,8 +258,8 @@
     </div>
 
     <div class="cta-row reveal">
-      <a class="btn btn-ghost" href="/experience/">All {{ roles | length }} roles</a>
-      <a class="btn btn-quiet" href="/education/">Certifications and courses</a>
+      <a class="btn btn-ghost" href="{{ url('/experience/') }}">{{ t('career.all_roles', roles=roles | length) }}</a>
+      <a class="btn btn-quiet" href="{{ url('/education/') }}">{{ t('career.certs_link') }}</a>
     </div>
   </div>
 </section>
@@ -296,22 +269,21 @@
   <div class="wrap">
     <div class="panel reveal">
       <div class="section-head center">
-        <p class="kicker">Next</p>
-        <h2>Worth a conversation?</h2>
-        <p class="lead">{{ profile.availability.text }} Pick a slot, or send an email and I will
-          come back to you.</p>
+        <p class="kicker">{{ t('cta.kicker') }}</p>
+        <h2>{{ t('cta.title') }}</h2>
+        <p class="lead">{{ profile.availability.text }} {{ t('cta.lead') }}</p>
       </div>
 
       <div class="cta-row">
-        <a class="btn btn-sig" data-magnetic href="{{ profile.links.booking }}" rel="noopener" target="_blank">Book a call</a>
+        <a class="btn btn-sig" data-magnetic href="{{ profile.links.booking }}" rel="noopener" target="_blank">{{ t('cta.book_call') }}</a>
         <a class="btn btn-ghost" href="mailto:{{ profile.contact.email }}">{{ profile.contact.email }}</a>
         <a class="btn btn-quiet" href="tel:{{ profile.contact.phone_href }}">{{ profile.contact.phone }}</a>
       </div>
 
       <div class="cta-row">
-        <a class="btn btn-quiet" href="{{ pdfs.cv }}" download>CV (PDF)</a>
-        <a class="btn btn-quiet" href="{{ pdfs.jds }}" download>JDs &amp; Duties (PDF)</a>
-        <a class="btn btn-quiet" href="{{ pdfs.cover }}" download>Cover letter (PDF)</a>
+        <a class="btn btn-quiet" href="{{ pdfs.cv }}" download>{{ t('download.cv_pdf') }}</a>
+        <a class="btn btn-quiet" href="{{ pdfs.jds }}" download>{{ t('download.jds_pdf') }}</a>
+        <a class="btn btn-quiet" href="{{ pdfs.cover }}" download>{{ t('download.cover_pdf') }}</a>
       </div>
     </div>
   </div>

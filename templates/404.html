@@ -6,17 +6,16 @@
 <section class="section">
   <div class="wrap">
     <div class="section-head">
-      <p class="kicker">HTTP 404</p>
+      <p class="kicker">{{ t('notfound.kicker') }}</p>
       <h1 class="mono grad-text">404</h1>
-      <p class="lead">There is nothing at that address. It has either moved, or the link that
-        sent you here was wrong. Everything on the site is one hop away.</p>
+      <p class="lead">{{ t('notfound.lead') }}</p>
     </div>
 
     <div class="cta-row">
       {% for item in nav %}
       <a class="btn btn-ghost" href="{{ item.path }}">{{ item.nav }}</a>
       {% endfor %}
-      <a class="btn btn-sig" data-magnetic href="{{ pdfs.cv }}" download>Download the CV</a>
+      <a class="btn btn-sig" data-magnetic href="{{ pdfs.cv }}" download>{{ t('cta.download_cv') }}</a>
     </div>
   </div>
 </section>

@@ -14,25 +14,23 @@
 <section class="section">
   <div class="wrap">
     <header class="section-head reveal" style="--d:0">
-      <p class="kicker">Education</p>
-      <h1>Education &amp; courses</h1>
+      <p class="kicker">{{ t('education.kicker') }}</p>
+      <h1>{{ t('education.title') }}</h1>
       {# Counted off `kind` rather than the list length: the list also carries the
          school-leaving certificate, which is neither of those things. #}
       {% set credentials = education | rejectattr('kind', 'equalto', 'schooling') | list %}
       <p class="lead">
-        {{ credentials | length }} certifications and qualifications, and {{ courses | length }} courses
-        and vendor training. Newest first, with what each one covered.
+        {{ t('education.lead', credentials=credentials | length, courses=courses | length) }}
       </p>
-      <p>
-        The badges are verifiable on
-        <a href="{{ profile.links.credly }}" rel="me noopener" target="_blank">Credly</a>,
-        and the older Cisco and Microsoft tracks are listed with the subjects they covered.
-      </p>
+      {# See base.html: the anchor goes in as an argument so a translation can
+         reorder freely, and the sentence is escaped before the substitution. #}
+      {% set credly_link %}<a href="{{ profile.links.credly }}" rel="me noopener" target="_blank">Credly</a>{% endset %}
+      <p>{{ (t('education.verify_note') | e).format(link=credly_link) }}</p>
     </header>
 
     <div class="cta-row reveal" style="--d:1">
-      <a class="btn btn-ghost" href="{{ profile.links.credly }}" rel="me noopener" target="_blank">Verify on Credly</a>
-      <a class="btn btn-quiet" href="{{ pdfs.cv }}" download>CV PDF</a>
+      <a class="btn btn-ghost" href="{{ profile.links.credly }}" rel="me noopener" target="_blank">{{ t('education.verify_cta') }}</a>
+      <a class="btn btn-quiet" href="{{ pdfs.cv }}" download>{{ t('download.cv_link') }}</a>
     </div>
   </div>
 </section>
@@ -41,9 +39,9 @@
 <section class="section" id="studying">
   <div class="wrap">
     <div class="section-head reveal" style="--d:0">
-      <p class="kicker"><span class="pill-live">In progress</span></p>
-      <h2>Currently studying</h2>
-      <p>{{ in_progress | length }} tracks on the go, studied around a full-time job.</p>
+      <p class="kicker"><span class="pill-live">{{ t('education.in_progress') }}</span></p>
+      <h2>{{ t('common.currently_studying') }}</h2>
+      <p>{{ t('education.studying_note', count=in_progress | length) }}</p>
     </div>
     <div class="chip-row reveal" style="--d:1">
       {% for topic in in_progress %}
@@ -57,9 +55,9 @@
 <section class="section" id="certifications">
   <div class="wrap">
     <div class="section-head reveal" style="--d:0">
-      <p class="kicker">Credentials</p>
-      <h2>Certifications &amp; qualifications</h2>
-      <p>The institution is where the work was done, whether that was a classroom or self-study.</p>
+      <p class="kicker">{{ t('education.credentials_kicker') }}</p>
+      <h2>{{ t('education.credentials_title') }}</h2>
+      <p>{{ t('education.credentials_note') }}</p>
     </div>
 
     <div class="grid-2">
@@ -73,14 +71,16 @@
         <p class="mono">
           {% if item.get('credential') %}{{ item.get('credential') }}{% endif %}
           {% if item.get('credential') and item.get('national_qualification') %}<br>{% endif %}
-          {% if item.get('national_qualification') %}National qualification: {{ item.get('national_qualification') }}{% endif %}
+          {% if item.get('national_qualification') %}{{ t('education.national_qualification', value=item.get('national_qualification')) }}{% endif %}
         </p>
         {% endif %}
 
         <div class="chip-row">
+          {# `kind` is a data value, so it is the content overlay's job to
+             translate it, not t()'s. #}
           <span class="chip">{{ item.kind | capitalize }}</span>
           {% if item.get('verify') %}
-          <a class="chip" href="{{ item.get('verify') }}" rel="noopener" target="_blank">Verify</a>
+          <a class="chip" href="{{ item.get('verify') }}" rel="noopener" target="_blank">{{ t('common.verify') }}</a>
           {% endif %}
         </div>
 
@@ -89,7 +89,7 @@
            chevron, hairline). Nothing in it is timeline-specific, so the
            subject lists reuse it rather than growing a second one. #}
         <details class="tl-duties">
-          <summary>Subjects ({{ item['subjects'] | length }})</summary>
+          <summary>{{ t('education.subjects', count=item['subjects'] | length) }}</summary>
           <ul>
             {% for subject in item['subjects'] %}
             <li>{{ subject }}</li>
@@ -106,12 +106,10 @@
 <section class="section" id="courses">
   <div class="wrap">
     <div class="section-head reveal" style="--d:0">
-      <p class="kicker">Training</p>
-      <h2>Courses &amp; training</h2>
-      <p>
-        Classroom and vendor courses, plus the longer online ones. Most of the recent
-        material is on <a href="{{ profile.links.udemy }}" rel="me noopener" target="_blank">Udemy</a>.
-      </p>
+      <p class="kicker">{{ t('education.training_kicker') }}</p>
+      <h2>{{ t('education.training_title') }}</h2>
+      {% set udemy_link %}<a href="{{ profile.links.udemy }}" rel="me noopener" target="_blank">Udemy</a>{% endset %}
+      <p>{{ (t('education.training_note') | e).format(link=udemy_link) }}</p>
     </div>
 
     <div class="grid-3">

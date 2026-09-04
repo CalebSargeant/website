@@ -1,0 +1,968 @@
+# Dutch overlay for the English source in data/*.yml and data/i18n/en.yml.
+#
+# Only what differs lives here. Anything absent falls back to English rather
+# than rendering blank, and `make build` prints what is still falling back.
+# Roles are keyed by their `id` from data/experience.yml, never by position,
+# so reordering the English data cannot re-point a translation at another job.
+#
+# Job titles, company names, technologies and certifications stay in English
+# on purpose: that is what a Dutch technical CV looks like.
+ui:
+  nav.primary: Hoofdnavigatie
+  nav.brand_aria: '{name}, homepage'
+  nav.language: Taal
+  nav.download_cv: CV downloaden
+  common.skip_to_content: Naar de inhoud
+  common.to: tot
+  common.verify: Verifiëren
+  common.current: Huidig
+  common.currently_studying: Momenteel in studie
+  common.everything_else: Al het overige ({count})
+  common.years_short: '{n} jr'
+  theme.switch_to: Schakel over naar het {mode} thema
+  theme.light: lichte
+  theme.dark: donkere
+  footer.site: Site
+  footer.downloads: Downloads
+  footer.elsewhere: Elders
+  footer.documentation: Documentatie
+  footer.generated_note: Het CV, het JDs & Duties-overzicht en de motivatiebrief komen alle drie uit dezelfde
+    data als deze pagina. {link}.
+  footer.source_link: Broncode op GitHub
+  cmdk.open: Open het commandopalet
+  cmdk.title: Commandopalet
+  cmdk.search_label: Zoek in het commandopalet
+  cmdk.placeholder: Spring naar een pagina, pak een PDF, kopieer een adres
+  cmdk.list_label: Commando's
+  cmdk.download_cover: Download de motivatiebrief
+  cmdk.copy_email: Kopieer mijn e-mailadres
+  cmdk.toggle_theme: Wissel van thema
+  cmdk.toggle_theme_hint: licht / donker
+  cmdk.print: Print deze pagina
+  cmdk.empty: Daar past niets bij.
+  cmdk.hint.move: navigeren
+  cmdk.hint.open: openen
+  cmdk.hint.close: sluiten
+  download.cv_pdf: CV (PDF)
+  download.jds_pdf: JDs & Duties (PDF)
+  download.cover_pdf: Motivatiebrief (PDF)
+  download.cv_link: CV PDF
+  download.jds_link: JDs & Duties PDF
+  cta.view_cv: Bekijk het CV
+  cta.download_pdf: Download de PDF
+  cta.download_cv: Download het CV
+  cta.download_jds: Download JDs & Duties
+  cta.download_cover: Download de motivatiebrief
+  cta.book_call: Plan een gesprek
+  cta.kicker: Volgende
+  cta.title: Een gesprek waard?
+  cta.lead: Kies een tijdslot, of stuur een mail en ik kom bij je terug.
+  focus.platform: Platform
+  focus.cloud: Cloud
+  focus.network: Netwerk
+  focus.security: Security
+  filter.all: Alles
+  hero.title_before: Netwerken, platforms en de
+  hero.title_accent: lijm ertussen.
+  hero.term.years: '{years} jaar in IT, sinds {start}'
+  now.kicker: Nu
+  now.title: Waar ik op dit moment mee bezig ben
+  now.lead: De rollen die ik nu heb, en wat ik daarnaast studeer.
+  now.range_present: '{start} tot heden'
+  whatdo.kicker: Wat ik doe
+  whatdo.title: Vier dingen, en de overlap ertussen
+  whatdo.lead: Het meeste van mijn werk zit waar twee hiervan elkaar raken, en dat is meestal waar het
+    stukgaat.
+  whatdo.platform.title: Platform engineering
+  whatdo.platform.body: Kubernetes, Terraform en GitOps, en het interne platform daarbovenop, zodat een
+    productteam zijn eigen omgevingen en repositories kan opzetten zonder te wachten tot ik het met de
+    hand doe.
+  whatdo.cloud.title: Cloud-infrastructuur
+  whatdo.cloud.body: 'Azure en AWS opgebouwd als code in plaats van bij elkaar geklikt: AKS en EKS, netwerken,
+    identity, en het ondankbare werk aan lifecycle-regels en juist bemeten instances waarmee de maandrekening
+    te verdedigen blijft.'
+  whatdo.network.title: Netwerken
+  whatdo.network.body: Routing, switching, firewalls en VPN's op Cisco, MikroTik en FortiGate, van een
+    wereldwijd netwerk over meerdere datacenters op BGP en HSRP tot één camera op afstand die na een reboot
+    vanzelf terug moet komen.
+  whatdo.security.title: Security
+  whatdo.security.body: 'Hardening, identity en de toolchain voor applicatiebeveiliging: SSO, MFA en PKI
+    aan de ene kant, Dependency-Track, SonarQube, Trivy en ZAP in de CI aan de andere, met bevindingen
+    die gevolgd worden tot ze echt dicht zijn.'
+  skills.kicker: Vaardigheden
+  skills.title: Beoordeeld zoals ik een collega zou beoordelen
+  skills.lead: Vijf is dagelijks en diep. Drie betekent dat het in productie draait en dat ik de documentatie
+    erbij open zou houden. De jaren zijn hoe lang ik het in handen heb.
+  skills.filter_aria: Filter vaardigheden op gebied
+  skills.level_aria: Niveau {level} van 5
+  skills.soft_kicker: Ook het vermelden waard
+  career.kicker: Loopbaan
+  career.title: De laatste vier rollen
+  career.lead: '{roles} rollen sinds {year}, van een MSP-helpdesk tot platform engineering. De volledige
+    tijdlijn, met elke taak, staat op de ervaringspagina.'
+  career.all_roles: Alle {roles} rollen
+  career.certs_link: Certificeringen en cursussen
+  experience.kicker: Werkverleden
+  experience.title: Ervaring
+  experience.ld_name: '{name}, engineeringrollen'
+  experience.lead: '{years} jaar in IT, verdeeld over {roles} engineeringrollen, van een MSP-helpdesk
+    in Kaapstad tot platform engineering in Nederland.'
+  experience.duties_note: Open een rol voor de volledige takenlijst. Uit die lijsten wordt de {link} gegenereerd,
+    dus het document en deze pagina kunnen niet uit elkaar lopen.
+  experience.filter_aria: Filter rollen op aandachtsgebied
+  experience.roles_heading: Rollen, nieuwste eerst
+  experience.full_duties: Volledige taken ({count})
+  experience.same_duties: Dezelfde taken als bij de andere vermelding van {company}.
+  education.kicker: Opleiding
+  education.title: Opleiding & cursussen
+  education.lead: '{credentials} certificeringen en diploma''s, en {courses} cursussen en vendortrainingen.
+    Nieuwste eerst, met wat elk ervan behandelde.'
+  education.verify_note: De badges zijn te verifiëren op {link}, en bij de oudere Cisco- en Microsoft-trajecten
+    staan de vakken die ze behandelden.
+  education.verify_cta: Verifieer op Credly
+  education.in_progress: Loopt nog
+  education.studying_note: '{count} trajecten lopen op dit moment, naast een fulltimebaan.'
+  education.credentials_kicker: Kwalificaties
+  education.credentials_title: Certificeringen & diploma's
+  education.credentials_note: De instelling is waar het werk gedaan is, of dat nu in een klaslokaal was
+    of in zelfstudie.
+  education.national_qualification: 'Nationale kwalificatie: {value}'
+  education.subjects: Vakken ({count})
+  education.training_kicker: Training
+  education.training_title: Cursussen & training
+  education.training_note: Klassikale cursussen en vendortrainingen, plus de langere online cursussen.
+    Het meeste recente materiaal staat op {link}.
+  cv.pdf_alt_title: '{name} CV (PDF)'
+  cv.tailor: Op maat
+  cv.print_view: Printweergave
+  cv.generated_on: Gegenereerd uit data/ op {date}
+  cv.filter_note: Filter de rollen op aandachtsgebied. De PDF bevat altijd alles.
+  cv.section.profile: Profiel
+  cv.section.skills: Kernvaardigheden
+  cv.section.education: Opleiding & certificeringen
+  cv.section.interests: Interesses
+  cv.also: Ook
+  cv.experience_note: '{roles} rollen sinds {year}. Hier de hoofdpunten, de volledige takenlijst per rol
+    staat op de {page_link} en in de {pdf_link}.'
+  cv.experience_page_link: ervaringspagina
+  cv.jds_pdf_link: PDF met functiebeschrijvingen
+  cv.full_duties: Volledige taken
+  cv.full_duties_aria: Volledige takenlijst voor {title} bij {company}
+  cv.colophon_kicker: Colofon
+  cv.colophon_body: Elke datum, rol en certificering op deze pagina komt uit een set YAML-bestanden in
+    {path}. Deze pagina is één weergave daarvan, de PDF is een andere, en ze komen uit dezelfde build,
+    dus ze kunnen niet uit elkaar lopen.
+  cv.colophon_built: Laatst gebouwd op {date}. De bron staat op {link}, samen met het buildscript dat
+    deze pagina gemaakt heeft.
+  contact.kicker: Contact
+  contact.title: Neem contact op
+  contact.lead: Mail is de snelste manier om me te bereiken. Is het makkelijker om het door te spreken,
+    plan dan een tijdslot dat jou uitkomt.
+  contact.state.open: Open voor werk
+  contact.state.selective: Selectief
+  contact.state.closed: Niet op zoek
+  contact.state.unknown: Beschikbaarheid
+  contact.direct: Direct
+  contact.email: E-mail
+  contact.phone: Telefoon
+  contact.location: Locatie
+  contact.copy: Kopiëren
+  contact.copy_aria: Kopieer mijn e-mailadres naar het klembord
+  contact.book_slot: Plan een tijdslot
+  contact.elsewhere_note: De plekken waar het werk te zien is.
+  contact.link.github: '{link} voor infrastructuurcode, het homelab en de bron van deze site.'
+  contact.link.linkedin: '{link} voor dezelfde geschiedenis in de vorm die recruiters verwachten.'
+  contact.link.credly: '{link} voor verifieerbare certificeringsbadges.'
+  contact.link.udemy: '{link} voor de cursusgeschiedenis achter de trainingslijst.'
+  contact.link.docs: '{link} voor aantekeningen en runbooks, geschreven terwijl ik ze uitzoek.'
+  contact.documents: Documenten
+  contact.documents_note: Alle drie worden bij elke deploy uit dezelfde data als deze site gerenderd,
+    dus ze kunnen niet afwijken van wat je hier leest.
+  contact.doc.cv: CV
+  contact.doc.cv_note: Twee pagina's. Rollen, hoofdpunten, vaardigheden en opleiding, opgemaakt om in
+    één keer door te lezen.
+  contact.doc.jds: JDs & Duties
+  contact.doc.jds_note: De volledige takenlijsten, gegroepeerd per gebied, voor wie het detail nodig heeft.
+  contact.doc.cover: Motivatiebrief
+  contact.doc.cover_note: Eén pagina, algemeen. Vraag om een versie die op jouw rol geschreven is en die
+    krijg je.
+  notfound.kicker: HTTP 404
+  notfound.lead: Op dat adres staat niets. Het is verplaatst, of de link die je hierheen stuurde klopte
+    niet. Alles op de site is één stap verderop.
+  print.courses: Cursussen
+  print.page_x_of_y: Pagina {n} van {total}
+  print.selected_highlights: Een greep uit het werk
+  print.curriculum_vitae: Curriculum vitae
+  print.long_version_label: De lange versie.
+  print.long_version: De volledige takenlijsten staan in het document Job Descriptions & Duties, en dezelfde
+    data voedt {site}. Referenties op aanvraag.
+  print.jds_kicker: Functiebeschrijvingen & taken
+  print.jds_intro: Het volledige overzicht van wat elke rol echt inhield, gegroepeerd per werkgebied.
+    Het CV is de samenvatting van dit document in twee pagina's. Beide komen uit dezelfde bron, dus niets
+    hier spreekt iets daar tegen.
+  print.contents: Inhoud
+  print.jds_same_position: Dezelfde functie als bij de andere vermelding van {company}, uitgevoerd vanaf
+    een andere locatie. De takenlijst is identiek en staat hier volledig herhaald, zodat dit hoofdstuk
+    op zichzelf staat.
+  print.jds_end: Einde van het overzicht · {count} rollen vastgelegd
+  print.label.web: Web
+  print.label.docs: Docs
+  print.label.duties: Taken
+  og.lead: '{headline} in {location}. {years} jaar in IT, {roles} engineeringrollen.'
+  date.months:
+  - januari
+  - februari
+  - maart
+  - april
+  - mei
+  - juni
+  - juli
+  - augustus
+  - september
+  - oktober
+  - november
+  - december
+  date.months_short:
+  - jan
+  - feb
+  - mrt
+  - apr
+  - mei
+  - jun
+  - jul
+  - aug
+  - sep
+  - okt
+  - nov
+  - dec
+  date.present: Heden
+  date.year_unit: jr
+  date.month_unit: mnd
+pages:
+  home:
+    title: Caleb Sargeant · Network, Security & DevOps Engineer
+    description: Platform-, cloud-, netwerk- en security-engineer in Eindhoven. Kubernetes, Terraform,
+      Azure en AWS, en de netwerken eronder. CV uit dezelfde data.
+    nav: Home
+  experience:
+    title: Ervaring · Caleb Sargeant
+    description: Twaalf engineeringrollen sinds 2012, van MSP-helpdesk tot platform engineering, met per
+      rol de volledige takenlijst.
+    nav: Ervaring
+  education:
+    title: Opleiding & cursussen · Caleb Sargeant
+    description: 'Certificeringen, diploma''s en trainingen: CCNP Security, CCNP Routing & Switching,
+      MCSE, ITIL en AWS.'
+    nav: Opleiding
+  cv:
+    title: CV · Caleb Sargeant
+    description: Het CV, op het scherm en als PDF. Allebei komen ze uit dezelfde data als de rest van
+      deze site.
+    nav: CV
+  contact:
+    title: Contact · Caleb Sargeant
+    description: Mail, telefoon, LinkedIn, GitHub, en een link om een tijdslot te plannen.
+    nav: Contact
+  notfound:
+    title: Niet gevonden · Caleb Sargeant
+    description: Die pagina bestaat niet.
+  print-cv:
+    title: Caleb Sargeant CV
+    description: ''
+  print-jds:
+    title: Caleb Sargeant, Functieomschrijvingen & taken
+    description: ''
+  print-cover:
+    title: Caleb Sargeant, Motivatiebrief
+    description: ''
+profile:
+  location: Eindhoven, Nederland
+  headline: Network, Security & DevOps Engineer
+  tagline: Platform, cloud, netwerk en security engineering sinds 2012.
+  summary: Ik werk sinds 2012 in de IT, gespecialiseerd in platform engineering, automatisering, infrastructure
+    as code, netwerken en security. Ik heb van alles beheerd, van bare-metal serverruimtes tot gevirtualiseerde
+    platformen en cloud-native architecturen, en ik geef om systemen die betrouwbaar en onderhoudbaar
+    zijn en saai blijven in productie. Ik neem verantwoordelijkheid voor complexe technische vraagstukken,
+    of het nu gaat om het verbeteren van CI/CD, het ontwerpen van infrastructure as code of het beveiligen
+    van netwerken en workloads, en ik hecht aan heldere, pragmatische communicatie.
+  nationality_note: Gerechtigd om in de EU te werken (woon en werk in Nederland)
+  availability:
+    text: Open voor gesprekken over platform-, cloud- en netwerk/security-engineering.
+  cover_letter:
+    salutation: Geachte heer, mevrouw,
+    paragraphs:
+    - Sinds 2012 werk ik in uiteenlopende hoeken van de IT, met een sterke nadruk op platform engineering,
+      automatisering, infrastructure as code, netwerken en security. Ik wil systemen bouwen die betrouwbaar
+      en onderhoudbaar zijn, en ik pak elke uitdaging aan met oog voor helderheid, consistentie en verbetering.
+    - Mijn ervaring beslaat DevOps, netwerksecurity, cloud- en hybride infrastructuur, en daarnaast systeemautomatisering,
+      scripting en open-source tooling. Ik heb in heel verschillende omgevingen gewerkt, van bare-metal
+      servers tot gevirtualiseerde platformen en cloud-native architecturen, en daar oplossingen neergezet
+      die veilig, schaalbaar en onderhoudbaar zijn. Ik neem graag verantwoordelijkheid voor complexe technische
+      vraagstukken, of het nu gaat om het verbeteren van CI/CD-pipelines, het ontwerpen van infrastructure
+      as code of het beveiligen van netwerken en workloads. Ik hecht aan heldere, pragmatische communicatie
+      en werk graag samen met collega's aan systemen die in de praktijk doen wat nodig is.
+    - U bent van harte welkom om mijn website, documentatie en GitHub te bekijken. Daar vindt u praktische
+      voorbeelden van hoe ik als engineer werk en problemen oplos.
+    - Heeft u vragen of wilt u de functie verder bespreken, dan ga ik daar graag over in gesprek. Dank
+      voor uw tijd en aandacht.
+    sign_off: Met vriendelijke groet,
+  stats:
+  - label: Jaar in de IT
+    since: 2012
+    suffix: +
+  - label: Engineering-rollen
+    value: 12
+  - label: Landen waar ik werkte
+    value: 2
+  - label: Certificeringen
+    value: 8
+  interests:
+  - Powerlifting
+  - Buitenactiviteiten
+  - Tijd met het gezin
+  - Home lab en self-hosting
+roles:
+  pinkroccade-cloud-engineer:
+    type: Vast
+    location: Nederland
+    summary: 'Cloud- en platform engineering voor software voor de lokale overheid: Kubernetes-platformen,
+      infrastructure as code en het migratiepad weg van legacy applicatiestacks.'
+    highlights:
+    - Cloud- en Kubernetes platform engineering voor workloads in de overheidssector.
+    - Infrastructure as code en CI/CD voor applicatieteams.
+    - Migratie en modernisering van legacy applicatieplatformen.
+  tengen-devops-engineer:
+    type: Contract
+    location: Op afstand · Zuid-Afrika
+    summary: 'Enige DevOps Engineer voor een multi-cloud omgeving: Kubernetes via GitOps, Terraform-modules,
+      netwerken met WireGuard en MikroTik, en de monitoring die een camerapark in productie in de gaten
+      houdt.'
+    highlights:
+    - Volledig declaratieve Kubernetes-clusters beheerd met FluxCD, met Kustomize- en Helm-templates per
+      omgeving.
+    - Terraform-modules geschreven en onderhouden voor EKS, VPC's, subnets, IAM, databases en VPN's in
+      AWS, Azure en GCP.
+    - Infrastructuur-secrets beveiligd met SOPS (GPG/AGE), opgeslagen in Git en ontsleuteld in CI.
+    - MongoDB in productie geüpgraded van 4.4 naar 7, met replica sets, scheiding tussen staging en productie
+      en offsite backups.
+    - Opslagkosten op lange termijn verlaagd door schijfopruiming te automatiseren en backups met lifecycle
+      rules naar S3 Glacier te verplaatsen.
+    - Het cameraplatform voor live kentekenherkenning gebouwd en beheerd, met HTTPS op afstand, NTP/DNS-synchronisatie
+      en reverse proxies.
+    duties:
+    - group: Infrastructuurautomatisering & cloudplatformen
+      items:
+      - Applicaties en services uitgerold en geconfigureerd met Ansible, Docker en Kubernetes.
+      - Infrastructuur beheerd in AWS, Azure en GCP, inclusief provisioning, backupstrategie en kostenoptimalisatie.
+      - Terraform-modules geschreven en onderhouden om EKS-clusters, VPC's, subnets, IAM, databases en
+        VPN's uit te rollen.
+      - Complexe workflows geautomatiseerd met GitHub Actions, Terraform en Ansible, voor betrouwbaardere
+        deployments en consistentere infrastructuur.
+    - group: Kubernetes, GitOps & secrets management
+      items:
+      - Kubernetes-clusters beheerd via GitOps-workflows met FluxCD, waarmee de clusterstatus volledig
+        declaratief werd en deployments automatisch liepen.
+      - Kustomize- en Helm-templates gemaakt en beheerd voor herbruikbare, omgevingsspecifieke Kubernetes-configuratie.
+      - Infrastructuur-secrets beveiligd met SOPS, met GPG- en AGE-versleutelde secrets in Git, geïntegreerd
+        in de CI/CD-pipelines.
+      - Een veilige multi-omgevingsarchitectuur ontworpen met RBAC, service accounts en scheiding van
+        namespaces.
+      - Rancher en Atlantis tegen elkaar afgewogen voor Terraform-automatisering en het beheer van GitOps-workflows.
+      - Terraform-repositories herstructureerd op modulariteit, security en schaalbaarheid.
+    - group: Netwerken, VPN's & security
+      items:
+      - WireGuard- en L2TP-VPN's uitgerold en onderhouden, met veilige tunnels tussen MikroTik-routers,
+        firewalls en cloudomgevingen.
+      - VPN-connectiviteitsproblemen opgelost, toegang geregeld voor het interne team en externe partners,
+        en VPN- en firewall-logs gecontroleerd.
+      - Firewalls (SonicWall, MikroTik, FortiGate) geconfigureerd en onderhouden, met correcte routering
+        en veilige netwerksegmentatie.
+      - Infrastructuur gehard op basis van pentestresultaten, waaronder het sluiten van ongebruikte poorten,
+        het harden van routers en het controleren van SSH-toegang.
+    - group: Monitoring, logging & observability
+      items:
+      - Zabbix-monitoring opgezet en onderhouden voor camera's, routers, VPN's en VM-infrastructuur.
+      - Alerting afgestemd om ruis in Slack te beperken en bruikbaarder inzicht te geven, waaronder het
+        oplossen van dubbele alerts en alerting op S3-lifecycle.
+      - Monitoring geautomatiseerd voor schijfgebruik, Mongo- en MySQL-performance en drempelwaarden voor
+        systeemresources, met scripting en GitHub Actions.
+    - group: CI/CD & deployment engineering
+      items:
+      - CI/CD-pipelines gebouwd en onderhouden met GitHub Actions, voor PR-workflows, geautomatiseerd
+        testen, het vullen van databases en uitrol naar productie.
+      - Meerdere backend- en frontendservices gedockeriseerd, uitgerold met PM2, en alerting ingericht
+        op procesfouten en API-throttling.
+      - Rollbackstrategieën, de scheiding tussen staging en productie en release-playbooks gedocumenteerd,
+        zodat developers met meer vertrouwen en veiliger konden werken.
+    - group: Infrastructuurbeheer
+      items:
+      - VM's beheerd in AWS, Azure en on-prem, waaronder schijfuitbreiding, imageproblemen, hoog CPU-
+        en schijfgebruik en netwerkbeschikbaarheid.
+      - Schijfopruiming geautomatiseerd, S3-lifecycle rules ingericht en backups naar S3 Glacier verplaatst
+        om de opslagkosten op lange termijn te drukken.
+      - Disaster-recovery plannen en procedures ontwikkeld en gedocumenteerd om legacy omgevingen opnieuw
+        op te bouwen.
+    - group: Databasebeheer
+      items:
+      - MongoDB-clusters geüpgraded van 4.4 naar 7, inclusief migratie, replica sets, scheiding tussen
+        staging en productie en offsite backups.
+      - MySQL onderhouden en getuned voor staging en productie, met het oplossen van connectiviteitsproblemen,
+        verkeerde tijdzones en het beheer van gebruikerstoegang.
+      - Backup- en monitoringscripts gebouwd voor de Zabbix-database, MongoDB en SonicWall-configuraties,
+        zodat alles herstelbaar en controleerbaar bleef.
+    - group: Camera- & IoT-infrastructuur
+      items:
+      - Camera's in productie uitgerold en onderhouden voor live kentekenherkenning, inclusief HTTPS op
+        afstand, NTP/DNS-synchronisatie en reverse proxies.
+      - Cameraspecifieke problemen opgelost, zoals wisselende leesresultaten, hoog dataverbruik, tijdzonefouten
+        en dagelijkse reboots.
+      - Tools gebouwd om beelden op te halen, haperende camera's te herstarten en te bevestigen dat het
+        netwerkverkeer correct door de firewall liep.
+      - Samengewerkt met derden en partners aan camera-uitrol, VPN-routering, IP-whitelisting en het oplossen
+        van problemen op locatie.
+    - group: Documentatie & support
+      items:
+      - Interne documentatie geschreven over de opzet van VPN en WireGuard, camera-installatie en HTTPS-integraties,
+        backupstrategie en DR-procedures, en infrastructuurdiagrammen en uitrolplannen.
+      - Onboarding-gidsen gemaakt voor engineers, gaten in legacy systemen gedicht en herbouwstrategieën
+        voor legacy omgevingen vastgelegd voor rampscenario's.
+      - Collega's en klanten consequent geholpen met database- en VPN-toegang, SSH-problemen en mislukte
+        deployments.
+    - group: Interne tooling & developer experience
+      items:
+      - Git-workflows verbeterd, met protected branches en een branchingstrategie voor zowel de IaC- als
+        de applicatiecodebases.
+      - Scripts ontwikkeld voor terugkerend werk, zoals VPN-statuscontroles, backups van Docker-containers,
+        MongoDB-opschoning en het verlengen van certificaten.
+      - Meegedaan aan toolevaluaties (DefectDojo, SonarQube, Infracost) en gezorgd dat de integraties
+        in CI/CD werkten.
+      - De developer experience verbeterd door ontwikkelomgevingen te dockeriseren, PM2-processen aan
+        GitHub-repos te koppelen en snelle lokale onboarding mogelijk te maken.
+    - group: Samenwerking & communicatie
+      items:
+      - Cross-functioneel samengewerkt met developers, systeembeheerders en infrastructure engineers.
+      - Onboarding-sessies, planningsessies voor de camera-POC en ontwerpworkshops voor infrastructuur
+        gehouden.
+      - Rechtstreeks met stakeholders gecommuniceerd om kritieke problemen op te lossen, netwerkconfiguratie
+        te ondersteunen en infrastructuuruitrol te plannen.
+  budget-thuis-platform-engineer:
+    type: Vast
+    location: Amsterdam, Nederland
+    location_note: Op afstand vanuit Kaapstad tot mei 2024
+    summary: 'Azure platform engineering voor een Nederlandse energie- en telecomaanbieder: AKS, Terraform,
+      het interne developerplatform en de CI/CD waar honderden .NET-services doorheen gaan.'
+    highlights:
+    - 'Azure-infrastructuur ontworpen, gebouwd en beheerd met Terraform: AKS-clusters, ACR, VNets, NSG''s
+      en identity-integraties.'
+    - De migratie van legacy Linux-VM's naar microservices op AKS geleid.
+    - 'Het interne developerplatform gebouwd: herbruikbare, DRY infrastructuurmodules die de omgevingen
+      en repositories van een nieuw team opzetten.'
+    - Observability (Prometheus, Grafana, Blackbox Exporter) uitgerold over dev, test, acceptatie en productie.
+    - Microsoft Entra ID gekoppeld aan Kubernetes RBAC, en IP-whitelisting, SSO en certificaatbeheer gecontroleerd.
+    - 'Ingevallen als Scrum Master voor het platformteam: retrospectives begeleid en actiepunten omgezet
+      in geprioriteerd engineeringwerk.'
+    - Begonnen op afstand vanuit Kaapstad en na vijf maanden verhuisd naar Amsterdam.
+    duties:
+    - group: Infrastructure engineering
+      items:
+      - Azure-cloudinfrastructuur ontwerpen, implementeren en beheren met Terraform (AKS-clusters, ACR,
+        VNets, NSG's, identity-integraties).
+      - De migratie van legacy Linux-VM's naar moderne microservices op AKS leiden.
+      - RabbitMQ-clusters op AKS beheren en onderhouden met FluxCD en Helm, inclusief vhost-configuratie,
+        authenticatie, het inrichten van resources, ingress en het verzamelen van metrics.
+      - Observability-stacks implementeren, waaronder Prometheus, Grafana en Blackbox Exporter, in alle
+        omgevingen (dev, test, acc, prod).
+      - Connectiviteits- en performanceproblemen onderzoeken en oplossen (Redis-timeouts, stabiliteit
+        van RabbitMQ, fouten door volle schijven).
+    - group: CI/CD en developer tooling
+      items:
+      - GitHub Actions-workflows en TeamCity-pipelines bouwen, verbeteren en debuggen voor .NET- en containerapplicaties.
+      - 'GitHub-configuratie standaardiseren en documenteren: org secrets, repobeheer, forks en het onboarden
+        van nieuwe developers.'
+      - Kostenefficiënt gebruik van GitHub Actions en opslag onderzoeken en mogelijk maken (logs, caching,
+        schijfruimte van runners).
+      - Self-hosted GitHub runners opzetten en beheren, waaronder Windows-runners waarop Bash-scripts
+        kunnen draaien.
+      - Azure-authenticatie mogelijk maken in testworkflows en .NET restore-problemen in pipelines oplossen.
+    - group: Intern developerplatform
+      items:
+      - Herbruikbare infrastructuurmodules ontwikkelen en onderhouden volgens het DRY-principe.
+      - Omgevingen en repositories opzetten voor interne teams (Mobile Backend, Web API).
+      - Gezamenlijke afspraken over omgevingen, naamgevingsconventies en toegangsbeheer vastleggen (GitHub,
+        Azure, APIM).
+      - Onboarding-gidsen, aanvraagformulieren en documentatie maken zodat interne teams het platform
+        efficiënt kunnen gebruiken.
+      - Interne API-managementflows ontwerpen en de APIM-configuratie ondersteunen voor publieke API's
+        en interne services.
+    - group: Security & identity
+      items:
+      - Microsoft Entra ID (Azure AD) koppelen aan Kubernetes RBAC voor rolgebaseerde toegang.
+      - IP-whitelisting, SSO voor interne services en certificaatbeheer implementeren en controleren.
+      - Zorgen dat het beheer van secrets en variabelen in GitHub en Azure voldoet aan least privilege
+        en aan de best practices voor automatisering.
+    - group: Platformbeheer & support
+      items:
+      - Support en runbooks leveren aan andere teams voor dagelijkse developerproblemen (GitHub, Redis,
+        TeamCity, het inrichten van omgevingen).
+      - Meedraaien in het supportrooster en de supportplanning en -processen documenteren.
+      - Een servicedesk opzetten voor het platformteam, met intakeformulieren en triage van tickets voor
+        interne aanvragen.
+      - Problemen in productie en test oplossen, waaronder deployments van .NET-applicaties, AKS-problemen
+        en uitdagingen met on-prem systemen.
+    - group: Documentatie & procesondersteuning
+      items:
+      - Uitgebreide documentatie schrijven en onderhouden in Confluence over platformprocedures, onboarding,
+        observability, CI/CD en infrastructuurstandaarden.
+      - Wijzigingen aan monitoringstacks en deploymentpipelines bijwerken en documenteren.
+      - Actiepunten uit retrospectives vastleggen en helpen om best practices door de sprints heen vast
+        te houden.
+    - group: Scrum Master-taken
+      items:
+      - 'Tijdelijk optreden als Scrum Master voor het platformteam: retrospectives begeleiden, sprints
+        beheren en ceremonies organiseren.'
+      - Zorgen dat actiepunten uit retrospectives worden omgezet in concrete engineeringtaken en geprioriteerd
+        worden.
+  byte-orbit-devsecops-engineer:
+    type: Vast
+    location: Kaapstad, Zuid-Afrika
+    summary: 'De securitykant van een product engineering-organisatie: AWS WAF en Cisco FTD in Terraform,
+      de application-security toolchain (Dependency-Track, DefectDojo, SonarQube) en ZTNA-evaluaties.'
+    highlights:
+    - De Terraform geschreven voor AWS WAF, een Cisco FTD-transit gateway met Geneve en GWLB, Dependency-Track,
+      DefectDojo en SonarQube, over alle omgevingen heen.
+    - De application-security toolchain van begin tot eind opgezet en aangesloten op GitLab CI, met Sonar,
+      dependency checks, Trivy en ZAP.
+    - 'Het proces rond vulnerability response gedraaid: alerts bewaken, nieuwe bevindingen op risico beoordelen
+      en ze als ticket tot afronding brengen.'
+    - ZTNA-proof-of-concepts opgeleverd (Duo Network Gateway, ZScaler, Cisco Umbrella SIG) en de SSO-
+      en SAML-integraties die daarbij hoorden.
+    - Bijgedragen aan de ISO 27001-documentatie en wekelijks gerapporteerd over trends in de securitybranche
+      aan de Information Security Council.
+    duties:
+    - group: Infrastructure as code
+      items:
+      - 'Terraform-code schrijven voor verschillende omgevingen: AWS WAF, Cisco FTD met GWLB en transit
+        gateway, OWASP Dependency-Track, DefectDojo, SonarQube.'
+      - Cisco FTD NGFW installeren en configureren als POC in AWS met een GWLB via een Geneve-tunnel,
+        met Terraform.
+      - S3-accesskeys roteren in AWS.
+    - group: Application-security toolchain
+      items:
+      - OWASP Dependency-Track installeren en configureren, alerts naar OpsGenie laten sturen en koppelen
+        aan DefectDojo.
+      - SonarQube installeren en configureren.
+      - DefectDojo installeren en configureren.
+      - GitLab CI/CD-pipelines aanpassen en beveiligen met Sonar, dependency check, Trivy, ZAP en vergelijkbare
+        tools.
+      - Branch-permissies, securityaudit en configuratie van GitLab CI/CD.
+    - group: Vulnerability & incident response
+      items:
+      - OpsGenie-alerts over security-incidenten aannemen, onderzoeken en afsluiten.
+      - Alle security-alerts van de organisatie bewaken, afstemmen met teams en nieuwe kwetsbaarheden
+        op risico beoordelen, en ze als ticket vastleggen zodat ze opgelost worden.
+      - Met teams samenwerken aan bevindingen uit pentestrapporten en ze laten oplossen.
+      - Documentatie schrijven over securityrisico's en hoe je ze beperkt.
+      - Wekelijks trends in de securitybranche onderzoeken en rapporteren voor de vergaderingen van de
+        Information Security Council.
+    - group: Identity, access & zero trust
+      items:
+      - 'POC met Duo Network Gateway als ZTNA-oplossing: installeren en configureren, HTTPS-verbindingen
+        werkend krijgen, DNG met SSO inrichten en applicaties erachter beschermen.'
+      - POC met ZScaler als ZTNA-oplossing.
+      - Trial en POC met Cisco Umbrella SIG.
+      - SAML-configuraties voor diverse applicaties via JumpCloud.
+      - Duo koppelen aan Datadog.
+      - '1Password: toegang en policies beheren.'
+      - Het gebruik van Apple Developer Consoles controleren.
+    - group: Governance
+      items:
+      - ISO 27001-documentatie en samenwerking met teams.
+      - Een fingerprinting-oplossing onderzoeken voor een klant.
+  mindspring-devops-engineer:
+    type: Vast
+    location: Kaapstad, Zuid-Afrika
+    summary: 'De brede DevOps-rol bij een MSP: beheer van GCP, Azure en AWS, Jenkins en Bamboo, infrastructuur
+      beheerd met Ansible, en de monitoring en backups voor een klantenportefeuille.'
+    highlights:
+    - De organisatie gemigreerd van Bitbucket naar GitHub, en applicaties uitgerold naar GCP App Engine.
+    - Prometheus, Alertmanager en Grafana geïnstalleerd en beheerd via Docker en Ansible, met fijnmazige
+      alerting naar Slack.
+    - De automatisering geschreven die cloudinstances 's nachts start en stopt om kosten te besparen.
+    - MikroTik-routefailover ingericht voor storingen op de glasvezel, inclusief melding, en een zero-trust
+      IPTables-policy beheerd via Ansible.
+    - 'De backupomgeving gebouwd: Veeam op Hyper-V, gescripte FTP- en cloudbackups, en Hyper-V-replicatie.'
+    duties:
+    - group: Deployments & Git
+      items:
+      - Pull requests mergen in Git en uitrollen naar de applicatieserver.
+      - Branches rebasen met Git en merge conflicts oplossen.
+      - Applicaties uitrollen naar GCP App Engine.
+      - Migreren van Bitbucket naar GitHub.
+    - group: CI/CD
+      items:
+      - Atlassian Bamboo installeren, configureren en onderhouden.
+      - Jenkins installeren, configureren en onderhouden.
+      - Bitbucket-pipelines schrijven.
+    - group: Cloudbeheer
+      items:
+      - Instances in GCP herschalen en werken met GCP-billingaccounts.
+      - Beheer van Office 365 en Google Admin.
+      - Een script maken dat instances 's nachts automatisch start en stopt om kosten te besparen.
+      - Beheer van cloudinfrastructuur in GCP, Azure en AWS.
+      - Onderzoek naar cloudmigratie van on-premise servers.
+    - group: Infrastructuurconfiguratie & beheer
+      items:
+      - De UniFi-controller in Docker configureren via Ansible.
+      - IPTables configureren via Ansible.
+      - Rootpartities op servers vergroten en schijfruimte vrijmaken op servers met kleine schijven.
+      - FTP-backups, backups naar Bitbucket en backups naar een cloudserver scripten voor de hele omgeving.
+      - Veeam-backups configureren op Hyper-V-servers en Hyper-V-replicatie inrichten.
+      - Backups van Windows-servers configureren.
+      - Connectiviteit van SFTP-servers testen; SFTP- en OpenVPN-servers opzetten.
+      - Crontabs inrichten op servers.
+      - Certificaatproblemen op Ubuntu en CentOS onderzoeken bij het verlopen van het Let's Encrypt-rootcertificaat.
+      - Nginx-configuratie.
+    - group: Monitoring & logging
+      items:
+      - Configuratie en onderhoud van Nagios XI en Core.
+      - Prometheus, Alertmanager en Grafana installeren en configureren via Docker en Ansible.
+      - Fijnmazige alerting inrichten in Prometheus en Prometheus-alerts naar Slack configureren.
+      - Werken met Datadog-monitoring.
+      - Een ELK-stackserver installeren en configureren.
+    - group: Databasebeheer
+      items:
+      - Backups, replicatieconfiguratie en onderhoud van MySQL- en Postgres-databases.
+      - Gebruikers aanmaken en rechten toekennen in MySQL en Postgres; velden bijwerken na select-queries.
+      - MongoDB-alerts onderzoeken en het MongoDB-cloudcluster upgraden.
+    - group: Netwerken & security
+      items:
+      - Een FortiGate 30e installeren en configureren.
+      - MikroTik RouterOS installeren en configureren.
+      - MikroTik-routefailover bij uitval van de glasvezel, inclusief melding.
+      - IP-adressen blokkeren en toestaan, en NAT met IPTables.
+      - IPTables volgens zero trust configureren; IPTables-regels controleren.
+      - Beheer van SSH-sleutels.
+    - group: Documentatie & overig
+      items:
+      - Documentatie schrijven over RAID-schijfuitval in het datacenter om downtime te beperken.
+      - Documentatie maken over CI/CD, incidentrapporten vastleggen en de migratie van fysieke machines
+        naar GCP, AWS en Azure documenteren.
+      - API-calls via Postman.
+      - Penetratietesten.
+      - Werken met MailScanner.
+      - Agile methodieken.
+  thinkst-senior-security-engineer:
+    type: Vast
+    location: Kaapstad, Zuid-Afrika
+    summary: 'Diepgaande technische support en onderzoek voor Canary, het deception-platform: uitrol op
+      elke grote cloud en hypervisor, troubleshooting op protocolniveau en gepubliceerde security write-ups.'
+    highlights:
+    - Canary- en Canarytoken-implementaties ondersteund in AWS, GCP, Azure, on-prem en VMware, inclusief
+      DNS-tunneling en de configuratie van HTTP-kanalen.
+    - Een manier gevonden om Canary op OpenStack te laten draaien.
+    - Canarytoken-implementaties en consoleconfiguratie geschreven in Python, PowerShell en Bash, en klanten
+      geholpen met implementaties via de API.
+    - Onderzoek gedaan naar kwetsbaarheden en exploits en daar write-ups over gepubliceerd (onder andere
+      pass-the-hash) op de securityblog.
+    - SAML- en SSO-configuratie, webhooks en syslog-integraties verzorgd voor enterprise klanten.
+    duties:
+    - group: Support engineering
+      items:
+      - SAML en SSO configureren en bijwerken.
+      - Canary inschakelen en uitrollen in AWS, GCP, Azure, on-prem en VMware.
+      - Canary-implementaties en bijbehorende vragen (DNS-tunneling, hoe het geconfigureerd wordt).
+      - Canarytoken-implementaties en bijbehorende vragen (DNS- en HTTP-kanalen, hoe ze geconfigureerd
+        worden).
+      - Offline Canaries en Canaries met vastgelopen instellingen onderzoeken en herstellen.
+      - Functies van de Canary Console configureren en inschakelen.
+      - Problemen met API-toegang en -gebruik oplossen; webhooks configureren; syslog inschakelen en configureren.
+      - Canary opzetten en problemen oplossen via videoverbinding.
+      - Algemene securityvragen beantwoorden, met diepgaande kennis van de TCP/IP-protocollen (DNS, DHCP,
+        SSH, SFTP, HTTP/S, LDAP) en van cloudtechnologie.
+    - group: Scripting
+      items:
+      - Canarytoken-implementaties via Python, PowerShell en Bash.
+      - Deploymentconfiguratie voor Canary genereren, plus consoleconfiguratie en Linux-commando's in
+        Bash.
+      - Klanten helpen met implementaties via de API.
+    - group: Onderzoek & projecten
+      items:
+      - Een manier gevonden om Canary op OpenStack te laten draaien.
+      - Write-ups publiceren over onderzoek en leerwerk rond securityonderwerpen (onder andere pass-the-hash).
+      - Kwetsbaarheden en exploits onderzoeken en er blogposts over schrijven.
+  kurtosys-senior-network-security-engineer:
+    type: Vast
+    location: Kaapstad, Zuid-Afrika
+    summary: Doorgegroeid naar de senior rol op hetzelfde wereldwijde netwerk, met inbreng in ontwerp
+      en architectuur, de migratie naar Azure en de uitrol van PKI en MFA.
+    highlights:
+    - MFA ingevoerd voor remote-access VPN en voor beheertoegang tot netwerkapparatuur (Duo, Google Authenticator).
+    - 'Microsoft PKI geïmplementeerd: een standalone root-CA met een enterprise subordinate CA.'
+    - Gevirtualiseerde en fysieke servers gemigreerd naar Azure, en Windows NPS gemigreerd naar FreeRADIUS
+      in de cloud.
+    - VPN-tunnels gebouwd tussen ASA, Azure en AWS, en de DR-procedure met Azure gescript.
+    - Redundantie en failover op laag 2 en laag 3 ingericht, en Syslog doorgezet naar Azure Sentinel.
+    duties:
+    - group: Projecten
+      items:
+      - MFA invoeren voor remote-access VPN en beheertoegang tot netwerkapparatuur (Duo, Google Authenticator).
+      - Zabbix-monitoring bouwen binnen en tussen het datacenter en de kantooromgevingen.
+      - Syslog implementeren met Azure Sentinel.
+      - Redundantie en failover op laag 2 en laag 3 in het netwerk implementeren.
+      - 'Het virtuele kantoor migreren: gevirtualiseerde en fysieke servers naar clouddiensten en gevirtualiseerde
+        instances in Azure.'
+      - Windows NPS migreren naar FreeRADIUS-instances in de cloud.
+      - Microsoft PKI implementeren (een standalone root-CA met een enterprise subordinate CA).
+      - VPN-tunnels bouwen vanaf en tussen ASA, Azure en AWS.
+      - De DR-procedure met Azure scripten.
+      - FirePOWER, NGFWv en ASAv implementeren.
+      - De hele serverruimte opnieuw bekabelen.
+    - group: Taken & verantwoordelijkheden
+      items:
+      - Netwerkapparatuur uitrollen en configureren, handmatig (waarbij automatiseringskansen in kaart
+        worden gebracht) of geautomatiseerd.
+      - Netwerkapparatuur en gevirtualiseerde functies ontwikkelen en verbeteren.
+      - Rapportage opzetten over de effectiviteit van de processen.
+      - Bijdragen aan het ontwerp en de architectuur van het netwerk.
+      - De wereldwijde netwerkinfrastructuur en -diensten bewaken.
+      - Netwerksupport leveren aan grote infrastructuurprojecten.
+      - Change control en deploymentprocessen coördineren.
+      - Netwerkapparatuur en -diensten harden.
+      - Tweede- en derdelijns netwerksupport leveren aan de infrastructuur- en engineeringteams.
+      - Meehelpen om de netwerkinfrastructuur betrouwbaar te laten draaien.
+  kurtosys-network-security-engineer:
+    type: Vast
+    location: Kaapstad, Zuid-Afrika
+    summary: 'Tweeënhalf jaar op een wereldwijd netwerk met meerdere datacenters voor de financiële sector:
+      Cisco ASA en FirePOWER, high availability over meerdere lagen, en diagnose op pakketniveau.'
+    highlights:
+    - Netwerksecurity beheerd op Cisco ASA (ACL's, stateful inspection en threat detection) over een wereldwijde
+      omgeving.
+    - High availability ingericht over meerdere lagen (onder andere HSRP) en dynamische routering met
+      BGP, OSPF en EIGRP.
+    - Diagnose gesteld op pakketniveau op Linux en Cisco, inclusief het ontsleutelen van TLS 1.2 in Wireshark
+      met ephemeral keys.
+    - Netwerkconfiguratie geautomatiseerd met Ansible en RANCID, met configuratiebeheer in Git.
+    - 802.1x en RADIUS beheerd in een gemengde omgeving met FreeRADIUS en Windows NPS, plus Cisco ISE
+      BYOD.
+    duties:
+    - group: Network engineering
+      items:
+      - Beheer van de fysieke laag en de datalinklaag, vooral alle soorten Ethernet tot 10G over glasvezel
+        of UTP.
+      - Diepgaande kennis van de TCP/IP-protocollen (DNS, DHCP, SSH, SFTP, HTTP/S, LDAP, RDP).
+      - Diagnose en troubleshooting, waaronder het opvangen en analyseren van pakketten op Linux- of Cisco-apparatuur
+        (TLS 1.2 ontsleutelen in Wireshark met ephemeral keys).
+      - Netwerksecurity, ACL's, stateful inspection en threat detection, hoofdzakelijk op de Cisco ASA-firewall.
+      - Klassieke datacenter- en kantoornetwerken.
+      - High availability implementeren over meerdere lagen (onder andere HSRP).
+      - Dynamische en statische routering (BGP, OSPF, EIGRP).
+      - Kennis van load balancing-technologie (L4-L7, SSH/HTTPS).
+      - Connectiviteit via Ethernet, glasvezel en wireless, inclusief 10GE en 802.11ac.
+      - Intrusion prevention- en detectiesystemen.
+      - Licentiebeheer van netwerkapparatuur.
+    - group: Cloud & virtualisatie
+      items:
+      - OpenStack-netwerken (Nova, OpenStack CLI, GUI).
+      - AWS-netwerken (VPC, VPN, EIP).
+      - AnyConnect remote-access VPN; IPsec- en SSL-VPN-technologie.
+      - Microsoft Hyper-V (2012, 2012 R2, 2016) en Microsoft Failover Clustering.
+    - group: Platformen & identity
+      items:
+      - Beheer van Linux (Ubuntu) en Windows (7 tot 10, Server 2012 tot 2016) voor netwerkdiensten.
+      - Kennis van domeindiensten op Windows Server en alle bijbehorende protocollen.
+      - Active Directory (Windows 2012 R2 en 2016, forests met meerdere childdomeinen); hiërarchisch AD-ontwerp
+        en de implementatie ervan.
+      - 802.1x, RADIUS in een gemengde omgeving, FreeRADIUS, Windows NPS.
+      - Cisco ISE BYOD.
+      - DNS (Microsoft, BIND); SSH en (S)FTP met AD-authenticatie vanaf Linux.
+    - group: Automatisering & monitoring
+      items:
+      - Bash-scripting.
+      - Netwerkautomatisering (RANCID, Ansible) en configuratiebeheer in Git.
+      - Centrale logaggregatie met Logstash, Graylog en ElasticSearch.
+      - SNMP-monitoring met dataverzameling (Cacti, Zabbix); infrastructuurmonitoring (Nagios, Zabbix).
+      - Configuratiebackups van netwerkapparatuur (RANCID).
+      - Bandbreedte testen, bewaken en erover rapporteren (NetFlow, AWS cost analyser).
+      - Acceptatietesten van compute nodes met performancetesttools.
+      - Ubiquiti UniFi wireless systemen.
+    - group: Manier van werken
+      items:
+      - Aan meerdere projecten tegelijk werken, beheerst en georganiseerd.
+      - Zelfstandig werken aan projecten of aan BAU-taken.
+      - Werken in een team dat over meerdere locaties verspreid is.
+  dimension-data-security-engineer:
+    type: Vast
+    location: Kaapstad, Zuid-Afrika
+    summary: 'Managed security engineering voor een portefeuille enterprise klanten: firewalls van Cisco
+      ASA, FortiGate en Juniper, site-to-site VPN''s en ACL-reviews.'
+    highlights:
+    - Site-to-site VPN's, ACL's en firewalls (Cisco ASA, FortiGate, Juniper) geconfigureerd en storingen
+      daarin verholpen voor enterprise klanten.
+    - Zero-hit ACL-reviews uitgevoerd bij alle klanten, en firewall-upgrades op ASA en FortiGate.
+    - Incidenten van begin tot eind opgepakt, van de eerstelijnsmelding tot de afsluiting en de terugkoppeling
+      aan de klant.
+    duties:
+    - group: Engineering
+      items:
+      - 'Eerstelijns supportmeldingen: site-to-site VPN''s configureren en storingen verhelpen, ACL''s
+        configureren en onderhouden, firewalls configureren en onderhouden (Cisco ASA, FortiGate, Juniper).'
+      - Routes aanmaken en wijzigen; interfaces onderhouden en aanpassen; NAT.
+      - Connectiviteitsproblemen onderzoeken met captures, packet-tracer en Wireshark.
+      - Cisco ASA's en FortiGates installeren en configureren; firewall-upgrades.
+      - Backups van configuraties en logs.
+      - Onderhoud en rapportage in McAfee ePO; rapportage via Bluecoat Reporter.
+      - Zero-hit ACL-review bij alle klanten.
+    - group: Servicemanagement
+      items:
+      - Problemen signaleren voordat of zodra ze optreden, en incidenten op tijd vastleggen.
+      - Afstemmen met alle betrokkenen om de oplossing te versnellen; escaleren waar nodig.
+      - Volledige verantwoordelijkheid voor de afhandeling van meldingen, met doorlopende terugkoppeling
+        aan klanten.
+      - Incidenten bijwerken met voortgang en de details van de oplossing.
+      - Ontwerp- en configuratiedocumentatie; netwerkdiagrammen maken en onderhouden.
+      - Dagelijkse health checks; dagelijkse, wekelijkse en maandelijkse rapportages; SOP's en reserveonderdelenlijsten
+        die twee keer per jaar worden gecontroleerd.
+  dimension-data-customer-support-engineer:
+    type: Vast
+    location: Kaapstad, Zuid-Afrika
+    summary: Klantsupport van begin tot eind voor een enterprise klantenbestand, inclusief een VIP-gebruikersgroep,
+      plus het beheer van AD, Exchange en de infrastructuur daarachter.
+    highlights:
+    - Eerste-, tweede- en derdelijns support geleverd (telefonisch, op afstand en op locatie) aan het
+      hele klantenbestand, met specifieke aandacht voor VIP-support.
+    - Active Directory, Group Policy en de print-, DNS- en DHCP-servers beheerd.
+    - Externe leveranciers aangestuurd voor bekabeling, vergaderzalen, printers en het melden van hardwarestoringen.
+    duties:
+    - group: Support
+      items:
+      - Incidenten en aanvragen van gebruikers vastleggen, toewijzen, bewaken en erover rapporteren, en
+        onopgeloste problemen doorzetten naar de juiste afdeling.
+      - Het vaste aanspreekpunt zijn voor de klant en aanvragen van begin tot eind tot een oplossing brengen.
+      - Eerste-, tweede- en derdelijns klantsupport leveren (telefonisch, op afstand en op locatie) voor
+        alle klanten.
+      - 'Extra aandacht voor VIP-support: veel contact, opvolging, proactieve controles en korte doorlooptijden.'
+      - Verantwoordelijk voor complexe foutopsporing, reparatie en configuratie op alle werkstations,
+        laptops, desktops en mobiele apparaten.
+      - Hardwareproblemen oplossen in de IT-infrastructuur, zoals servers, switches, bureautelefoons (Cisco),
+        beamers en videoconferencing-apparatuur.
+      - Support leveren op mobiele apparaten (BlackBerry, Apple, Android, Nokia).
+    - group: Beheer
+      items:
+      - AD-accounts aanmaken en onderhouden; accounts op MS Exchange Server inrichten en beheren.
+      - Group Policy Objects maken en onderhouden.
+      - Active Directory, Group Policy, de printserver, de DNS-server en de DHCP-server beheren en onderhouden.
+      - Het IT-assetregister bijhouden en meehelpen bij IT-inkoop.
+      - Administratieve ondersteuning aan IT Operations, zoals het beheer van backupschijven naar de uitwijklocatie.
+      - 'Afstemmen met externe leveranciers zodat het werk op locatie wordt uitgevoerd: bekabeling in
+        het gebouw, vergader- en bestuurskamers, en het melden van printer- en hardwarestoringen.'
+      - Zorgen dat aan de ISO-eisen wordt voldaan en dat beleid en procedures worden nageleefd.
+  mmi-desktop-support-engineer:
+    type: Vast
+    location: Kaapstad, Zuid-Afrika
+    summary: 'De hele IT-afdeling van een zorgbedrijf: desktops, servers, het switched netwerk, toegangscontrole
+      en alles daartussenin.'
+    highlights:
+    - Service en IT-support verzorgd voor de hele IT-afdeling, van het opbouwen van werkstations tot Terminal
+      Servers.
+    - Het switched netwerk van HP bewaakt, geïnstalleerd en onderhouden, en de netwerkbekabeling aangelegd
+      en opgeruimd.
+    - Het ImproNet-toegangscontrolesysteem beheerd.
+    duties:
+    - group: Support & beheer
+      items:
+      - Service en IT-support voor de hele IT-afdeling.
+      - Incidenten en aanvragen van gebruikers vastleggen, toewijzen, bewaken en erover rapporteren; alle
+        gemelde calls afsluiten.
+      - Administratieve ondersteuning aan IT Operations, zoals het beheer van backupschijven naar de uitwijklocatie.
+      - Het IT-assetregister bijhouden en meehelpen bij IT-inkoop.
+      - AD-accounts aanmaken en onderhouden; accounts op MS Exchange Server inrichten en beheren.
+      - Group Policy Objects maken en onderhouden.
+      - Beheer van Windows DNS, DHCP en FSRM; Windows Server onderhouden en problemen erin oplossen.
+      - Beheer van het toegangscontrolesysteem (ImproNet).
+      - Terminal Servers installeren, bewaken en onderhouden.
+    - group: Infrastructuur
+      items:
+      - Het switched netwerk van HP bewaken, installeren en onderhouden.
+      - Netwerkbekabeling aanleggen en opruimen.
+      - Nieuwe werkstations, thin clients en laptops installeren.
+      - Nieuwe BlackBerry-, iPhone- en Android-toestellen inrichten; fax instellen en problemen ermee
+        oplossen.
+      - Beheer van Ubiquiti wireless.
+      - Scripts maken in batch.
+      - Printerproblemen en software- en hardwareproblemen oplossen.
+      - 3G-gebruikers op afstand helpen; elk computerprobleem in het gebouw onderzoeken en oplossen.
+  mindspring-it-support-engineer:
+    type: Vast
+    location: Kaapstad, Zuid-Afrika
+    summary: Waar het begon. Helpdesk bij een MSP, aan de kant van de gebruiker en aan de kant van de
+      server, werk op locatie, en het zelf leren programmeren waar al het latere uit voortkwam.
+    highlights:
+    - Helpdesk gedraaid aan gebruikerskant (Windows, Mac, Office, ADSL) en serverkant (CentOS/RHEL 5 en
+      later, Windows Server 2003 en later).
+    - Linux-mail beheerd (domeinen, forwards, relays, queues en DNS-records) en de monitoring van ADSL
+      en servers met Nagios XI.
+    - Een Git-server en een ThinStation-server getest en opgezet voor het bedrijf.
+    - Mezelf PHP, HTML, CSS, VBS, batch en Bash geleerd in rustige uren, en een applicatie gebouwd die
+      automatisch inlogt op servers met KeePass en PHP.
+    - Twee klantwebsites gebouwd en opgeleverd (kaytrad.co.za, saasie.co.za).
+    duties:
+    - group: Helpdesk, gebruikerskant
+      items:
+      - Werkstations vanaf Windows 98, en macOS.
+      - Problemen oplossen met elke versie van Outlook op Windows en Mac, en met Office-producten.
+      - ADSL-problemen oplossen; bandbreedte bijkopen voor klanten.
+      - Netwerkproblemen oplossen; printers installeren; benodigde software installeren.
+      - Computers vrijmaken van virussen, malware en adware; Java-problemen met internetbankieren verhelpen.
+      - Elk browserprobleem oplossen (Chrome, Firefox, IE); vTiger CRM gebruikt voor helpdesktickets.
+    - group: Helpdesk, serverkant
+      items:
+      - CentOS Linux-servers (RHEL 5 en later), grotendeels via de command line; Windows Server 2003 en
+        later, en SBS 2003 en later.
+      - Onderhoud van Linux- en Windows-servers; monitoring van ADSL en servers met Nagios XI.
+      - Nieuwe domeinen, afwezigheidsberichten, mailforwards en e-mailgebruikers aanmaken, en gebruikers
+        toevoegen aan de relayserver (Linux).
+      - DNS-records aanmaken en aanpassen; mail terughalen; mailqueues controleren en legen; de connectiviteit
+        van mailservers testen met telnet.
+      - VPN-verbindingen opzetten; DNS- en DynDNS-problemen oplossen.
+    - group: Technisch werk op kantoor
+      items:
+      - Ethernetkabels maken; Windows-, Mac- en Linux-machines opnieuw installeren; nieuwe Windows- en
+        Linux-servers en werkstations installeren.
+      - De integriteit van harde schijven testen en klantdata terughalen; hardwareproblemen onderzoeken
+        en offertes laten opstellen via de financiële afdeling.
+      - Nieuwe technologie onderzoeken en testen; een Git-server en een ThinStation-server testen en opzetten.
+      - Bekabeling opruimen; voorstellen uitwerken; nieuwe routers opzetten en configureren; problemen
+        met UPS'en oplossen.
+      - Wachtwoordherstel op Windows-, Linux- en Mac-machines.
+    - group: Support op locatie
+      items:
+      - Geplande bezoeken en spoedbezoeken wanneer de helpdesk het probleem niet kon oplossen.
+      - Onderhoud aan werkstations en servers; nieuwe computers inrichten; printers installeren; fax instellen.
+      - Netwerkproblemen oplossen; switches, routers en bekabeling opzetten; invallen voor vaste technici.
+      - 'Drie maanden als vaste technicus bij een klant van Mindspring: serverinstallaties, evaluatie
+        van Kaseya en ManageEngine, audit van SQL Server, Hyper-V-installaties en -replicatie, en Windows
+        Deployment Services.'
+    - group: Ontwikkelervaring
+      items:
+      - Leren programmeren in PHP, HTML, CSS, VBS, batch en Bash tijdens rustige kantooruren, en in die
+        talen testprogramma's ontwikkeld.
+      - Een applicatie ontwikkeld die automatisch inlogt op servers en diensten met KeePass en PHP.
+      - Gemaakte websites uploaden via FTP en cPanel; websites aanpassen in Joomla en WordPress.
+      - Scripts gemaakt om mijn eigen werk makkelijker te maken.
+      - 'Gemaakte websites: kaytrad.co.za en saasie.co.za.'
+skills:
+  Platform & orchestration: Platform & orkestratie
+  Cloud: Cloud
+  Networking: Netwerken
+  Security: Security
+  Observability & data: Observability & data
+  Systems & scripting: Systemen & scripting
+soft_skills:
+- Agile-methodieken
+- Documentatie als gewoonte
+- Probleemoplossend
+- Teamspeler
+- Timemanagement
+- Heldere communicatie
+- Klantgerichtheid

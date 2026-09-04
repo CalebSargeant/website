@@ -9,7 +9,7 @@
   letter stamped with a month that has already passed reads worse than one with
   no date at all.
 #}
-<html lang="en-GB">
+<html lang="{{ locale.html_lang }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,18 +28,18 @@
     <p class="cover-role">{{ profile.headline }}</p>
 
     <p class="cover-contact">
-      <span><b>Web</b><span>{{ profile.links.website | replace('https://', '') }}</span></span>
-      <span><b>Docs</b><span>{{ profile.links.docs | replace('https://', '') }}</span></span>
+      <span><b>{{ t('print.label.web') }}</b><span>{{ profile.links.website | replace('https://', '') }}</span></span>
+      <span><b>{{ t('print.label.docs') }}</b><span>{{ profile.links.docs | replace('https://', '') }}</span></span>
       <span><b>GitHub</b><span>{{ profile.links.github | replace('https://', '') }}</span></span>
-      <span><b>Email</b><span>{{ profile.contact.email }}</span></span>
-      <span><b>Phone</b><span>{{ profile.contact.phone }}</span></span>
+      <span><b>{{ t('contact.email') }}</b><span>{{ profile.contact.email }}</span></span>
+      <span><b>{{ t('contact.phone') }}</b><span>{{ profile.contact.phone }}</span></span>
     </p>
 
     {# Absolute URLs, not the site-relative paths in `pdfs`: these have to
        resolve when the letter is read as a PDF on someone else's machine. #}
     <p class="cover-docs">
-      <span><b>CV</b><a href="{{ site.base_url }}{{ pdfs.cv }}">{{ site.base_url | replace('https://', '') }}{{ pdfs.cv }}</a></span>
-      <span><b>Duties</b><a href="{{ site.base_url }}{{ pdfs.jds }}">{{ site.base_url | replace('https://', '') }}{{ pdfs.jds }}</a></span>
+      <span><b>{{ t('contact.doc.cv') }}</b><a href="{{ site.base_url }}{{ pdfs.cv }}">{{ site.base_url | replace('https://', '') }}{{ pdfs.cv }}</a></span>
+      <span><b>{{ t('print.label.duties') }}</b><a href="{{ site.base_url }}{{ pdfs.jds }}">{{ site.base_url | replace('https://', '') }}{{ pdfs.jds }}</a></span>
     </p>
   </header>
 

@@ -1,0 +1,291 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# English interface strings. This is the SOURCE locale.
+#
+# Two maps, both read by scripts/build.py:
+#
+#   ui:     flat dotted keys, the only thing t('key') can resolve. Every other
+#           locale's file is an overlay on this one, so a key missing there
+#           falls back to the English written here rather than rendering blank.
+#           A key missing HERE is a hard failure: make_translator raises.
+#   pages:  per page id, the <title>, the meta description and the nav label.
+#           These duplicate the PAGES table in build.py on purpose. English
+#           stays readable in context there; this file is what a translator
+#           actually edits, and localise_page prefers it when it has a value.
+#
+# Rules for anything added here:
+#   * Facts do not belong in this file. Names, employers, job titles, tech and
+#     certification names come from data/*.yml and are translated (or not) by
+#     the content overlay, never by t().
+#   * Placeholders are Python str.format: "{years} years". A literal brace in a
+#     string that also takes arguments will break the format call.
+#   * One key per string. If the same sentence appears on two pages it gets one
+#     key used twice, so a translator never has to notice the repetition.
+# ═══════════════════════════════════════════════════════════════════════════
+# ── page metadata ─────────────────────────────────────────────────────────
+# The English half of the PAGES table. A locale overlay overrides any of these
+# per page id; anything it leaves out falls back to what is written here.
+ui:
+  nav.primary: Primary
+  nav.brand_aria: '{name}, home page'
+  nav.language: Language
+  nav.download_cv: Download CV
+  common.skip_to_content: Skip to content
+  common.to: to
+  common.verify: Verify
+  common.current: Current
+  common.currently_studying: Currently studying
+  common.everything_else: Everything else ({count})
+  common.years_short: '{n} yr'
+  theme.switch_to: Switch to the {mode} theme
+  theme.light: light
+  theme.dark: dark
+  footer.site: Site
+  footer.downloads: Downloads
+  footer.elsewhere: Elsewhere
+  footer.documentation: Documentation
+  footer.generated_note: The CV, the JDs & Duties sheet and the cover letter are all generated from the
+    same data as this page. {link}.
+  footer.source_link: Source on GitHub
+  cmdk.open: Open the command palette
+  cmdk.title: Command palette
+  cmdk.search_label: Search the command palette
+  cmdk.placeholder: Jump to a page, grab a PDF, copy an address
+  cmdk.list_label: Commands
+  cmdk.download_cover: Download the cover letter
+  cmdk.copy_email: Copy my email address
+  cmdk.toggle_theme: Toggle the theme
+  cmdk.toggle_theme_hint: light / dark
+  cmdk.print: Print this page
+  cmdk.empty: Nothing matches that.
+  cmdk.hint.move: move
+  cmdk.hint.open: open
+  cmdk.hint.close: close
+  download.cv_pdf: CV (PDF)
+  download.jds_pdf: JDs & Duties (PDF)
+  download.cover_pdf: Cover letter (PDF)
+  download.cv_link: CV PDF
+  download.jds_link: JDs & Duties PDF
+  cta.view_cv: View the CV
+  cta.download_pdf: Download PDF
+  cta.download_cv: Download the CV
+  cta.download_jds: Download JDs & Duties
+  cta.download_cover: Download cover letter
+  cta.book_call: Book a call
+  cta.kicker: Next
+  cta.title: Worth a conversation?
+  cta.lead: Pick a slot, or send an email and I will come back to you.
+  focus.platform: Platform
+  focus.cloud: Cloud
+  focus.network: Network
+  focus.security: Security
+  filter.all: All
+  hero.title_before: Networks, platforms and the
+  hero.title_accent: glue between them.
+  hero.term.years: '{years} years in IT, since {start}'
+  now.kicker: Now
+  now.title: What I am on at the moment
+  now.lead: The seats I currently hold, and what I am studying around them.
+  now.range_present: '{start} to present'
+  whatdo.kicker: What I do
+  whatdo.title: Four things, and the overlap between them
+  whatdo.lead: Most of my work sits where two of these meet, which is usually where things break.
+  whatdo.platform.title: Platform engineering
+  whatdo.platform.body: Kubernetes, Terraform and GitOps, and the internal platform on top of them, so
+    a product team can bootstrap its own environments and repositories without waiting on me to do it
+    by hand.
+  whatdo.cloud.title: Cloud infrastructure
+  whatdo.cloud.body: 'Azure and AWS built as code rather than clicked together: AKS and EKS, networking,
+    identity, and the unglamorous work of lifecycle rules and right-sized instances that keeps the monthly
+    bill defensible.'
+  whatdo.network.title: Networks
+  whatdo.network.body: Routing, switching, firewalls and VPNs on Cisco, MikroTik and FortiGate, from a
+    global multi-datacentre network on BGP and HSRP down to a single remote camera that has to come back
+    on its own after a reboot.
+  whatdo.security.title: Security
+  whatdo.security.body: 'Hardening, identity and the application-security toolchain: SSO, MFA and PKI
+    on one side, Dependency-Track, SonarQube, Trivy and ZAP wired into CI on the other, with findings
+    tracked until they are actually closed.'
+  skills.kicker: Skills
+  skills.title: Rated the way I would rate a colleague
+  skills.lead: Five is daily and deep. Three means it is running in production and I would keep the documentation
+    open. The years are how long the thing has been in my hands.
+  skills.filter_aria: Filter skills by area
+  skills.level_aria: Level {level} of 5
+  skills.soft_kicker: Also worth saying
+  career.kicker: Career
+  career.title: The last four seats
+  career.lead: '{roles} roles since {year}, from an MSP helpdesk to platform engineering. The full timeline,
+    with every duty, is on the experience page.'
+  career.all_roles: All {roles} roles
+  career.certs_link: Certifications and courses
+  experience.kicker: Career history
+  experience.title: Experience
+  experience.ld_name: '{name}, engineering roles'
+  experience.lead: '{years} years in IT across {roles} engineering roles, from an MSP helpdesk in Cape
+    Town to platform engineering in the Netherlands.'
+  experience.duties_note: Open a role for its full duty list. Those lists are what the {link} is generated
+    from, so the document and this page cannot drift apart.
+  experience.filter_aria: Filter roles by focus area
+  experience.roles_heading: Roles, newest first
+  experience.full_duties: Full duties ({count})
+  experience.same_duties: Same duties as the other {company} entry.
+  education.kicker: Education
+  education.title: Education & courses
+  education.lead: '{credentials} certifications and qualifications, and {courses} courses and vendor training.
+    Newest first, with what each one covered.'
+  education.verify_note: The badges are verifiable on {link}, and the older Cisco and Microsoft tracks
+    are listed with the subjects they covered.
+  education.verify_cta: Verify on Credly
+  education.in_progress: In progress
+  education.studying_note: '{count} tracks on the go, studied around a full-time job.'
+  education.credentials_kicker: Credentials
+  education.credentials_title: Certifications & qualifications
+  education.credentials_note: The institution is where the work was done, whether that was a classroom
+    or self-study.
+  education.national_qualification: 'National qualification: {value}'
+  education.subjects: Subjects ({count})
+  education.training_kicker: Training
+  education.training_title: Courses & training
+  education.training_note: Classroom and vendor courses, plus the longer online ones. Most of the recent
+    material is on {link}.
+  cv.pdf_alt_title: '{name} CV (PDF)'
+  cv.tailor: Tailor
+  cv.print_view: Print view
+  cv.generated_on: Generated from data/ on {date}
+  cv.filter_note: Filter the roles to a focus area. The PDF always contains everything.
+  cv.section.profile: Profile
+  cv.section.skills: Core skills
+  cv.section.education: Education & certifications
+  cv.section.interests: Interests
+  cv.also: Also
+  cv.experience_note: '{roles} roles since {year}. Highlights here, the full duty list for every role
+    is on the {page_link} and in the {pdf_link}.'
+  cv.experience_page_link: experience page
+  cv.jds_pdf_link: job descriptions PDF
+  cv.full_duties: Full duties
+  cv.full_duties_aria: Full duty list for {title} at {company}
+  cv.colophon_kicker: Colophon
+  cv.colophon_body: Every date, role and certification on this page is read from a set of YAML files in
+    {path}. This page is one rendering of them, the PDF is another, and both come out of the same build,
+    so they cannot drift apart.
+  cv.colophon_built: Last built {date}. The source is on {link}, along with the build script that produced
+    this page.
+  contact.kicker: Contact
+  contact.title: Get in touch
+  contact.lead: Email is the quickest way to reach me. If it is easier to talk it through, book a slot
+    and pick a time that suits you.
+  contact.state.open: Open to work
+  contact.state.selective: Selective
+  contact.state.closed: Not looking
+  contact.state.unknown: Availability
+  contact.direct: Direct
+  contact.email: Email
+  contact.phone: Phone
+  contact.location: Location
+  contact.copy: Copy
+  contact.copy_aria: Copy my email address to the clipboard
+  contact.book_slot: Book a slot
+  contact.elsewhere_note: The places where the work is visible.
+  contact.link.github: '{link} for infrastructure code, the homelab, and the source of this site.'
+  contact.link.linkedin: '{link} for the same history in the shape recruiters expect.'
+  contact.link.credly: '{link} for verifiable certification badges.'
+  contact.link.udemy: '{link} for the course history behind the training list.'
+  contact.link.docs: '{link} for notes and runbooks, written as they are worked out.'
+  contact.documents: Documents
+  contact.documents_note: All three are rendered from the same data as this site on every deploy, so they
+    cannot disagree with what you read here.
+  contact.doc.cv: CV
+  contact.doc.cv_note: Two pages. Roles, highlights, skills and education, laid out for a first read.
+  contact.doc.jds: JDs & Duties
+  contact.doc.jds_note: The full duty lists, grouped by area, for anyone who needs the detail.
+  contact.doc.cover: Cover letter
+  contact.doc.cover_note: One page, general purpose. Ask for a version written for your role and you will
+    get one.
+  notfound.kicker: HTTP 404
+  notfound.lead: There is nothing at that address. It has either moved, or the link that sent you here
+    was wrong. Everything on the site is one hop away.
+  print.courses: Courses
+  print.page_x_of_y: Page {n} of {total}
+  print.selected_highlights: Selected highlights
+  print.curriculum_vitae: Curriculum vitae
+  print.long_version_label: The long version.
+  print.long_version: The full duty lists are in the Job Descriptions & Duties document, and the same
+    data drives {site}. References available on request.
+  print.jds_kicker: Job descriptions & duties
+  print.jds_intro: The full record of what each role actually involved, grouped by area of work. The CV
+    is the two-page summary of this document. Both are generated from the same source, so nothing here
+    contradicts anything there.
+  print.contents: Contents
+  print.jds_same_position: The same position as the other {company} entry, worked from a different location.
+    The duty list is identical and is repeated here in full so this section stands on its own.
+  print.jds_end: End of record · {count} roles documented
+  print.label.web: Web
+  print.label.docs: Docs
+  print.label.duties: Duties
+  og.lead: '{headline} in {location}. {years} years in IT, {roles} engineering roles.'
+  date.months:
+  - January
+  - February
+  - March
+  - April
+  - May
+  - June
+  - July
+  - August
+  - September
+  - October
+  - November
+  - December
+  date.months_short:
+  - Jan
+  - Feb
+  - Mar
+  - Apr
+  - May
+  - Jun
+  - Jul
+  - Aug
+  - Sep
+  - Oct
+  - Nov
+  - Dec
+  date.present: Present
+  date.year_unit: yr
+  date.month_unit: mo
+pages:
+  home:
+    title: Caleb Sargeant · Network, Security & DevOps Engineer
+    description: Platform, cloud, network and security engineer in Eindhoven, Netherlands. Kubernetes,
+      Terraform, Azure and AWS, and the networks underneath them. CV generated straight from this site.
+    nav: Home
+  experience:
+    title: Experience · Caleb Sargeant
+    description: Twelve engineering roles since 2012, from MSP helpdesk to platform engineering, with
+      the full duty list for each.
+    nav: Experience
+  education:
+    title: Education & courses · Caleb Sargeant
+    description: 'Certifications, qualifications and training: CCNP Security, CCNP Routing & Switching,
+      MCSE, ITIL and AWS.'
+    nav: Education
+  cv:
+    title: CV · Caleb Sargeant
+    description: The CV, on screen and as a PDF. Both are generated from the same data as the rest of
+      this site.
+    nav: CV
+  contact:
+    title: Contact · Caleb Sargeant
+    description: Email, phone, LinkedIn, GitHub, and a link to book a slot.
+    nav: Contact
+  notfound:
+    title: Not found · Caleb Sargeant
+    description: That page does not exist.
+  print-cv:
+    title: Caleb Sargeant CV
+    description: ''
+  print-jds:
+    title: Caleb Sargeant, Job Descriptions & Duties
+    description: ''
+  print-cover:
+    title: Caleb Sargeant, Cover Letter
+    description: ''
