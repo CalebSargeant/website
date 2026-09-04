@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{#
+  /education: certifications, qualifications and the training behind them.
+
+  build.py sorts both lists newest first, so nothing here reorders anything: add
+  an entry to data/education.yml or data/courses.yml and it lands in its place.
+
+  Card children are kept flat (no wrapper divs) because site.css spaces a card
+  with `.card > * + *`, which only reaches direct children.
+#}
+{% block body_class %}page-education{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <header class="section-head reveal" style="--d:0">
+      <p class="kicker">Education</p>
+      <h1>Education &amp; courses</h1>
+      {# Counted off `kind` rather than the list length: the list also carries the
+         school-leaving certificate, which is neither of those things. #}
+      {% set credentials = education | rejectattr('kind', 'equalto', 'schooling') | list %}
+      <p class="lead">
+        {{ credentials | length }} certifications and qualifications, and {{ courses | length }} courses
+        and vendor training. Newest first, with what each one covered.
+      </p>
+      <p>
+        The badges are verifiable on
+        <a href="{{ profile.links.credly }}" rel="me noopener" target="_blank">Credly</a>,
+        and the older Cisco and Microsoft tracks are listed with the subjects they covered.
+      </p>
+    </header>
+
+    <div class="cta-row reveal" style="--d:1">
+      <a class="btn btn-ghost" href="{{ profile.links.credly }}" rel="me noopener" target="_blank">Verify on Credly</a>
+      <a class="btn btn-quiet" href="{{ pdfs.cv }}" download>CV PDF</a>
+    </div>
+  </div>
+</section>
+
+{% if in_progress %}
+<section class="section" id="studying">
+  <div class="wrap">
+    <div class="section-head reveal" style="--d:0">
+      <p class="kicker"><span class="pill-live">In progress</span></p>
+      <h2>Currently studying</h2>
+      <p>{{ in_progress | length }} tracks on the go, studied around a full-time job.</p>
+    </div>
+    <div class="chip-row reveal" style="--d:1">
+      {% for topic in in_progress %}
+      <span class="chip">{{ topic }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section" id="certifications">
+  <div class="wrap">
+    <div class="section-head reveal" style="--d:0">
+      <p class="kicker">Credentials</p>
+      <h2>Certifications &amp; qualifications</h2>
+      <p>The institution is where the work was done, whether that was a classroom or self-study.</p>
+    </div>
+
+    <div class="grid-2">
+      {% for item in education %}
+      <article class="card reveal" style="--d:{{ loop.index0 % 2 }}">
+        <p class="kicker">{{ item.completed_label }}</p>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.institution }}</p>
+
+        {% if item.get('credential') or item.get('national_qualification') %}
+        <p class="mono">
+          {% if item.get('credential') %}{{ item.get('credential') }}{% endif %}
+          {% if item.get('credential') and item.get('national_qualification') %}<br>{% endif %}
+          {% if item.get('national_qualification') %}National qualification: {{ item.get('national_qualification') }}{% endif %}
+        </p>
+        {% endif %}
+
+        <div class="chip-row">
+          <span class="chip">{{ item.kind | capitalize }}</span>
+          {% if item.get('verify') %}
+          <a class="chip" href="{{ item.get('verify') }}" rel="noopener" target="_blank">Verify</a>
+          {% endif %}
+        </div>
+
+        {% if item.get('subjects') %}
+        {# .tl-duties is the stylesheet's disclosure treatment (mono summary,
+           chevron, hairline). Nothing in it is timeline-specific, so the
+           subject lists reuse it rather than growing a second one. #}
+        <details class="tl-duties">
+          <summary>Subjects ({{ item['subjects'] | length }})</summary>
+          <ul>
+            {% for subject in item['subjects'] %}
+            <li>{{ subject }}</li>
+            {% endfor %}
+          </ul>
+        </details>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section" id="courses">
+  <div class="wrap">
+    <div class="section-head reveal" style="--d:0">
+      <p class="kicker">Training</p>
+      <h2>Courses &amp; training</h2>
+      <p>
+        Classroom and vendor courses, plus the longer online ones. Most of the recent
+        material is on <a href="{{ profile.links.udemy }}" rel="me noopener" target="_blank">Udemy</a>.
+      </p>
+    </div>
+
+    <div class="grid-3">
+      {% for course in courses %}
+      <article class="card reveal" style="--d:{{ loop.index0 % 3 }}">
+        <p class="kicker">{{ course.date_label }}</p>
+        <h3>{{ course.title }}</h3>
+        <p>{{ course.institution }}{% if course.get('location') %}<br>{{ course.get('location') }}{% endif %}</p>
+        <div class="chip-row">
+          <span class="chip">{{ course.duration }}</span>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

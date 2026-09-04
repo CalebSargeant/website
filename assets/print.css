@@ -1,0 +1,824 @@
+/* ==========================================================================
+   print.css. The three printed documents: the CV, the JDs & Duties record,
+   and the cover letter. Loaded only by templates/print/*, never by the site.
+
+   Headless Chromium prints these with page.pdf(format='A4',
+   print_background=True) and zero margins, so every gutter you see on the
+   paper is declared here. There is no dark theme and no JavaScript: these are
+   white-paper documents, not the website in a light skin.
+   ========================================================================== */
+
+/* ── page geometry ───────────────────────────────────────────────────────── */
+
+@page { size: A4; margin: 0; }
+
+/* The JDs record is one container that fragments over a dozen or so
+   pages, so it cannot supply its own gutter the way a fixed .sheet does:
+   padding on a fragmented block paints at the top of the first fragment and
+   the bottom of the last one, never on the pages between. A named page is the
+   only mechanism that puts the same margin on every page. Chromium has
+   shipped named pages since 110; if that ever regresses the document loses
+   its gutter, which is ugly but not broken. */
+@page flow { size: A4; margin: 22mm 15mm 16mm; }
+
+/* Backgrounds carry meaning here (the accent bar, the note tint), so they
+   must survive the print pipeline. */
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+:root {
+  --paper:    #FFFFFF;
+  --ink:      #14202B;   /* body */
+  --ink-2:    #52697D;   /* secondary, 5.4:1 on white */
+  --rule:     #D8E1E9;
+  --rule-2:   #EAF0F5;
+  --accent:   #0E7490;   /* the site's light-theme --sig-ink; prints true */
+  --accent-2: #3B4FE0;
+  --tint:     #F2F8FA;
+
+  /* Fallbacks matter: if the Google Fonts request fails inside the print
+     container the sheet must still set solid, not fall back to Times. */
+  --sans: "Space Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --t-body:  9.2pt;
+  --t-small: 8.2pt;
+  --t-micro: 7.2pt;
+  --t-label: 6.8pt;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--t-body);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.42;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+p { margin: 0 0 2.4mm; orphans: 3; widows: 3; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+li { orphans: 2; widows: 2; }
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; }
+strong { font-weight: 600; }
+
+/* ── break discipline ────────────────────────────────────────────────────── */
+
+.cv-role,
+.duty-group,
+.edu-item,
+.toc-row,
+.jd-role-head { break-inside: avoid; }
+
+h1, h2, h3 { break-after: avoid; margin: 0; }
+
+/* A forced new sheet. Used for the first role section of the JDs record so
+   the contents page stands on its own. */
+.page { break-before: page; }
+
+/* ── the fixed sheet (CV, cover letter) ──────────────────────────────────── */
+
+.sheet {
+  position: relative;
+  width: 210mm;
+  /* Chromium's A4 page box rounds to 209.90 x 296.99mm, a whisker under the
+     nominal 210 x 297. Without the clamp the sheet overhangs by a fraction of
+     a millimetre and Chromium emits a blank page after every sheet. */
+  max-width: 100%;
+  height: 296.8mm;
+  padding: 14mm 14mm 17mm;
+  overflow: hidden;          /* a sheet clips rather than silently reflowing */
+  background: var(--paper);
+}
+
+.sheet + .sheet { break-before: page; }
+
+/* The one piece of brand on the paper: the site's light-theme accent gradient
+   as a bleed bar across the head of every sheet. */
+.sheet::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2.2mm;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+}
+
+.sheet-foot {
+  position: absolute;
+  left: 14mm; right: 14mm; bottom: 8mm;
+  display: flex;
+  justify-content: space-between;
+  gap: 6mm;
+  padding-top: 2mm;
+  border-top: 0.25mm solid var(--rule-2);
+  font-family: var(--mono);
+  font-size: 6.2pt;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+}
+
+/* ── the flowing document (JDs & Duties) ─────────────────────────────────── */
+
+/* The running header is a repeating <thead>, not a position: fixed box.
+   Chromium clamps fixed boxes inside the page area (a negative offset wraps
+   to the opposite edge instead of reaching the margin), so a fixed header
+   would print on top of the text. A table header row is the one construct
+   Chromium repeats on every page AND reserves layout space for. */
+/* separate, not collapse: in the collapsing border model CSS drops the
+   table element's own padding, which is what gives the screen preview its
+   page gutter. */
+.flow {
+  page: flow;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* The gradient rule that heads every CV sheet, repeated here by the same
+   <thead> so both documents read as one set. */
+.flow > thead td {
+  padding: 2.6mm 0 5mm;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%)
+              top left / 100% 0.9mm no-repeat;
+}
+
+.run-head {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 2mm;
+  border-bottom: 0.25mm solid var(--rule);
+  font-family: var(--mono);
+  font-size: 6.2pt;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* No page counter: Chromium does not implement counter(page) in @page margin
+   boxes, and Playwright prints these without displayHeaderFooter, so there is
+   no reliable way to number the pages from CSS. Better nothing than "Page 0". */
+
+/* ── shared type primitives ──────────────────────────────────────────────── */
+
+.kicker {
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Section rule: the label, then a hairline that eats the remaining width. */
+.sec-head {
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  margin: 0 0 2.1mm;
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.sec-head::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 0.25mm;
+  background: var(--rule);
+}
+
+/* ==========================================================================
+   CV
+   ========================================================================== */
+
+.cv-grid {
+  display: grid;
+  grid-template-columns: 60mm 1fr;
+  align-items: start;
+}
+
+/* The main column is first in the source so the document starts at its <h1>
+   rather than at the sidebar's <h2>s; these two put it back on the right. */
+.cv-grid > .cv-side { grid-column: 1; grid-row: 1; }
+.cv-grid > .cv-main { grid-column: 2; grid-row: 1; }
+
+.cv-side {
+  padding-right: 8mm;
+  border-right: 0.25mm solid var(--rule);
+}
+
+.cv-main { padding-left: 8mm; }
+
+/* ── masthead ── */
+
+.cv-name {
+  font-size: 23pt;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+.cv-headline {
+  margin: 1.2mm 0 0;
+  font-size: 10.4pt;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+}
+
+.cv-tagline {
+  margin: 1.9mm 0 0;
+  padding-top: 1.9mm;
+  border-top: 0.25mm solid var(--rule);
+  font-family: var(--mono);
+  font-size: var(--t-micro);
+  color: var(--ink-2);
+}
+
+.cv-block { margin-top: 4.2mm; }
+
+.cv-summary { font-size: 8.6pt; line-height: 1.38; }
+
+/* ── sidebar ── */
+
+.cv-portrait {
+  width: 38mm;
+  height: 38mm;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 22%;
+  /* A ring rather than a border so the crop stays a true circle. */
+  box-shadow: 0 0 0 0.5mm var(--paper), 0 0 0 0.9mm var(--accent);
+  margin: 1mm 0 5.5mm 1mm;
+}
+
+.side-block { margin-bottom: 5mm; }
+.side-block:last-child { margin-bottom: 0; }
+
+.side-list li { margin-bottom: 1.6mm; }
+.side-list li:last-child { margin-bottom: 0; }
+
+.side-line {
+  font-family: var(--mono);
+  font-size: 6.9pt;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.side-note {
+  margin-top: 2.4mm;
+  font-size: 6.9pt;
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+
+.edu-item { margin-bottom: 2.6mm; }
+.edu-item:last-child { margin-bottom: 0; }
+
+.edu-title {
+  display: block;
+  font-size: 7.9pt;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.edu-meta {
+  display: block;
+  margin-top: 0.5mm;
+  font-family: var(--mono);
+  font-size: 6.4pt;
+  color: var(--ink-2);
+}
+
+.side-tags {
+  font-size: 7.6pt;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* ── core skills ── */
+
+.cv-skills {
+  columns: 2;
+  column-gap: 7mm;
+  font-size: 7.5pt;
+  line-height: 1.24;
+}
+
+.cv-skills li {
+  break-inside: avoid;
+  margin-bottom: 1mm;
+  padding-left: 3mm;
+  position: relative;
+}
+
+/* A dash rather than a bullet: at 8pt a round bullet turns into a smudge. */
+.cv-skills li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 1.15mm;
+  width: 1.7mm; height: 0.4mm;
+  background: var(--accent);
+}
+
+.cv-soft {
+  margin-top: 2mm;
+  padding-top: 1.8mm;
+  border-top: 0.25mm solid var(--rule-2);
+  font-size: 7.2pt;
+  line-height: 1.36;
+  color: var(--ink-2);
+}
+
+/* ── experience table ── */
+
+.cv-jobs {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cv-jobs td {
+  padding: 1.05mm 0;
+  border-bottom: 0.25mm solid var(--rule-2);
+  vertical-align: top;
+}
+
+.cv-jobs tr:last-child td { border-bottom: 0; }
+
+.cv-when {
+  width: 27mm;
+  padding-right: 3mm !important;
+  font-family: var(--mono);
+  font-size: 6.4pt;
+  line-height: 1.26;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.cv-when b {
+  display: block;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.cv-what { font-size: 8.3pt; line-height: 1.18; }
+.cv-org { font-weight: 600; }
+.cv-title { color: var(--accent); }
+
+/* Separator in CSS, not in the markup, so the two halves stay independently
+   selectable and the wrap point is Chromium's choice rather than a stray "·"
+   stranded at the end of a line. */
+.cv-org::after {
+  content: "·";
+  margin: 0 1.1mm;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.cv-where {
+  display: block;
+  margin-top: 0.25mm;
+  font-size: 6.5pt;
+  line-height: 1.25;
+  color: var(--ink-2);
+}
+
+/* The current roles carry a filled marker so the eye finds "now" instantly. */
+.cv-jobs tr.is-current .cv-when b::after {
+  content: "";
+  display: inline-block;
+  width: 1.3mm; height: 1.3mm;
+  margin-left: 1.2mm;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: 0.2mm;
+}
+
+/* ── sheet two: highlights ── */
+
+.cv-cont {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6mm;
+  margin-bottom: 6mm;
+  padding-bottom: 2.4mm;
+  border-bottom: 0.25mm solid var(--rule);
+}
+
+.cv-cont h2 {
+  font-size: 13pt;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.cv-cont p {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--t-micro);
+  color: var(--ink-2);
+}
+
+.cv-highlights {
+  columns: 2;
+  column-gap: 9mm;
+  /* Holds the closing note down near the foot of the sheet without pinning
+     it there: extra highlights push the note further down instead of
+     printing underneath it. */
+  min-height: 210mm;
+}
+
+.cv-role {
+  margin-bottom: 6.4mm;
+  /* Multicol balances columns, and a role block split down the middle reads
+     as two different jobs. Keep each one whole. */
+  break-inside: avoid;
+}
+
+.cv-role-head { margin-bottom: 1.8mm; }
+
+.cv-role-org {
+  font-size: 10.2pt;
+  display: block;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.cv-role-sub {
+  display: block;
+  margin-top: 0.6mm;
+  font-family: var(--mono);
+  font-size: 6.9pt;
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+
+.cv-role li {
+  position: relative;
+  margin-bottom: 1.9mm;
+  padding-left: 3.4mm;
+  font-size: 8.7pt;
+  line-height: 1.42;
+}
+
+.cv-role li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 1.7mm;
+  width: 1.7mm; height: 0.4mm;
+  background: var(--accent);
+}
+
+.cv-close {
+  margin-top: 5mm;
+  padding-top: 3.4mm;
+  border-top: 0.25mm solid var(--rule);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 9mm;
+}
+
+.cv-close p {
+  font-size: 7.9pt;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.cv-close strong { color: var(--ink); }
+
+/* ==========================================================================
+   JDs & Duties
+   ========================================================================== */
+
+.jd-title { margin-bottom: 12mm; }
+
+.jd-title h1 {
+  margin: 3mm 0 0;
+  font-size: 30pt;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.jd-title .jd-sub {
+  margin: 1.6mm 0 0;
+  font-size: 11pt;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.jd-title .jd-meta {
+  margin: 3.4mm 0 0;
+  padding-top: 3mm;
+  border-top: 0.25mm solid var(--rule);
+  font-family: var(--mono);
+  font-size: var(--t-micro);
+  color: var(--ink-2);
+}
+
+.jd-intro {
+  margin-top: 4mm;
+  max-width: 145mm;
+  color: var(--ink-2);
+}
+
+/* Cover-page facts. Straight from profile.stats, so the numbers cannot drift
+   away from the ones on the site. */
+.jd-facts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 7mm;
+  padding: 4mm 0;
+  border-top: 0.25mm solid var(--rule);
+  border-bottom: 0.25mm solid var(--rule);
+}
+
+.jd-facts b {
+  display: block;
+  font-size: 19pt;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.jd-facts span {
+  display: block;
+  margin-top: 1.6mm;
+  font-family: var(--mono);
+  font-size: 6.2pt;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* ── contents ── */
+
+.jd-toc { margin-top: 2mm; }
+
+.toc-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  column-gap: 4mm;
+  padding: 2.4mm 0;
+  border-bottom: 0.25mm solid var(--rule-2);
+}
+
+.toc-org { font-weight: 600; }
+
+.toc-org::after {
+  content: "·";
+  margin: 0 1.2mm;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.toc-title {
+  color: var(--ink-2);
+  font-size: var(--t-small);
+}
+
+.toc-when {
+  font-family: var(--mono);
+  font-size: 6.9pt;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+/* ── role sections ── */
+
+.jd-role { margin-bottom: 8mm; }
+.jd-role:last-child { margin-bottom: 0; }
+
+.jd-role-head {
+  margin-bottom: 3.4mm;
+  padding-bottom: 2.4mm;
+  border-bottom: 0.5mm solid var(--accent);
+}
+
+.jd-role-head h2 {
+  font-size: 15pt;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.jd-role-title {
+  margin: 1mm 0 0;
+  font-size: 10.5pt;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.jd-role-meta {
+  margin: 1.6mm 0 0;
+  font-family: var(--mono);
+  font-size: 6.9pt;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+}
+
+.jd-role-summary {
+  margin-bottom: 3.4mm;
+  max-width: 150mm;
+  color: var(--ink-2);
+}
+
+.jd-note {
+  margin-bottom: 3.4mm;
+  padding: 2.2mm 3mm;
+  background: var(--tint);
+  border-left: 0.7mm solid var(--accent);
+  font-size: var(--t-small);
+  color: var(--ink-2);
+}
+
+/* Margins, not gap: a grid/flex gap either side of a page boundary is
+   rendered inconsistently by Chromium's paged layout. */
+.duty-group { margin-bottom: 4.2mm; }
+.duty-group:last-child { margin-bottom: 0; }
+
+.duty-group h3 {
+  margin-bottom: 1.8mm;
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.duty-list li {
+  position: relative;
+  margin-bottom: 1.5mm;
+  padding-left: 4.4mm;
+  line-height: 1.4;
+}
+
+.duty-list li:last-child { margin-bottom: 0; }
+
+.duty-list li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 1.7mm;
+  width: 2.2mm; height: 0.4mm;
+  background: var(--accent);
+}
+
+.jd-end {
+  margin-top: 8mm;
+  padding-top: 3mm;
+  border-top: 0.25mm solid var(--rule);
+  font-family: var(--mono);
+  font-size: 6.6pt;
+  color: var(--ink-2);
+}
+
+/* ==========================================================================
+   Cover letter
+   ========================================================================== */
+
+.cover-head {
+  text-align: center;
+  margin-bottom: 13mm;
+}
+
+.cover-head h1 {
+  font-size: 26pt;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.cover-role {
+  margin: 1.8mm 0 0;
+  font-size: 11.5pt;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.cover-contact {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.6mm 4mm;
+  margin-top: 5mm;
+  padding-top: 4mm;
+  border-top: 0.25mm solid var(--rule);
+  font-family: var(--mono);
+  font-size: 7.4pt;
+  color: var(--ink-2);
+}
+
+.cover-contact b {
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 6.4pt;
+  margin-right: 1.2mm;
+}
+
+.cover-contact span { color: var(--ink); }
+
+/* One line per document. Stacked rather than run together: these are long
+   URLs and a wrapped one reads as a broken link. */
+.cover-docs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4mm;
+  margin: 4mm 0 0;
+  font-family: var(--mono);
+  font-size: 6.9pt;
+  color: var(--ink-2);
+}
+
+.cover-docs b {
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 6.2pt;
+  margin-right: 1.2mm;
+}
+
+.cover-docs a { color: var(--ink); }
+
+.letter {
+  max-width: 156mm;
+  margin: 0 auto;
+  font-size: 10.4pt;
+  line-height: 1.72;
+}
+
+.letter p { margin: 0 0 5.2mm; }
+
+.letter .salutation { margin-bottom: 5.4mm; }
+
+.letter .signoff { margin-bottom: 3mm; }
+
+.signature {
+  margin: 0;
+  font-size: 14pt;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.signature-sub {
+  margin: 1mm 0 0;
+  font-family: var(--mono);
+  font-size: var(--t-micro);
+  color: var(--ink-2);
+}
+
+/* ==========================================================================
+   Screen preview. /print/cv/ and friends are public pages, so they should
+   look like a document preview rather than a naked HTML dump.
+   ========================================================================== */
+
+@media screen {
+  body {
+    background: #E3E9EF;
+    padding: 26px 14px;
+  }
+
+  .sheet {
+    margin: 0 auto 26px;
+    box-shadow: 0 1px 2px rgba(10, 24, 38, 0.16),
+                0 20px 46px rgba(10, 24, 38, 0.20);
+  }
+
+  .flow {
+    width: 210mm;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 22mm 15mm 18mm;
+    background: var(--paper);
+    box-shadow: 0 1px 2px rgba(10, 24, 38, 0.16),
+                0 20px 46px rgba(10, 24, 38, 0.20);
+  }
+
+  /* On paper the header row repeats; on screen it prints once, which reads
+     as the document's own masthead rule. Nothing to hide. */
+  .flow > thead td { padding-bottom: 7mm; }
+
+  .jd-toc a:hover .toc-org,
+  .cover-docs a:hover { text-decoration: underline; }
+}
+
+@media print {
+  body { background: none; padding: 0; }
+  .sheet, .flow { margin: 0; box-shadow: none; }
+}

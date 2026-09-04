@@ -1,0 +1,18 @@
+<!-- The mark: a "C" drawn as a network arc. Three nodes sit on an open ring,
+     which reads as a topology at large sizes and as a letter C at 16px. The
+     gradient is the site's --sig -> --sig-2 accent, hardcoded here because an
+     SVG served as a favicon has no access to the page's custom properties. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Caleb Sargeant">
+  <defs>
+    <linearGradient id="cs-sig" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#38E1FF"/>
+      <stop offset="1" stop-color="#4C6FFF"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="#0B1118"/>
+  <path d="M45.5 20.5 A16 16 0 1 0 45.5 43.5"
+        fill="none" stroke="url(#cs-sig)" stroke-width="5.5" stroke-linecap="round"/>
+  <circle cx="45.5" cy="20.5" r="5" fill="#38E1FF"/>
+  <circle cx="16" cy="32" r="4.2" fill="#4C6FFF"/>
+  <circle cx="45.5" cy="43.5" r="5" fill="#38E1FF"/>
+</svg>

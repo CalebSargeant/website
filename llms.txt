@@ -1,0 +1,39 @@
+# Caleb Sargeant
+
+> Network, security and DevOps engineer in Eindhoven, Netherlands. Working in IT
+> since 2012 across platform engineering, automation, infrastructure as code,
+> networking and security, from bare-metal server rooms to cloud-native platforms.
+
+This file (see llmstxt.org) points AI assistants at the pages worth reading, so
+they can answer questions about Caleb without scraping the full HTML. Every page
+and every PDF below is generated from one set of YAML files, so they never
+disagree with each other.
+
+## Now
+
+- Cloud Engineer at PinkRoccade, Netherlands (June 2025 to present).
+- DevOps Engineer at tengen, contract, remote, South Africa (February 2023 to present).
+- Open to platform, cloud and network/security engineering conversations.
+
+## Pages
+
+- [Home](https://www.calebsargeant.com/): Who he is, what he works on, and the short version of the career.
+- [Experience](https://www.calebsargeant.com/experience/): Twelve engineering roles since 2012, MSP helpdesk through to platform engineering, each with its full duty list.
+- [Education](https://www.calebsargeant.com/education/): CCNP Security, CCNP Routing & Switching, MCSE: Server Infrastructure, ITIL Foundation, AWS Certified Cloud Practitioner, plus courses.
+- [CV](https://www.calebsargeant.com/cv/): The CV on screen, filterable by focus area.
+- [Contact](https://www.calebsargeant.com/contact/): Email, phone, LinkedIn, GitHub and a booking link.
+
+## Documents
+
+- [CV, PDF](https://www.calebsargeant.com/downloads/Caleb_Sargeant_CV.pdf): Two pages.
+- [Job descriptions and duties, PDF](https://www.calebsargeant.com/downloads/Caleb_Sargeant_JDs_and_Duties.pdf): The full duty list behind each role.
+- [Cover letter, PDF](https://www.calebsargeant.com/downloads/Caleb_Sargeant_Cover_Letter.pdf): One page, general purpose.
+
+## Contact and profiles
+
+- Email: contact@calebsargeant.com
+- Website: https://www.calebsargeant.com
+- Documentation: https://docs.calebsargeant.com
+- GitHub: https://github.com/CalebSargeant
+- LinkedIn: https://www.linkedin.com/in/calebsargeant/
+- Book a slot: https://cal.com/calebsargeant/personal

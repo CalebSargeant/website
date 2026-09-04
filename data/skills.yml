@@ -1,0 +1,77 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Skills. Source for the home page's skill matrix and the CV's HIGHLIGHTS block.
+#
+#   level     1-5. Drives the meter width on the site. 5 = daily, deep;
+#             3 = used in production, would need a doc open; 1 = exposure.
+#   years     Optional. Shown as a chip on the site, ignored by the CV.
+#   cv        true puts the item in the CV's HIGHLIGHTS list. Aim for ~18
+#             across all groups; more than that and the CV column overflows.
+# ═══════════════════════════════════════════════════════════════════════════
+
+groups:
+  - name: Platform & orchestration
+    icon: layers
+    skills:
+      - {name: "Kubernetes & Docker",        level: 5, years: 6, cv: true}
+      - {name: "Helm & Kustomize",           level: 5, years: 5, cv: false}
+      - {name: "GitOps (FluxCD, Argo)",      level: 5, years: 4, cv: false}
+      - {name: "Terraform",                  level: 5, years: 6, cv: true}
+      - {name: "Ansible",                    level: 4, years: 8, cv: true}
+      - {name: "CI/CD (GitHub Actions, Jenkins, TeamCity, GitLab, Bitbucket)", level: 5, years: 9, cv: true}
+      - {name: "Git",                        level: 5, years: 12, cv: true}
+
+  - name: Cloud
+    icon: cloud
+    skills:
+      - {name: "Azure (AKS, ACR, APIM, Entra ID)", level: 5, years: 4, cv: true}
+      - {name: "AWS (EKS, VPC, IAM, S3, WAF)",     level: 4, years: 7, cv: true}
+      - {name: "GCP",                              level: 3, years: 3, cv: true}
+      - {name: "OpenStack",                        level: 3, years: 3, cv: false}
+      - {name: "Cost optimisation & FinOps basics", level: 4, years: 5, cv: false}
+
+  - name: Networking
+    icon: network
+    skills:
+      - {name: "Routing & switching (Cisco, MikroTik)", level: 5, years: 11, cv: true}
+      - {name: "Firewalling (Cisco FTD/ASA, FortiGate, MikroTik, SonicWall)", level: 5, years: 10, cv: true}
+      - {name: "VPN (remote access and site-to-site)",    level: 5, years: 10, cv: true}
+      - {name: "TCP/IP, DNS, DHCP, LDAP, PKI",          level: 5, years: 12, cv: true}
+      - {name: "BGP, OSPF, EIGRP, HSRP",                level: 4, years: 8, cv: false}
+      - {name: "Wireless (Ubiquiti, Meraki, MikroTik)", level: 4, years: 9, cv: true}
+
+  - name: Security
+    icon: shield
+    skills:
+      - {name: "Network & workload hardening",              level: 5, years: 10, cv: true}
+      - {name: "Identity & SSO (Entra ID, SAML, Duo, JumpCloud)", level: 4, years: 6, cv: true}
+      - {name: "AppSec toolchain (Dependency-Track, DefectDojo, SonarQube, Trivy, ZAP)", level: 4, years: 4, cv: true}
+      - {name: "Secrets management (SOPS, Key Vault, 1Password)", level: 4, years: 5, cv: false}
+      - {name: "Pentesting & vulnerability response",       level: 3, years: 6, cv: true}
+      - {name: "ISO 27001 & security governance",           level: 3, years: 3, cv: false}
+
+  - name: Observability & data
+    icon: activity
+    skills:
+      - {name: "Prometheus, Grafana, Alertmanager", level: 5, years: 6, cv: true}
+      - {name: "Zabbix & Nagios",                   level: 4, years: 8, cv: true}
+      - {name: "ELK / Graylog / Datadog",           level: 4, years: 6, cv: true}
+      - {name: "MongoDB, MySQL, PostgreSQL",        level: 3, years: 7, cv: false}
+
+  - name: Systems & scripting
+    icon: terminal
+    skills:
+      - {name: "Linux (Ubuntu, CentOS, RHEL)", level: 5, years: 12, cv: true}
+      - {name: "Bash",                          level: 5, years: 12, cv: true}
+      - {name: "Python",                        level: 4, years: 6, cv: true}
+      - {name: "PowerShell",                    level: 3, years: 6, cv: false}
+      - {name: "Windows Server (2003 onwards)", level: 4, years: 12, cv: true}
+
+# Non-technical, shown as chips. These go straight into the CV highlights tail.
+soft_skills:
+  - Agile methodologies
+  - Documentation as a habit
+  - Problem solving
+  - Team player
+  - Time management
+  - Clear communication
+  - Customer service

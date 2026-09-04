@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% block body_class %}page-cv{% endblock %}
+
+{#
+  The CV page. This and print/cv.html are two renderings of the same YAML, so
+  nothing here may state a fact that is not in data/. If you find yourself
+  wanting to type a date, a duration or a count, it belongs in a .yml file.
+#}
+
+{% block head %}
+  <link rel="alternate" type="application/pdf" href="{{ pdfs.cv }}" title="Caleb Sargeant CV (PDF)">
+  {# tojson, not autoescape: inside a <script> block HTML entities would break
+     the JSON parse, and tojson escapes the characters that matter here. #}
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": {{ profile.name | tojson }},
+  "jobTitle": {{ profile.headline | tojson }},
+  "description": {{ profile.summary | tojson }},
+  "url": {{ (site.base_url ~ page.path) | tojson }},
+  "email": {{ ("mailto:" ~ profile.contact.email) | tojson }},
+  "telephone": {{ profile.contact.phone | tojson }},
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": {{ profile.location | tojson }}
+  },
+  "sameAs": {{ [profile.links.github, profile.links.linkedin,
+                profile.links.credly, profile.links.website] | tojson }},
+  "knowsAbout": {{ cv_skills | map(attribute="name") | list | tojson }},
+  "worksFor": [
+{% for role in current_roles %}
+    {"@type": "Organization", "name": {{ role.company | tojson }}}{% if not loop.last %},{% endif %}
+
+{% endfor %}
+  ],
+  "hasCredential": [
+{% for item in featured_education %}
+    {
+      "@type": "EducationalOccupationalCredential",
+      "name": {{ item.title | tojson }},
+      "credentialCategory": {{ item.kind | tojson }},
+      "dateCreated": {{ item.completed | string | tojson }},
+      "recognizedBy": {"@type": "Organization", "name": {{ item.institution | tojson }}}
+    }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+  ]
+}
+  </script>
+{% endblock %}
+
+{#
+  Icons are inlined rather than loaded as a sprite or a font: there are nine of
+  them, they are tiny, and it keeps the page to a single request.
+#}
+{% macro icon(name) -%}
+<svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+{%- if name == "mail" %}<path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/>
+{%- elif name == "phone" %}<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>
+{%- elif name == "pin" %}<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+{%- elif name == "globe" %}<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+{%- elif name == "github" %}<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.3 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5.1 5.1 0 0 0 19.9 1S18.7.6 16 2.5a13.4 13.4 0 0 0-7 0C6.3.6 5.1 1 5.1 1A5.1 5.1 0 0 0 5 4.8a5.4 5.4 0 0 0-1.5 3.8c0 5.4 3.3 6.6 6.4 6.9A3.4 3.4 0 0 0 9 18.1V22"/>
+{%- elif name == "linkedin" %}<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+{%- elif name == "download" %}<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+{%- elif name == "printer" %}<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+{%- elif name == "arrow" %}<line x1="7" y1="17" x2="17" y2="7"/><polyline points="8 7 17 7 17 16"/>
+{%- endif %}
+</svg>
+{%- endmacro %}
+
+{# Display form of a link: the host and path, without the noise. #}
+{% macro short_url(url) -%}
+{{ url.replace("https://", "").replace("www.", "").rstrip("/") }}
+{%- endmacro %}
+
+{% block content %}
+
+<div class="cv-toolbar" data-filter-root="#cv-doc" data-active-filter="all">
+  <div class="wrap cv-toolbar-in">
+
+    <div class="cv-filter">
+      <span class="kicker" id="cv-tailor-label">Tailor</span>
+      <div class="cv-filter-btns" role="group" aria-labelledby="cv-tailor-label">
+        <button type="button" class="filter-btn" data-filter="all" aria-pressed="true">All</button>
+{% for area in focus_areas %}
+        <button type="button" class="filter-btn" data-filter="{{ area }}" aria-pressed="false">{{ area | capitalize }}</button>
+{% endfor %}
+      </div>
+      <p class="cv-filter-note">Filter the roles to a focus area. The PDF always contains everything.</p>
+    </div>
+
+    <div class="cv-actions">
+      <a class="btn btn-sig" href="{{ pdfs.cv }}" download data-magnetic>{{ icon("download") }} Download PDF</a>
+      <a class="btn btn-ghost" href="/print/cv/">{{ icon("printer") }} Print view</a>
+      <p class="mono cv-stamp">Generated from data/ on {{ build_date }}</p>
+    </div>
+
+  </div>
+</div>
+
+<section class="section cv-page">
+  <div class="wrap">
+    <article class="cv-doc" id="cv-doc" data-cv-focus="all">
+
+      {# ── header ───────────────────────────────────────────────────────── #}
+      <header class="cv-head reveal" style="--d:0">
+        <h1 class="cv-name">{{ profile.name }}</h1>
+        <p class="cv-headline">{{ profile.headline }}</p>
+        <ul class="cv-contact mono">
+          <li>{{ icon("mail") }} <a href="mailto:{{ profile.contact.email }}">{{ profile.contact.email }}</a></li>
+          <li>{{ icon("phone") }} <a href="tel:{{ profile.contact.phone_href }}">{{ profile.contact.phone }}</a></li>
+          <li>{{ icon("pin") }} {{ profile.location }}</li>
+          <li>{{ icon("globe") }} <a href="{{ profile.links.website }}">{{ short_url(profile.links.website) }}</a></li>
+          <li>{{ icon("github") }} <a href="{{ profile.links.github }}" rel="me">{{ short_url(profile.links.github) }}</a></li>
+          <li>{{ icon("linkedin") }} <a href="{{ profile.links.linkedin }}" rel="me">{{ short_url(profile.links.linkedin) }}</a></li>
+        </ul>
+        <p class="cv-status mono">{{ profile.nationality_note }}</p>
+      </header>
+
+      {# ── profile ──────────────────────────────────────────────────────── #}
+      <section class="cv-section reveal" style="--d:1" aria-labelledby="cv-h-profile">
+        <h2 class="cv-section-title kicker" id="cv-h-profile">Profile</h2>
+        <p class="cv-summary">{{ profile.summary }}</p>
+      </section>
+
+      {# ── core skills ──────────────────────────────────────────────────── #}
+      <section class="cv-section reveal" style="--d:2" aria-labelledby="cv-h-skills">
+        <h2 class="cv-section-title kicker" id="cv-h-skills">Core skills</h2>
+        <ul class="cv-skill-list grid-2">
+{% for skill in cv_skills %}
+          <li class="cv-skill">
+            <span class="cv-skill-name">{{ skill.name }}</span>
+{% if skill.get("years") %}
+            <span class="cv-skill-years mono">{{ skill.years }} yr</span>
+{% endif %}
+          </li>
+{% endfor %}
+        </ul>
+        <p class="cv-sub mono">Also</p>
+        <div class="chip-row">
+{% for soft in soft_skills %}
+          <span class="chip">{{ soft }}</span>
+{% endfor %}
+        </div>
+      </section>
+
+      {# ── experience ───────────────────────────────────────────────────── #}
+      <section class="cv-section reveal" style="--d:3" aria-labelledby="cv-h-experience">
+        <h2 class="cv-section-title kicker" id="cv-h-experience">Experience</h2>
+        <p class="cv-sub">{{ roles | length }} roles since {{ (roles | last).start_year }}. Highlights here, the full duty
+          list for every role is on the <a href="/experience/">experience page</a> and in the
+          <a href="{{ pdfs.jds }}">job descriptions PDF</a>.</p>
+
+{% for role in roles %}
+        {# data-focus is what the toolbar filters on. Space separated so the
+           CSS can match a single area with [data-focus~="cloud"]. #}
+        <article class="cv-role reveal" style="--d:{{ loop.index0 % 3 }}"
+                 id="cv-{{ role.id }}" data-focus="{{ role.focus | join(' ') }}">
+          <div class="cv-role-head">
+            <h3 class="cv-role-title">{{ role.title }}, <span class="cv-role-org">{{ role.company }}</span></h3>
+            <p class="cv-when mono">
+              <span>{{ role.start_short }} &ndash; {{ role.end_short }}</span>
+              <span class="cv-dur">{{ role.duration }}</span>
+{% if role.is_current %}
+              <span class="pill-live">Current</span>
+{% endif %}
+            </p>
+          </div>
+
+          {# location_note carries the roles that moved country part-way through.
+             Dropping it here would date the relocation wrongly on the CV. #}
+          <p class="cv-role-meta mono">{{ role.location }} &middot; {{ role.type }}{% if role.get('location_note') %} &middot; {{ role.location_note }}{% endif %}</p>
+          <p class="cv-role-summary">{{ role.summary }}</p>
+
+{% if role.highlights %}
+          <ul class="cv-highlights">
+{% for line in role.highlights %}
+            <li>{{ line }}</li>
+{% endfor %}
+          </ul>
+{% endif %}
+
+          <div class="cv-role-foot">
+            <div class="chip-row cv-role-focus">
+{% for area in role.focus %}
+              <span class="chip">{{ area }}</span>
+{% endfor %}
+            </div>
+            <a class="cv-role-link" href="/experience/#{{ role.id }}"
+               aria-label="Full duty list for {{ role.title }} at {{ role.company }}">Full duties {{ icon("arrow") }}</a>
+          </div>
+        </article>
+{% endfor %}
+      </section>
+
+      {# ── education ────────────────────────────────────────────────────── #}
+      <section class="cv-section reveal" style="--d:4" aria-labelledby="cv-h-education">
+        <h2 class="cv-section-title kicker" id="cv-h-education">Education &amp; certifications</h2>
+
+        <ul class="cv-entry-list">
+{% for item in featured_education %}
+          <li class="cv-entry">
+            <p class="cv-entry-title">{{ item.title }}</p>
+            <p class="cv-entry-meta mono">
+              <span>{{ item.institution }}</span>
+              <span>{{ item.completed_label }}</span>
+              <span class="chip">{{ item.kind }}</span>
+{% if item.get("verify") %}
+              <a href="{{ item.verify }}">Verify {{ icon("arrow") }}</a>
+{% endif %}
+            </p>
+{% if item.get("national_qualification") %}
+            <p class="cv-entry-note">National qualification: {{ item.national_qualification }}</p>
+{% endif %}
+          </li>
+{% endfor %}
+        </ul>
+
+{% if in_progress %}
+        <p class="cv-sub mono">In progress</p>
+        <div class="chip-row">
+{% for study in in_progress %}
+          <span class="chip">{{ study }}</span>
+{% endfor %}
+        </div>
+{% endif %}
+
+        {# "reject in featured" rather than a featured flag test, so this keeps
+           working if an entry ever omits the key. #}
+{% set other_education = education | reject("in", featured_education) | list %}
+{% if other_education %}
+        <details class="cv-more">
+          <summary>Everything else ({{ other_education | length }})</summary>
+          <ul class="cv-entry-list">
+{% for item in other_education %}
+            <li class="cv-entry">
+              <p class="cv-entry-title">{{ item.title }}</p>
+              <p class="cv-entry-meta mono">
+                <span>{{ item.institution }}</span>
+                <span>{{ item.completed_label }}</span>
+                <span class="chip">{{ item.kind }}</span>
+              </p>
+{% if item.get("national_qualification") %}
+              <p class="cv-entry-note">National qualification: {{ item.national_qualification }}</p>
+{% endif %}
+            </li>
+{% endfor %}
+          </ul>
+        </details>
+{% endif %}
+      </section>
+
+      {# ── courses ──────────────────────────────────────────────────────── #}
+      <section class="cv-section reveal" style="--d:5" aria-labelledby="cv-h-courses">
+        <h2 class="cv-section-title kicker" id="cv-h-courses">Courses &amp; training</h2>
+
+        <ul class="cv-entry-list">
+{% for course in featured_courses %}
+          <li class="cv-entry">
+            <p class="cv-entry-title">{{ course.title }}</p>
+            <p class="cv-entry-meta mono">
+              <span>{{ course.institution }}</span>
+              <span>{{ course.date_label }}</span>
+              <span>{{ course.duration }}</span>
+            </p>
+          </li>
+{% endfor %}
+        </ul>
+
+{% set other_courses = courses | reject("in", featured_courses) | list %}
+{% if other_courses %}
+        <details class="cv-more">
+          <summary>Everything else ({{ other_courses | length }})</summary>
+          <ul class="cv-entry-list">
+{% for course in other_courses %}
+            <li class="cv-entry">
+              <p class="cv-entry-title">{{ course.title }}</p>
+              <p class="cv-entry-meta mono">
+                <span>{{ course.institution }}</span>
+                <span>{{ course.date_label }}</span>
+                <span>{{ course.duration }}</span>
+              </p>
+            </li>
+{% endfor %}
+          </ul>
+        </details>
+{% endif %}
+      </section>
+
+      {# ── interests ────────────────────────────────────────────────────── #}
+      <section class="cv-section reveal" style="--d:6" aria-labelledby="cv-h-interests">
+        <h2 class="cv-section-title kicker" id="cv-h-interests">Interests</h2>
+        <div class="chip-row">
+{% for interest in profile.interests %}
+          <span class="chip">{{ interest }}</span>
+{% endfor %}
+        </div>
+      </section>
+
+      {# ── how this page is made ────────────────────────────────────────── #}
+      <footer class="cv-colophon panel reveal" style="--d:7">
+        <p class="kicker">Colophon</p>
+        <p>Every date, role and certification on this page is read from a set of YAML files in
+          <span class="mono">data/</span>. This page is one rendering of them, the PDF is another,
+          and both come out of the same build, so they cannot drift apart.</p>
+        <p>Last built {{ build_date }}. The source is on
+          <a href="{{ site.repo }}">GitHub</a>, along with the build script that produced this page.</p>
+      </footer>
+
+    </article>
+  </div>
+</section>
+
+{% endblock %}

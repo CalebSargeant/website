@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{#
+  /contact: the page someone lands on with an actual intent, so everything on it
+  is a plain link first: mailto, tel and https all work with JavaScript off. The
+  copy button is the only enhanced part and it sits beside the address rather
+  than in place of it.
+
+  Card children stay flat: site.css spaces cards with `.card > * + *`, which only
+  reaches direct children.
+#}
+{% block body_class %}page-contact{% endblock %}
+
+{% block head %}
+{# base.html already publishes the Person node. This one points at it by @id
+   rather than describing him a second time with slightly different facts. #}
+<script type="application/ld+json">
+{{ {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "@id": site.base_url ~ page.path ~ "#contact",
+  "url": site.base_url ~ page.path,
+  "name": page.title,
+  "description": page.description,
+  "mainEntity": {"@id": site.base_url ~ "/#person"},
+  "significantLink": [
+    site.base_url ~ pdfs.cv,
+    site.base_url ~ pdfs.jds,
+    site.base_url ~ pdfs.cover,
+    profile.links.booking,
+  ],
+} | tojson(indent=2) }}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <header class="section-head reveal" style="--d:0">
+      <p class="kicker">Contact</p>
+      <h1>Get in touch</h1>
+      <p class="lead">
+        Email is the quickest way to reach me. If it is easier to talk it through,
+        book a slot and pick a time that suits you.
+      </p>
+      {% if profile.availability.show %}
+      {# One label per state, so a `closed` note never renders in the live green. #}
+      {% set state_labels = {"open": "Open to work", "selective": "Selective", "closed": "Not looking"} %}
+      <p>
+        {% if profile.availability.state == 'open' %}
+        <span class="pill-live">{{ state_labels.get(profile.availability.state, 'Availability') }}</span>
+        {% else %}
+        <span class="chip">{{ state_labels.get(profile.availability.state, 'Availability') }}</span>
+        {% endif %}
+        {{ profile.availability.text }}
+      </p>
+      {% endif %}
+    </header>
+
+    <div class="grid-2">
+      <article class="card reveal" style="--d:0">
+        <h2>Direct</h2>
+
+        <p class="kicker">Email</p>
+        <p>
+          <a class="mono" href="mailto:{{ profile.contact.email }}">{{ profile.contact.email }}</a>
+          {# data-copy-label is the slot site.js swaps for "Copied", so the flash
+             never eats the rest of the button. #}
+          <button type="button" class="btn btn-ghost" data-copy="{{ profile.contact.email }}"
+                  aria-label="Copy my email address to the clipboard">
+            <span data-copy-label>Copy</span>
+          </button>
+        </p>
+
+        <p class="kicker">Phone</p>
+        <p><a class="mono" href="tel:{{ profile.contact.phone_href }}">{{ profile.contact.phone }}</a></p>
+
+        <p class="kicker">Location</p>
+        <p>{{ profile.location }}<br>{{ profile.nationality_note }}</p>
+
+        <div class="cta-row">
+          <a class="btn btn-sig" data-magnetic href="{{ profile.links.booking }}"
+             rel="noopener" target="_blank">Book a slot</a>
+        </div>
+      </article>
+
+      <article class="card reveal" style="--d:1">
+        <h2>Elsewhere</h2>
+        <p>The places where the work is visible.</p>
+        <ul>
+          <li>
+            <a href="{{ profile.links.github }}" rel="me noopener" target="_blank">GitHub</a>
+            for infrastructure code, the homelab, and the source of this site.
+          </li>
+          <li>
+            <a href="{{ profile.links.linkedin }}" rel="me noopener" target="_blank">LinkedIn</a>
+            for the same history in the shape recruiters expect.
+          </li>
+          <li>
+            <a href="{{ profile.links.credly }}" rel="me noopener" target="_blank">Credly</a>
+            for verifiable certification badges.
+          </li>
+          <li>
+            <a href="{{ profile.links.udemy }}" rel="me noopener" target="_blank">Udemy</a>
+            for the course history behind the training list.
+          </li>
+          <li>
+            <a href="{{ profile.links.docs }}" rel="noopener" target="_blank">docs.calebsargeant.com</a>
+            for notes and runbooks, written as they are worked out.
+          </li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="downloads">
+  <div class="wrap">
+    <div class="section-head reveal" style="--d:0">
+      <p class="kicker">Downloads</p>
+      <h2>Documents</h2>
+      <p>
+        All three are rendered from the same data as this site on every deploy, so
+        they cannot disagree with what you read here.
+      </p>
+    </div>
+
+    <div class="grid-3">
+      <article class="card reveal" style="--d:0">
+        <h3>CV</h3>
+        <p>Two pages. Roles, highlights, skills and education, laid out for a first read.</p>
+        <div class="cta-row">
+          <a class="btn btn-ghost" href="{{ pdfs.cv }}" download>Download CV</a>
+        </div>
+      </article>
+
+      <article class="card reveal" style="--d:1">
+        <h3>JDs &amp; Duties</h3>
+        <p>The full duty lists, grouped by area, for anyone who needs the detail.</p>
+        <div class="cta-row">
+          <a class="btn btn-ghost" href="{{ pdfs.jds }}" download>Download JDs &amp; Duties</a>
+        </div>
+      </article>
+
+      <article class="card reveal" style="--d:2">
+        <h3>Cover letter</h3>
+        <p>One page, general purpose. Ask for a version written for your role and you will get one.</p>
+        <div class="cta-row">
+          <a class="btn btn-ghost" href="{{ pdfs.cover }}" download>Download cover letter</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+{% endblock %}

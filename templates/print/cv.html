@@ -1,0 +1,183 @@
+<!doctype html>
+{#
+  The CV sheet. Standalone: no base.html, no JavaScript, one stylesheet.
+  Headless Chromium prints this to /downloads/Caleb_Sargeant_CV.pdf.
+
+  Two sheets by design. Sheet one is the fixed-height document (sidebar plus
+  main column) and clips rather than reflowing, so anything that could grow
+  (the per-role highlights) lives on sheet two where it has room. Adding a
+  role to data/experience.yml lengthens the table on sheet one by one row and
+  cannot silently push content off the paper.
+#}
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }}</title>
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{# display=block, not swap: the PDF renderer screenshots this page once, and a
+   swap would bake the fallback font into the download. #}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=block">
+<link rel="stylesheet" href="/assets/print.css">
+</head>
+<body>
+
+{#
+  The highlight block on sheet two: the four most recent employers, one entry
+  each. Deduplicating on company matters because one job can be two roles in
+  the data (a promotion, or a relocation), and two entries for the same
+  employer would eat half the block. The length test skips stub entries whose
+  only highlight is a placeholder line.
+#}
+{% set picked = namespace(seen=[], roles=[]) %}
+{% for role in roles %}
+  {% if picked.roles | length < 4 and role.highlights | length > 1
+        and role.company not in picked.seen %}
+    {% set picked.seen = picked.seen + [role.company] %}
+    {% set picked.roles = picked.roles + [role] %}
+  {% endif %}
+{% endfor %}
+
+<!-- ── sheet one ───────────────────────────────────────────────────────── -->
+<article class="sheet">
+  <div class="cv-grid">
+
+    <div class="cv-main">
+      <header>
+        <h1 class="cv-name">{{ profile.name }}</h1>
+        <p class="cv-headline">{{ profile.headline }}</p>
+        <p class="cv-tagline">{{ profile.tagline }}</p>
+      </header>
+
+      <section class="cv-block">
+        <h2 class="sec-head">Profile</h2>
+        <p class="cv-summary">{{ profile.summary }}</p>
+      </section>
+
+      <section class="cv-block">
+        <h2 class="sec-head">Core skills</h2>
+        <ul class="cv-skills">
+          {% for skill in cv_skills %}
+          <li>{{ skill.name }}</li>
+          {% endfor %}
+        </ul>
+        <p class="cv-soft"><strong>Also:</strong> {{ soft_skills | join(' · ') }}</p>
+      </section>
+
+      <section class="cv-block">
+        <h2 class="sec-head">Experience</h2>
+        <table class="cv-jobs">
+          <tbody>
+            {% for role in roles %}
+            <tr{% if role.is_current %} class="is-current"{% endif %}>
+              <td class="cv-when">
+                <b>{{ role.start_short }} &ndash; {{ role.end_short }}</b>
+                {{ role.duration }}
+              </td>
+              <td class="cv-what">
+                <span class="cv-org">{{ role.company }}</span>
+                <span class="cv-title">{{ role.title }}</span>
+                <span class="cv-where">{{ role.location }} · {{ role.type }}{% if role.get('location_note') %} · {{ role.location_note }}{% endif %}</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <aside class="cv-side">
+      <img class="cv-portrait" src="/assets/img/caleb.jpg" alt="Caleb Sargeant" width="320" height="320">
+
+      <section class="side-block">
+        <h2 class="sec-head">Contact</h2>
+        <ul class="side-list">
+          <li class="side-line">{{ profile.location }}</li>
+          <li class="side-line">{{ profile.contact.email }}</li>
+          <li class="side-line">{{ profile.contact.phone }}</li>
+          <li class="side-line">{{ profile.links.website | replace('https://', '') }}</li>
+          <li class="side-line">{{ profile.links.docs | replace('https://', '') }}</li>
+          <li class="side-line">{{ profile.links.github | replace('https://', '') }}</li>
+          <li class="side-line">{{ profile.links.linkedin | replace('https://', '') | replace('www.', '') }}</li>
+        </ul>
+        <p class="side-note">{{ profile.nationality_note }}</p>
+      </section>
+
+      <section class="side-block">
+        <h2 class="sec-head">Education</h2>
+        <ul>
+          {% for item in featured_education %}
+          <li class="edu-item">
+            <span class="edu-title">{{ item.title }}</span>
+            <span class="edu-meta">{{ item.institution }} · {{ item.completed_label }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section class="side-block">
+        <h2 class="sec-head">Courses</h2>
+        <ul>
+          {% for course in featured_courses %}
+          <li class="edu-item">
+            <span class="edu-title">{{ course.title }}</span>
+            <span class="edu-meta">{{ course.institution }} · {{ course.date_label }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section class="side-block">
+        <h2 class="sec-head">Interests</h2>
+        <p class="side-tags">{{ profile.interests | join(' · ') }}</p>
+      </section>
+    </aside>
+
+  </div>
+
+  <footer class="sheet-foot">
+    <span>{{ profile.name }} · {{ profile.headline }}</span>
+    <span>Page 1 of 2</span>
+  </footer>
+</article>
+
+<!-- ── sheet two ───────────────────────────────────────────────────────── -->
+<article class="sheet">
+  <div class="cv-cont">
+    <h2>Selected highlights</h2>
+    <p>{{ profile.name }} · Curriculum vitae</p>
+  </div>
+
+  <div class="cv-highlights">
+    {% for role in picked.roles %}
+    <section class="cv-role">
+      <header class="cv-role-head">
+        <h3 class="cv-role-org">{{ role.company }}</h3>
+        <span class="cv-role-sub">{{ role.title }} · {{ role.start_short }} &ndash; {{ role.end_short }} · {{ role.location }}</span>
+      </header>
+      <ul>
+        {% for point in role.highlights %}
+        <li>{{ point }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endfor %}
+  </div>
+
+  <div class="cv-close">
+    <p><strong>Currently studying.</strong> {{ in_progress | join(', ') }}.</p>
+    <p><strong>The long version.</strong> The full duty lists are in the
+      Job Descriptions &amp; Duties document, and the same data drives
+      {{ site.base_url | replace('https://', '') }}. References available on request.</p>
+  </div>
+
+  <footer class="sheet-foot">
+    <span>{{ profile.name }} · {{ profile.contact.email }}</span>
+    <span>Page 2 of 2</span>
+  </footer>
+</article>
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+# Response headers for www.calebsargeant.com.
+# https://developers.cloudflare.com/workers/static-assets/headers/
+#
+# Limits: 100 rules, 2,000 characters per line. Rules are ADDITIVE: a request
+# matching several rules gets the union of their headers. That is why no two
+# rules below ever set the same header name on overlapping paths: two matching
+# Cache-Control rules would both contribute, and which one a browser honours is
+# not something worth finding out in production.
+#
+# scripts/build.py copies this file into dist/ verbatim. It applies to static
+# asset responses only.
+
+/*
+  # Two years, subdomains included. `preload` is deliberately left off: the
+  # preload list is effectively a one-way door and it would pin every
+  # calebsargeant.com subdomain (docs. and anything else added later) to
+  # HTTPS-only in shipped browsers. Add it once you are sure they all will
+  # always serve valid HTTPS.
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Redundant with CSP frame-ancestors below, kept for pre-CSP3 browsers.
+  X-Frame-Options: DENY
+  Cross-Origin-Opener-Policy: same-origin
+  # interest-cohort is the FLoC opt-out. It is a dead API in shipped browsers but
+  # costs nothing to keep, and privacy scanners still look for it.
+  Permissions-Policy: accelerometer=(), autoplay=(), browsing-topics=(), camera=(), display-capture=(), encrypted-media=(), geolocation=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=()
+  # script-src is 'self' plus 'unsafe-inline', and that is a deliberate, honest
+  # compromise rather than an oversight.
+  #
+  # templates/base.html carries exactly one inline script: the theme bootstrap
+  # that reads the stored/system preference and stamps data-theme on <html>
+  # BEFORE first paint. It has to be inline: moving it into site.js means a
+  # frame of the wrong theme on every page load: so the choice is a hash or
+  # 'unsafe-inline'.
+  #
+  # TODO: replace 'unsafe-inline' with the sha256 of that snippet. A hash keeps
+  # the policy meaningful (any OTHER inline script stays blocked), which
+  # 'unsafe-inline' does not. It is not done yet because the hash has to be
+  # recomputed by hand every time the snippet changes by a single character, and
+  # a silently-broken theme bootstrap is worse than a slightly loose script-src
+  # on a site that accepts no user input. When you do it:
+  #     printf "%s" "<exact script body, no surrounding tags>" | openssl dgst -sha256 -binary | openssl base64
+  # then swap 'unsafe-inline' for 'sha256-<output>'. Note that browsers IGNORE
+  # 'unsafe-inline' once a hash is present, so both can sit here during the
+  # changeover only if you accept the hash winning.
+  #
+  # style-src needs 'unsafe-inline' for the style="" attributes the templates
+  # use to pass per-element values into CSS (reveal stagger --d, skill meter
+  # widths). Drop it if those ever move into site.css.
+  #
+  # Google Fonts is the only third party the site talks to: the stylesheet comes
+  # from fonts.googleapis.com and the font files it references from
+  # fonts.gstatic.com. Nothing else is allowed: no analytics, no CDN, no
+  # embeds. There is deliberately no connect-src directive, so same-origin
+  # fetches inherit default-src 'self'; if you ever add one, 'self' must be
+  # restated in it or every same-origin fetch breaks in a way that looks exactly
+  # like the endpoint being down.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; form-action 'self' mailto:; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
+
+# NOTE ON HTML: there is deliberately no Cache-Control rule for pages here.
+# Adding one would have to live on /* , which also matches /assets/* and
+# /downloads/* and would collide with the rules below. Left alone, the Workers
+# asset server serves HTML with an ETag and max-age=0, must-revalidate: a cheap
+# 304 on every visit and never a stale page. That is exactly the policy pages
+# rebuilt on every deploy want, so it stays the default rather than being
+# restated.
+
+# assets/ is copied byte-for-byte by scripts/build.py: site.css, site.js and
+# hero-net.js ship at stable, unversioned paths with no content hash. Immutable
+# caching on a stable path is a bug, not an optimisation: a CSS fix would not
+# reach a returning visitor for a year. An hour of browser caching with a day of
+# stale-while-revalidate keeps repeat views instant while capping how long a
+# stale theme can linger.
+#
+# The day templates/base.html starts fingerprinting asset URLs (/assets/site.<hash>.css),
+# this becomes `public, max-age=31536000, immutable` and should.
+/assets/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+# The three PDFs are REGENERATED ON EVERY DEPLOY from data/, which is what stops
+# the published CV drifting from the site. Caching them for a year would undo
+# that: a recruiter would be handed the CV as it stood the last time their
+# browser happened to fetch it. Five minutes, with an hour of
+# stale-while-revalidate so a click is never blocked on a revalidation.
+/downloads/*
+  Cache-Control: public, max-age=300, stale-while-revalidate=3600
+
+# The print sheets exist as the source the PDF renderer prints from, and as a
+# "view in browser" convenience. They are the same content as /cv/ with none of
+# the design, so indexing them is duplicate content. robots.txt disallows them
+# too; this header is the belt to that braces, for crawlers that fetch the URL
+# anyway (a Disallowed URL is never fetched, so a well-behaved crawler never
+# sees this: the two controls cover different crawlers, not the same one).
+/print/*
+  X-Robots-Tag: noindex, nofollow

@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{#
+  /experience: the career timeline.
+
+  Every fact here comes from data/experience.yml. The duty lists render into the
+  page rather than being fetched on demand, because the same lists are printed
+  into the JDs & Duties PDF and the page has to be complete with JavaScript off:
+  <details> collapses them without hiding them from find-in-page or a crawler.
+#}
+{% block body_class %}page-experience{% endblock %}
+
+{% block head %}
+{# ItemList, not Person.hasOccupation: the order is half the meaning on this page,
+   and an EmployeeRole wrapper is the only schema.org shape that carries the
+   start/end dates alongside the employer. #}
+{% set ld_items = [] %}
+{% for role in roles %}
+{% set ld_role = {
+     "@type": "EmployeeRole",
+     "roleName": role.title,
+     "startDate": role.start | string,
+     "description": role.summary,
+     "worksFor": {"@type": "Organization", "name": role.company},
+   } %}
+{% if not role.is_current %}
+{% set _ = ld_role.update({"endDate": role.end | string}) %}
+{% endif %}
+{% set _ = ld_items.append({"@type": "ListItem", "position": loop.index, "item": ld_role}) %}
+{% endfor %}
+<script type="application/ld+json">
+{{ {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": profile.name ~ ", engineering roles",
+  "url": site.base_url ~ page.path,
+  "itemListOrder": "https://schema.org/ItemListOrderDescending",
+  "numberOfItems": roles | length,
+  "itemListElement": ld_items,
+} | tojson(indent=2) }}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="wrap">
+
+    <header class="section-head reveal" style="--d:0">
+      <p class="kicker">Career history</p>
+      <h1>Experience</h1>
+      <p class="lead">
+        {{ years_experience }} years in IT across {{ roles | length }} engineering roles, from an
+        MSP helpdesk in Cape Town to platform engineering in the Netherlands.
+      </p>
+      <p>
+        Open a role for its full duty list. Those lists are what the
+        <a href="{{ pdfs.jds }}">JDs &amp; Duties PDF</a> is generated from, so the document
+        and this page cannot drift apart.
+      </p>
+    </header>
+
+    <div class="cta-row reveal" style="--d:1">
+      <a class="btn btn-ghost" href="{{ pdfs.jds }}">JDs &amp; Duties PDF</a>
+      <a class="btn btn-quiet" href="{{ pdfs.cv }}">CV PDF</a>
+    </div>
+
+    {# The filter root wraps the buttons *and* the items, so site.js can filter by
+       flipping one attribute here rather than touching every item. #}
+    <div data-filter-root data-active-filter="all">
+
+      <div class="filter-row reveal" style="--d:2" role="group" aria-label="Filter roles by focus area">
+        {# aria-pressed is the only selected-state hook: site.js keeps it in sync
+           and .filter-btn[aria-pressed="true"] carries the styling. A hard-coded
+           .is-active here would never be cleared, so two buttons would read as
+           selected the moment anyone picks a focus area. #}
+        <button type="button" class="filter-btn" data-filter="all" aria-pressed="true">
+          All <span class="filter-count mono">{{ roles | length }}</span>
+        </button>
+        {% for area in focus_areas %}
+        {% set counter = namespace(n=0) %}
+        {% for role in roles %}
+        {% if area in role.focus %}{% set counter.n = counter.n + 1 %}{% endif %}
+        {% endfor %}
+        <button type="button" class="filter-btn" data-filter="{{ area }}" aria-pressed="false">
+          {{ area | capitalize }} <span class="filter-count mono">{{ counter.n }}</span>
+        </button>
+        {% endfor %}
+      </div>
+
+      <h2 class="sr-only">Roles, newest first</h2>
+
+      <div class="timeline">
+        {# 1000 user units tall and preserveAspectRatio="none" so it stretches to
+           whatever height the timeline turns out to be, while site.js can still
+           measure it with getTotalLength(). No pathLength: that would rescale the
+           dash units under the measured length and freeze the draw. The unlit
+           rail behind it is .timeline::before, so this is only the lit line. #}
+        <svg class="timeline-spine" viewBox="0 0 2 1000" preserveAspectRatio="none"
+             aria-hidden="true" focusable="false">
+          <path id="spine-path" d="M1 0 V1000" vector-effect="non-scaling-stroke" />
+        </svg>
+
+        {% for role in roles %}
+        {# is-current on the item is what site.css keys the live dot off; the dot
+           keeps its own modifier so either hook works. #}
+        <article class="tl-item reveal{% if role.is_current %} is-current{% endif %}" id="{{ role.id }}"
+                 data-focus="{{ role.focus | join(' ') }}" style="--d:{{ loop.index0 % 3 }}">
+          <span class="tl-dot{% if role.is_current %} current{% endif %}" aria-hidden="true"></span>
+
+          <div class="tl-card">
+            {# One child per fact: .tl-when is a flex row that draws its own "·"
+               between children, so the date range has to stay in a single span
+               or the en dash ends up competing with a generated separator. #}
+            <p class="tl-when">
+              <span class="tl-range">
+                <time datetime="{{ role.start }}">{{ role.start_label }}</time>
+                <span aria-hidden="true">–</span><span class="sr-only">to</span>
+                {% if role.is_current %}
+                <span>{{ role.end_label }}</span>
+                {% else %}
+                <time datetime="{{ role.end }}">{{ role.end_label }}</time>
+                {% endif %}
+              </span>
+              <span class="tl-dur">{{ role.duration }}</span>
+            </p>
+
+            <h3 class="tl-role">{{ role.title }}</h3>
+            <p class="tl-org">{{ role.company }}</p>
+            {# location_note is optional: it exists for the roles that moved country
+               part-way through, where the single `location` would be misleading. #}
+            <p class="tl-place">{{ role.location }} · {{ role.type }}{% if role.get('location_note') %} · {{ role.get('location_note') }}{% endif %}</p>
+            <p class="tl-summary">{{ role.summary }}</p>
+
+            {% if role.highlights %}
+            <ul class="tl-highlights">
+              {% for highlight in role.highlights %}
+              <li>{{ highlight }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% if role.stack %}
+            <div class="chip-row">
+              {% for tech in role.stack %}
+              <span class="chip">{{ tech }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if role.duties %}
+            {# group["items"] and not group.items: Jinja resolves attributes before
+               keys, so the dot form would hand back the dict.items method. #}
+            {% set duty_count = namespace(n=0) %}
+            {% for group in role.duties %}
+            {% set duty_count.n = duty_count.n + group["items"] | length %}
+            {% endfor %}
+            <details class="tl-duties">
+              <summary>Full duties ({{ duty_count.n }})</summary>
+              {% if role.get('duties_shared_with') %}
+              <p class="duty-note mono">
+                Same duties as the other {{ role.get('duties_shared_with') }} entry.
+              </p>
+              {% endif %}
+              {% for group in role.duties %}
+              <div class="duty-group">
+                <h4>{{ group.group }}</h4>
+                <ul>
+                  {% for duty in group["items"] %}
+                  <li>{{ duty }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+              {% endfor %}
+            </details>
+            {% endif %}
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+# Vulnerability disclosure for calebsargeant.com, RFC 9116.
+# https://www.calebsargeant.com/.well-known/security.txt
+#
+# Unlike the magmamoose.com copy of this file, `Expires` here is NOT refreshed by
+# the build: scripts/build.py copies .well-known/ byte-for-byte and is not mine
+# to change. So this date is a manual, annual chore. An EXPIRED security.txt is
+# worse than none at all: scanners flag it, and it tells a finder the contact
+# address is probably stale: so bump the date below whenever you touch this
+# repo in the second half of the year.
+#
+# There is no bug bounty and nothing here processes anyone's data: the site is
+# static HTML about one person. Realistically this file exists so that someone
+# who spots a misconfiguration has an obvious place to send it.
+Contact: mailto:contact@calebsargeant.com
+Expires: 2027-09-01T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://www.calebsargeant.com/.well-known/security.txt
