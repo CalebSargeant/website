@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Print the three sheets in dist/print/ to the three PDFs in dist/downloads/.
+"""Print the sheets in dist/*/print/ to the PDFs in dist/*/downloads/.
 
-    ./scripts/render_pdf.py            render every PDF from dist/
+    ./scripts/render_pdf.py            render every PDF, every locale, from dist/
     ./scripts/render_pdf.py --check    verify the PDFs exist and are non-trivial
 
 Run ./scripts/build.py first: this script prints what is already in dist/, it
 does not render templates. `build.py --pdf` calls it as a subprocess.
 
-The list of documents lives in build.py (PDFS) and is imported, not copied, so
-adding a fourth print sheet there is the only edit needed to get a fourth PDF.
+The list of documents lives in build.py (PDF_DOCS crossed with LOCALES by
+pdf_jobs(), exported as PDFS) and is imported, not copied. Adding a fourth print
+sheet, or a third language, there is the only edit needed to get its PDFs.
 """
 
 from __future__ import annotations
@@ -32,19 +33,35 @@ INSTALL_HINT = (
 )
 
 try:
-    from build import OUT, PDFS
+    from build import LOCALES, OUT, PDFS
 except ImportError as exc:  # pyyaml / jinja2 missing -> build.py will not import
     print(f"error: cannot import scripts/build.py ({exc}).\n{INSTALL_HINT}",
           file=sys.stderr)
     raise SystemExit(2) from exc
 
-# Layout limits from docs/design-system.md. Going over is not fatal, it is the
-# signal that an edit in data/ has outgrown the sheet it renders onto.
-MAX_PAGES = {"/print/cv/": 2, "/print/cover/": 1}
+# Layout limits ride along on each job (build.py PDF_DOCS) rather than living in
+# a dict keyed by page path here: the same document has a different path in every
+# locale, and a Dutch CV that runs to three pages is exactly as much of a problem
+# as an English one. Going over is not fatal, it is the signal that an edit in
+# data/ (or a translation, which is usually longer) has outgrown its sheet.
 
 # A PDF of a blank or half-failed page still weighs a few KB, so "the file
 # exists" is not a useful check on its own.
 MIN_BYTES = 5_000
+
+
+def by_locale(jobs: list[dict]) -> dict[str, list[dict]]:
+    """Group PDFS by locale code, keeping build.py's locale order."""
+    grouped: dict[str, list[dict]] = {}
+    for spec in jobs:
+        grouped.setdefault(spec["locale"], []).append(spec)
+    return grouped
+
+
+def out_dir(specs: list[dict]) -> str:
+    """Where one locale's PDFs land, for the summary line."""
+    dirs = sorted({Path(s["out"]).parent.as_posix() for s in specs})
+    return ", ".join(f"dist/{d}/" for d in dirs)
 
 
 # ── local web server ────────────────────────────────────────────────────────
@@ -100,80 +117,97 @@ def describe(path: Path) -> str:
 
 # ── rendering ───────────────────────────────────────────────────────────────
 
-def render_all(base_url: str) -> int:
-    """Print every entry in PDFS. Returns the number of warnings raised."""
+def render_all(base_url: str) -> tuple[int, dict[str, int]]:
+    """Print every entry in PDFS. Returns (warning count, per-locale totals)."""
     from playwright.sync_api import sync_playwright
 
     warnings = 0
+    written: dict[str, int] = {}
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
         page = browser.new_page()
         page.set_default_timeout(30_000)
 
-        for spec in PDFS:
-            target = OUT / spec["out"]
-            target.parent.mkdir(parents=True, exist_ok=True)
+        for locale, specs in by_locale(PDFS).items():
+            print(f"  {locale}:")
+            for spec in specs:
+                target = OUT / spec["out"]
+                target.parent.mkdir(parents=True, exist_ok=True)
 
-            page.goto(base_url + spec["page"], wait_until="networkidle")
-            # networkidle fires when the font *files* have arrived, which is
-            # before the browser has swapped them in. Without this wait the
-            # first sheet reliably prints in the fallback font.
-            page.evaluate("() => document.fonts.ready.then(() => document.fonts.status)")
+                page.goto(base_url + spec["page"], wait_until="networkidle")
+                # networkidle fires when the font *files* have arrived, which is
+                # before the browser has swapped them in. Without this wait the
+                # first sheet reliably prints in the fallback font.
+                page.evaluate("() => document.fonts.ready.then(() => document.fonts.status)")
 
-            # prefer_css_page_size honours `@page { size: A4 }` in print.css;
-            # zero margins because the .sheet element owns its own padding.
-            page.pdf(
-                path=str(target),
-                format="A4",
-                print_background=True,
-                margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
-                prefer_css_page_size=True,
-            )
+                # prefer_css_page_size honours `@page { size: A4 }` in print.css;
+                # zero margins because the .sheet element owns its own padding.
+                page.pdf(
+                    path=str(target),
+                    format="A4",
+                    print_background=True,
+                    margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
+                    prefer_css_page_size=True,
+                )
 
-            pages = approx_page_count(target.read_bytes())
-            print(f"  {spec['out']}  ({describe(target)})")
+                pages = approx_page_count(target.read_bytes())
+                written[locale] = written.get(locale, 0) + 1
+                print(f"    {spec['out']}  ({describe(target)})")
 
-            limit = MAX_PAGES.get(spec["page"])
-            if limit and pages and pages > limit:
-                warnings += 1
-                print(f"  warning: {spec['out']} is {pages} pages, expected at "
-                      f"most {limit}. Trim the data or the layout.", file=sys.stderr)
+                limit = spec.get("max_pages")
+                if limit and pages and pages > limit:
+                    warnings += 1
+                    print(f"  warning: [{locale}] {spec['out']} is {pages} pages, "
+                          f"expected at most {limit}. Trim the data, the "
+                          f"translation or the layout.", file=sys.stderr)
 
         browser.close()
-    return warnings
+    return warnings, written
 
 
 def check() -> int:
-    missing = []
-    for spec in PDFS:
-        target = OUT / spec["out"]
-        if not target.exists():
-            missing.append(f"{spec['out']}: not built")
-            continue
-        data = target.read_bytes()
-        if not data.startswith(b"%PDF-"):
-            missing.append(f"{spec['out']}: not a PDF")
-        elif len(data) < MIN_BYTES:
-            missing.append(f"{spec['out']}: only {len(data)} bytes, looks empty")
-        else:
-            print(f"  ok  {spec['out']}  ({describe(target)})")
+    problems = []
+    grouped = by_locale(PDFS)
 
-    for problem in missing:
+    # A locale with no jobs at all means pdf_jobs() and LOCALES have drifted
+    # apart, which would otherwise pass silently as "nothing to verify".
+    for locale in LOCALES:
+        if not grouped.get(locale["code"]):
+            problems.append(f"[{locale['code']}] no PDFs defined for this locale")
+
+    for locale, specs in grouped.items():
+        print(f"  {locale}:")
+        for spec in specs:
+            target = OUT / spec["out"]
+            if not target.exists():
+                problems.append(f"[{locale}] {spec['out']}: not built")
+                continue
+            data = target.read_bytes()
+            if not data.startswith(b"%PDF-"):
+                problems.append(f"[{locale}] {spec['out']}: not a PDF")
+            elif len(data) < MIN_BYTES:
+                problems.append(f"[{locale}] {spec['out']}: only {len(data)} bytes, "
+                                "looks empty")
+            else:
+                print(f"    ok  {spec['out']}  ({describe(target)})")
+
+    for problem in problems:
         print(f"  FAIL  {problem}", file=sys.stderr)
-    return 1 if missing else 0
+    return 1 if problems else 0
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true",
-                    help="verify the PDFs exist and are non-trivial, render nothing")
+                    help="verify every locale's PDFs exist and are non-trivial, "
+                         "render nothing")
     args = ap.parse_args()
 
     if args.check:
         return check()
 
-    missing_sheets = [s["page"] for s in PDFS
+    missing_sheets = [f"{s['locale']}: {s['page']}" for s in PDFS
                       if not (OUT / s["page"].strip("/") / "index.html").exists()]
     if missing_sheets:
         print("error: dist/ has no print sheets to render "
@@ -189,7 +223,7 @@ def main() -> int:
 
     with serve(OUT) as base_url:
         try:
-            warnings = render_all(base_url)
+            warnings, written = render_all(base_url)
         except Exception as exc:
             # Almost always the browser binary rather than the package: a deploy
             # that quietly ships no CV is worse than one that fails here.
@@ -197,7 +231,9 @@ def main() -> int:
                   f"{INSTALL_HINT}", file=sys.stderr)
             return 1
 
-    print(f"Wrote {len(PDFS)} PDFs into dist/downloads/"
+    totals = ", ".join(f"{code} {count} -> {out_dir(by_locale(PDFS)[code])}"
+                       for code, count in written.items())
+    print(f"Wrote {sum(written.values())} PDFs ({totals})"
           + (f" with {warnings} warning(s)" if warnings else ""))
     return 0
 

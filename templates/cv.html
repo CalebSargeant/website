@@ -8,7 +8,7 @@
 #}
 
 {% block head %}
-  <link rel="alternate" type="application/pdf" href="{{ pdfs.cv }}" title="Caleb Sargeant CV (PDF)">
+  <link rel="alternate" type="application/pdf" href="{{ pdfs.cv }}" title="{{ t('cv.pdf_alt_title', name=profile.name) }}">
   {# tojson, not autoescape: inside a <script> block HTML entities would break
      the JSON parse, and tojson escapes the characters that matter here. #}
   <script type="application/ld+json">
@@ -80,22 +80,22 @@
   <div class="wrap cv-toolbar-in">
 
     <div class="cv-filter">
-      <span class="kicker" id="cv-tailor-label">Tailor</span>
+      <span class="kicker" id="cv-tailor-label">{{ t('cv.tailor') }}</span>
       <div class="cv-filter-btns" role="group" aria-labelledby="cv-tailor-label">
-        <button type="button" class="filter-btn" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" class="filter-btn" data-filter="all" aria-pressed="true">{{ t('filter.all') }}</button>
 {% for area in focus_areas %}
-        <button type="button" class="filter-btn" data-filter="{{ area }}" aria-pressed="false">{{ area | capitalize }}</button>
+        <button type="button" class="filter-btn" data-filter="{{ area }}" aria-pressed="false">{{ t('focus.' ~ area) }}</button>
 {% endfor %}
       </div>
     </div>
 
     <div class="cv-actions">
-      <a class="btn btn-sig" data-magnetic href="{{ pdfs.cv }}" download>{{ icon("download") }} Download PDF</a>
-      <a class="btn btn-ghost" href="/print/cv/">{{ icon("printer") }} Print view</a>
-      <p class="mono cv-stamp">Generated from data/ on {{ build_date }}</p>
+      <a class="btn btn-sig" data-magnetic href="{{ pdfs.cv }}" download>{{ icon("download") }} {{ t('cta.download_pdf') }}</a>
+      <a class="btn btn-ghost" href="{{ url('/print/cv/') }}">{{ icon("printer") }} {{ t('cv.print_view') }}</a>
+      <p class="mono cv-stamp">{{ t('cv.generated_on', date=build_date) }}</p>
     </div>
 
-    <p class="cv-filter-note">Filter the roles to a focus area. The PDF always contains everything.</p>
+    <p class="cv-filter-note">{{ t('cv.filter_note') }}</p>
 
   </div>
 </div>
@@ -106,7 +106,7 @@
 
       {# ── header ───────────────────────────────────────────────────────── #}
       <header class="cv-head reveal" style="--d:0">
-        <img class="cv-portrait" src="/assets/img/caleb.jpg" alt="Caleb Sargeant"
+        <img class="cv-portrait" src="/assets/img/caleb.jpg" alt="{{ profile.name }}"
              width="168" height="168" decoding="async">
         <div class="cv-head-text">
         <h1 class="cv-name">{{ profile.name }}</h1>
@@ -125,24 +125,24 @@
 
       {# ── profile ──────────────────────────────────────────────────────── #}
       <section class="cv-section reveal" style="--d:1" aria-labelledby="cv-h-profile">
-        <h2 class="cv-section-title kicker" id="cv-h-profile">Profile</h2>
+        <h2 class="cv-section-title kicker" id="cv-h-profile">{{ t('cv.section.profile') }}</h2>
         <p class="cv-summary">{{ profile.summary }}</p>
       </section>
 
       {# ── core skills ──────────────────────────────────────────────────── #}
       <section class="cv-section reveal" style="--d:2" aria-labelledby="cv-h-skills">
-        <h2 class="cv-section-title kicker" id="cv-h-skills">Core skills</h2>
+        <h2 class="cv-section-title kicker" id="cv-h-skills">{{ t('cv.section.skills') }}</h2>
         <ul class="cv-skill-list grid-2">
 {% for skill in cv_skills %}
           <li class="cv-skill">
             <span class="cv-skill-name">{{ skill.name }}</span>
 {% if skill.get("years") %}
-            <span class="cv-skill-years mono">{{ skill.years }} yr</span>
+            <span class="cv-skill-years mono">{{ t('common.years_short', n=skill.years) }}</span>
 {% endif %}
           </li>
 {% endfor %}
         </ul>
-        <p class="cv-sub mono">Also</p>
+        <p class="cv-sub mono">{{ t('cv.also') }}</p>
         <div class="chip-row">
 {% for soft in soft_skills %}
           <span class="chip">{{ soft }}</span>
@@ -152,10 +152,15 @@
 
       {# ── experience ───────────────────────────────────────────────────── #}
       <section class="cv-section reveal" style="--d:3" aria-labelledby="cv-h-experience">
-        <h2 class="cv-section-title kicker" id="cv-h-experience">Experience</h2>
-        <p class="cv-sub">{{ roles | length }} roles since {{ (roles | last).start_year }}. Highlights here, the full duty
-          list for every role is on the <a href="/experience/">experience page</a> and in the
-          <a href="{{ pdfs.jds }}">job descriptions PDF</a>.</p>
+        <h2 class="cv-section-title kicker" id="cv-h-experience">{{ t('experience.title') }}</h2>
+        {# Both anchors go in as arguments, so a translation can reorder the
+           clause without the links coming apart. See base.html for why the
+           sentence is escaped before the substitution rather than after. #}
+        {% set exp_page_link %}<a href="{{ url('/experience/') }}">{{ t('cv.experience_page_link') }}</a>{% endset %}
+        {% set jds_pdf_link %}<a href="{{ pdfs.jds }}">{{ t('cv.jds_pdf_link') }}</a>{% endset %}
+        <p class="cv-sub">{{ (t('cv.experience_note') | e).format(
+             roles=roles | length, year=(roles | last).start_year,
+             page_link=exp_page_link, pdf_link=jds_pdf_link) }}</p>
 
 {% for role in roles %}
         {# data-focus is what the toolbar filters on. Space separated so the
@@ -168,7 +173,7 @@
               <span>{{ role.start_short }} &ndash; {{ role.end_short }}</span>
               <span class="cv-dur">{{ role.duration }}</span>
 {% if role.is_current %}
-              <span class="pill-live">Current</span>
+              <span class="pill-live">{{ t('common.current') }}</span>
 {% endif %}
             </p>
           </div>
@@ -187,13 +192,17 @@
 {% endif %}
 
           <div class="cv-role-foot">
+            {# These are the role's own focus tags out of data/experience.yml,
+               not the toolbar's four labels, and the set is open: `support`
+               appears here and in no filter. Rendered as data, so a tag added
+               to a role never has to be added to a ui catalogue too. #}
             <div class="chip-row cv-role-focus">
 {% for area in role.focus %}
               <span class="chip">{{ area }}</span>
 {% endfor %}
             </div>
-            <a class="cv-role-link" href="/experience/#{{ role.id }}"
-               aria-label="Full duty list for {{ role.title }} at {{ role.company }}">Full duties {{ icon("arrow") }}</a>
+            <a class="cv-role-link" href="{{ url('/experience/') }}#{{ role.id }}"
+               aria-label="{{ t('cv.full_duties_aria', title=role.title, company=role.company) }}">{{ t('cv.full_duties') }} {{ icon("arrow") }}</a>
           </div>
         </article>
 {% endfor %}
@@ -201,7 +210,7 @@
 
       {# ── education ────────────────────────────────────────────────────── #}
       <section class="cv-section reveal" style="--d:4" aria-labelledby="cv-h-education">
-        <h2 class="cv-section-title kicker" id="cv-h-education">Education &amp; certifications</h2>
+        <h2 class="cv-section-title kicker" id="cv-h-education">{{ t('cv.section.education') }}</h2>
 
         <ul class="cv-entry-list">
 {% for item in featured_education %}
@@ -212,18 +221,18 @@
               <span>{{ item.completed_label }}</span>
               <span class="chip">{{ item.kind }}</span>
 {% if item.get("verify") %}
-              <a href="{{ item.verify }}">Verify {{ icon("arrow") }}</a>
+              <a href="{{ item.verify }}">{{ t('common.verify') }} {{ icon("arrow") }}</a>
 {% endif %}
             </p>
 {% if item.get("national_qualification") %}
-            <p class="cv-entry-note">National qualification: {{ item.national_qualification }}</p>
+            <p class="cv-entry-note">{{ t('education.national_qualification', value=item.national_qualification) }}</p>
 {% endif %}
           </li>
 {% endfor %}
         </ul>
 
 {% if in_progress %}
-        <p class="cv-sub mono">In progress</p>
+        <p class="cv-sub mono">{{ t('education.in_progress') }}</p>
         <div class="chip-row">
 {% for study in in_progress %}
           <span class="chip">{{ study }}</span>
@@ -236,7 +245,7 @@
 {% set other_education = education | reject("in", featured_education) | list %}
 {% if other_education %}
         <details class="cv-more">
-          <summary>Everything else ({{ other_education | length }})</summary>
+          <summary>{{ t('common.everything_else', count=other_education | length) }}</summary>
           <ul class="cv-entry-list">
 {% for item in other_education %}
             <li class="cv-entry">
@@ -247,7 +256,7 @@
                 <span class="chip">{{ item.kind }}</span>
               </p>
 {% if item.get("national_qualification") %}
-              <p class="cv-entry-note">National qualification: {{ item.national_qualification }}</p>
+              <p class="cv-entry-note">{{ t('education.national_qualification', value=item.national_qualification) }}</p>
 {% endif %}
             </li>
 {% endfor %}
@@ -258,7 +267,7 @@
 
       {# ── courses ──────────────────────────────────────────────────────── #}
       <section class="cv-section reveal" style="--d:5" aria-labelledby="cv-h-courses">
-        <h2 class="cv-section-title kicker" id="cv-h-courses">Courses &amp; training</h2>
+        <h2 class="cv-section-title kicker" id="cv-h-courses">{{ t('education.training_title') }}</h2>
 
         <ul class="cv-entry-list">
 {% for course in featured_courses %}
@@ -276,7 +285,7 @@
 {% set other_courses = courses | reject("in", featured_courses) | list %}
 {% if other_courses %}
         <details class="cv-more">
-          <summary>Everything else ({{ other_courses | length }})</summary>
+          <summary>{{ t('common.everything_else', count=other_courses | length) }}</summary>
           <ul class="cv-entry-list">
 {% for course in other_courses %}
             <li class="cv-entry">
@@ -295,7 +304,7 @@
 
       {# ── interests ────────────────────────────────────────────────────── #}
       <section class="cv-section reveal" style="--d:6" aria-labelledby="cv-h-interests">
-        <h2 class="cv-section-title kicker" id="cv-h-interests">Interests</h2>
+        <h2 class="cv-section-title kicker" id="cv-h-interests">{{ t('cv.section.interests') }}</h2>
         <div class="chip-row">
 {% for interest in profile.interests %}
           <span class="chip">{{ interest }}</span>
@@ -305,12 +314,11 @@
 
       {# ── how this page is made ────────────────────────────────────────── #}
       <footer class="cv-colophon panel reveal" style="--d:7">
-        <p class="kicker">Colophon</p>
-        <p>Every date, role and certification on this page is read from a set of YAML files in
-          <span class="mono">data/</span>. This page is one rendering of them, the PDF is another,
-          and both come out of the same build, so they cannot drift apart.</p>
-        <p>Last built {{ build_date }}. The source is on
-          <a href="{{ site.repo }}">GitHub</a>, along with the build script that produced this page.</p>
+        <p class="kicker">{{ t('cv.colophon_kicker') }}</p>
+        {% set data_path %}<span class="mono">data/</span>{% endset %}
+        <p>{{ (t('cv.colophon_body') | e).format(path=data_path) }}</p>
+        {% set repo_link %}<a href="{{ site.repo }}">GitHub</a>{% endset %}
+        <p>{{ (t('cv.colophon_built') | e).format(date=build_date, link=repo_link) }}</p>
       </footer>
 
     </article>

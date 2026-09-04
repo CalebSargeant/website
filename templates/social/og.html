@@ -3,7 +3,7 @@
    that changes rarely, so it is committed rather than regenerated per deploy.
    Standalone: no base.html, no external CSS, no JS. #}
 <!doctype html>
-<html lang="en-GB">
+<html lang="{{ locale.html_lang }}">
 <head>
 <meta charset="utf-8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -78,8 +78,8 @@
       </svg>
       <span class="wordmark">{{ profile.name }}</span>
     </div>
-    <h1>Networks, platforms<br>and the <span class="grad">glue between them.</span></h1>
-    <p class="lead">{{ profile.headline }} in {{ profile.location }}. {{ years_experience }} years in IT, {{ roles|length }} engineering roles.</p>
+    <h1>{{ t('hero.title_before') }} <span class="grad">{{ t('hero.title_accent') }}</span></h1>
+    <p class="lead">{{ t('og.lead', headline=profile.headline, location=profile.location, years=years_experience, roles=roles|length) }}</p>
     <div class="chips">
       <span class="chip">Kubernetes</span><span class="chip">Terraform</span>
       <span class="chip">Azure &middot; AWS</span><span class="chip">Cisco &middot; MikroTik</span>
