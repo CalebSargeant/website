@@ -1,0 +1,15 @@
+<!-- Nav brand mark. Same geometry as the favicon minus the tile, so it sits on
+     whatever the header's ground is and works in both themes. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+  <defs>
+    <linearGradient id="cs-sig-mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#38E1FF"/>
+      <stop offset="1" stop-color="#4C6FFF"/>
+    </linearGradient>
+  </defs>
+  <path d="M45.5 20.5 A16 16 0 1 0 45.5 43.5"
+        fill="none" stroke="url(#cs-sig-mark)" stroke-width="5.5" stroke-linecap="round"/>
+  <circle cx="45.5" cy="20.5" r="5" fill="#38E1FF"/>
+  <circle cx="16" cy="32" r="4.2" fill="#4C6FFF"/>
+  <circle cx="45.5" cy="43.5" r="5" fill="#38E1FF"/>
+</svg>

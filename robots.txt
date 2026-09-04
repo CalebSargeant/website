@@ -1,0 +1,26 @@
+# Crawler policy for www.calebsargeant.com.
+#
+# This is a CV site. Being read, indexed and quoted (by search engines and by
+# AI assistants alike) is the entire point of it, so the default is Allow and
+# the AI stance is permissive.
+#
+# Content-Signal (contentsignals.org) states how automated systems may use this
+# content:
+#   search=yes    let search and AI search index and link to these pages.
+#   ai-input=yes  let assistants read the pages to answer questions about Caleb.
+#   ai-train=yes  training on a public CV is fine. It is the one line here worth
+#                 a second thought, but a CV that a model already knows about is
+#                 a CV that gets recommended.
+#
+# There is a machine-readable summary of the whole site, with links to the pages
+# and the three PDFs, at https://www.calebsargeant.com/llms.txt (see llmstxt.org).
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+Allow: /
+
+# /print/ is the same content as /cv/ and /experience/ with the design stripped
+# out: it exists only as the source the PDF renderer prints from. Indexing it
+# would put duplicate, uglier copies of every page in the results.
+Disallow: /print/
+
+Sitemap: https://www.calebsargeant.com/sitemap.xml

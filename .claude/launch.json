@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "//": "Serves the already-built dist/ so a preview is instant. Run `make pdf` first if you want the /downloads/ links to resolve; the site itself only needs `make build`.",
+      "name": "site",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8788", "--directory", "dist", "--bind", "127.0.0.1"],
+      "port": 8788
+    }
+  ]
+}

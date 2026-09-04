@@ -1,0 +1,93 @@
+{# Open Graph / Twitter card, 1200x630. Rendered and screenshotted by
+   scripts/render_images.py, not by scripts/build.py. It is a build artefact
+   that changes rarely, so it is committed rather than regenerated per deploy.
+   Standalone: no base.html, no external CSS, no JS. #}
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1200px;height:630px;overflow:hidden;background:#080B10;color:#EAF2F8;
+       font-family:"Space Grotesk",system-ui,sans-serif;position:relative}
+  /* Same two-radial ambience the site uses, so the card and the page match. */
+  .amb{position:absolute;inset:0;
+       background:radial-gradient(52% 46% at 12% 0%,rgba(56,225,255,.14),transparent 62%),
+                  radial-gradient(46% 44% at 94% 96%,rgba(76,111,255,.13),transparent 62%)}
+  .grid{position:absolute;inset:0;opacity:.05;
+        background-image:linear-gradient(rgba(234,242,248,.6) 1px,transparent 1px),
+                         linear-gradient(90deg,rgba(234,242,248,.6) 1px,transparent 1px);
+        background-size:52px 52px;
+        -webkit-mask-image:radial-gradient(70% 62% at 50% 45%,#000,transparent 78%)}
+  .net{position:absolute;inset:0}
+  .inner{position:relative;height:100%;display:flex;flex-direction:column;
+         justify-content:center;padding:0 84px;gap:26px}
+  .top{display:flex;align-items:center;gap:16px}
+  .top svg{width:46px;height:46px}
+  .wordmark{font-size:22px;font-weight:600;letter-spacing:-.02em}
+  h1{font-size:76px;line-height:1.02;letter-spacing:-.038em;font-weight:700;max-width:900px}
+  .grad{background:linear-gradient(120deg,#38E1FF,#4C6FFF);-webkit-background-clip:text;
+        background-clip:text;-webkit-text-fill-color:transparent}
+  .lead{font-size:25px;line-height:1.45;color:#9FB3C4;max-width:790px}
+  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+  .chip{font-family:"JetBrains Mono",monospace;font-size:15px;color:#7FEAFF;
+        border:1px solid rgba(56,225,255,.28);background:rgba(56,225,255,.07);
+        padding:7px 15px;border-radius:8px}
+  .foot{position:absolute;left:84px;bottom:52px;display:flex;align-items:center;gap:22px;
+        font-family:"JetBrains Mono",monospace;font-size:17px;color:#6B8299}
+  .dot{width:9px;height:9px;border-radius:50%;background:#4ADE80;box-shadow:0 0 12px #4ADE80}
+  .rule{position:absolute;left:0;right:0;bottom:0;height:6px;
+        background:linear-gradient(90deg,#38E1FF,#4C6FFF)}
+</style>
+</head>
+<body>
+  <div class="amb"></div>
+  <div class="grid"></div>
+  {# A static frame of the hero topology, hand-placed so the card is deterministic. #}
+  <svg class="net" viewBox="0 0 1200 630" fill="none" aria-hidden="true">
+    <g stroke="#38E1FF" stroke-opacity=".16" stroke-width="1.2">
+      <path d="M905 118 L1042 196 M1042 196 L1006 342 M1006 342 L1094 452 M905 118 L1006 342
+               M1042 196 L1140 128 M1006 342 L888 430 M888 430 L1094 452 M888 430 L946 546"/>
+    </g>
+    <g fill="#38E1FF">
+      <circle cx="905" cy="118" r="5.5"/><circle cx="1042" cy="196" r="7.5"/>
+      <circle cx="1006" cy="342" r="5"/><circle cx="1140" cy="128" r="4"/>
+      <circle cx="888" cy="430" r="6.5"/><circle cx="946" cy="546" r="4.5"/>
+    </g>
+    <g fill="#4C6FFF">
+      <circle cx="1094" cy="452" r="5"/>
+      <circle cx="1024" cy="269" r="3.6"/><circle cx="947" cy="386" r="3.6"/>
+    </g>
+    <circle cx="1042" cy="196" r="19" stroke="#38E1FF" stroke-opacity=".3" stroke-width="1.4"/>
+    <circle cx="888" cy="430" r="26" stroke="#38E1FF" stroke-opacity=".16" stroke-width="1.4"/>
+  </svg>
+
+  <div class="inner">
+    <div class="top">
+      <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#38E1FF"/><stop offset="1" stop-color="#4C6FFF"/>
+        </linearGradient></defs>
+        <path d="M45.5 20.5 A16 16 0 1 0 45.5 43.5" stroke="url(#g)" stroke-width="5.5" stroke-linecap="round"/>
+        <circle cx="45.5" cy="20.5" r="5" fill="#38E1FF"/>
+        <circle cx="16" cy="32" r="4.2" fill="#4C6FFF"/>
+        <circle cx="45.5" cy="43.5" r="5" fill="#38E1FF"/>
+      </svg>
+      <span class="wordmark">{{ profile.name }}</span>
+    </div>
+    <h1>Networks, platforms<br>and the <span class="grad">glue between them.</span></h1>
+    <p class="lead">{{ profile.headline }} in {{ profile.location }}. {{ years_experience }} years in IT, {{ roles|length }} engineering roles.</p>
+    <div class="chips">
+      <span class="chip">Kubernetes</span><span class="chip">Terraform</span>
+      <span class="chip">Azure &middot; AWS</span><span class="chip">Cisco &middot; MikroTik</span>
+      <span class="chip">CCNP Security</span>
+    </div>
+  </div>
+
+  <div class="foot"><span class="dot"></span> www.calebsargeant.com</div>
+  <div class="rule"></div>
+</body>
+</html>

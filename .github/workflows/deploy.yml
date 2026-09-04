@@ -1,0 +1,156 @@
+# Deploy www.calebsargeant.com to Cloudflare Workers (static assets).
+#
+# Workers, not Pages: Cloudflare's current guidance is to start new projects on
+# Workers static assets, and that is where the ongoing investment goes. The
+# Worker is assets-only, no entrypoint, no code in the request path, so asset
+# requests are served free from the edge. See wrangler.toml.
+#
+# push to main             -> `wrangler deploy`, live on www.calebsargeant.com
+# pull_request             -> `wrangler versions upload`, an aliased preview URL
+#                             that takes NO production traffic, posted as a PR comment
+# workflow_dispatch (main) -> manual re-publish of production, for rollbacks
+#
+# THE PDFs ARE BUILT HERE AND ARE NOT COMMITTED. `build.py --pdf` renders
+# /print/cv/, /print/jds/ and /print/cover/ with Playwright on every single
+# deploy, from the same data/*.yml the HTML pages come from. That is the whole
+# point: there is no committed PDF that can quietly fall behind an edit to
+# data/experience.yml, because the published PDF did not exist until thirty
+# seconds before it was uploaded.
+#
+# Required secrets: CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID. Mint the
+# token from Cloudflare's "Edit Cloudflare Workers" template rather than a
+# hand-picked permission list.
+#
+# Actions are pinned by commit SHA; the trailing `# vX.Y.Z` comment is the tag
+# the SHA resolves to. Keep both in sync (Dependabot updates them together).
+
+name: Deploy (Cloudflare Workers)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Never cancel a production deploy mid-upload. Do cancel a superseded preview:
+# only the newest commit on a PR is worth publishing.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  production:
+    name: Deploy production
+    # workflow_dispatch is restricted to main so a manual run from a topic branch
+    # cannot quietly publish that branch to www.calebsargeant.com.
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    # GitHub-hosted, deliberately: `playwright install --with-deps` installs
+    # Chromium's shared libraries with apt, which needs a real Ubuntu image with
+    # sudo. A container-based self-hosted runner would fail on that step, not on
+    # the deploy, which is a confusing place to discover it.
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          # Keyed off requirements.txt. Saves ~20s on the pip step; more
+          # usefully, it means a PyPI outage does not fail a deploy of content
+          # that has not changed.
+          cache: pip
+
+      # Wrangler needs Node even though this site ships none of it. Node 24
+      # rather than 20: Wrangler 4.x declares `engines.node >= 22`, and on 20 it
+      # installs fine and then refuses to run.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements.txt
+
+      # Chromium only. Playwright installs all three browser engines by default,
+      # which is ~400MB of download for a job that renders three A4 sheets.
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+
+      - name: Stage the site and render the PDFs
+        run: python scripts/build.py --pdf
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.114.0"
+          # Everything else: assets directory, custom domain, 404 handling -
+          # comes from wrangler.toml, so this stays a bare deploy.
+          command: deploy
+
+  preview:
+    name: Deploy preview
+    # Fork PRs cannot read secrets, so the upload would fail with a confusing
+    # "authentication error" instead of an honest skip.
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+
+      # The preview builds the PDFs too. A PR that changes data/ but breaks the
+      # CV's two-page limit should fail here, not after it has merged.
+      - name: Stage the site and render the PDFs
+        run: python scripts/build.py --pdf
+
+      - name: Upload preview version
+        id: preview
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.114.0"
+          # `versions upload` uploads without deploying: the version is reachable
+          # on its own URL and takes no production traffic. The PR number makes
+          # the alias stable across pushes, so the link in the comment never
+          # changes, and unlike a branch name it is always URL-safe.
+          command: versions upload --preview-alias pr-${{ github.event.pull_request.number }}
+
+      # `--edit-last --create-if-none` is what keeps this to ONE comment per PR:
+      # it rewrites this workflow's previous comment instead of adding a
+      # twenty-first near-identical one. gh is preinstalled on ubuntu-latest.
+      - name: Comment the preview URL
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PREVIEW_URL: ${{ steps.preview.outputs.deployment-url }}
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          {
+            echo "**Preview:** ${PREVIEW_URL:-_the upload produced no URL, check the job log_}"
+            echo
+            echo "Built from \`${COMMIT_SHA}\`. The three PDFs in this preview were rendered"
+            echo "from \`data/\` by the same job, so they match the pages beside them."
+          } > preview-comment.md
+          gh pr comment "$PR_NUMBER" --edit-last --create-if-none --body-file preview-comment.md

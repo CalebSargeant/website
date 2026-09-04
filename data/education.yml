@@ -1,0 +1,107 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Formal education and certifications. Source for /education and the CV's
+# EDUCATION column.
+#
+#   kind        certification | qualification | schooling
+#   featured    true puts it in the CV's short EDUCATION list. Keep to ~6, or
+#               the CV column overflows the page.
+#   completed   YYYY-MM where known, else YYYY. Everything sorts on this.
+# ═══════════════════════════════════════════════════════════════════════════
+
+education:
+  - title: AWS Certified Cloud Practitioner
+    institution: Self-study
+    kind: certification
+    completed: 2023-09
+    featured: true
+    verify: https://www.credly.com/users/calebsargeant/badges
+
+  - title: CCNP Security
+    institution: Self-study
+    kind: certification
+    credential: "Cisco Certified Network Professional: Security"
+    completed: 2021-03
+    featured: true
+    subjects:
+      - Implementing and Operating Cisco Security Core Technologies (SCOR 350-701)
+      - Implementing Cisco Secure Solutions with Virtual Private Networks (SVPN 300-730)
+
+  - title: CCNA Security
+    institution: Self-study
+    kind: certification
+    credential: "Cisco Certified Network Associate: Security"
+    completed: 2017-04
+    featured: false
+    subjects:
+      - Implementing Cisco Network Security (IINS), CNSS 4011 Recognition
+
+  - title: ITIL Foundation
+    institution: Torque IT
+    kind: certification
+    credential: ITIL Foundation v3
+    completed: 2015-08
+    featured: true
+
+  - title: CCNP Routing & Switching
+    institution: CTU Training Solutions
+    kind: certification
+    credential: "Cisco Certified Network Professional: Routing & Switching"
+    completed: 2014-10
+    featured: true
+    subjects:
+      - Certified Secure Computer User (CSCU)
+      - CompTIA Network+
+      - CCNA
+      - CCNP
+
+  - title: "MCSE: Server Infrastructure"
+    institution: CTU Training Solutions
+    kind: qualification
+    credential: "MCSE: Server Infrastructure"
+    national_qualification: IT Database Administration (SAQA 71869)
+    completed: 2013
+    featured: true
+    subjects:
+      - Introduction to Generic Project Management
+      - Server Network Operating System Review
+      - Database Management Systems
+      - Electronic Messaging Systems
+
+  - title: "MCSA / MCITP: Server Infrastructure"
+    institution: CTU Training Solutions
+    kind: qualification
+    credential: "MCITP: Server Infrastructure"
+    national_qualification: IT System Support (SAQA 48573)
+    completed: 2012
+    featured: false
+    subjects:
+      - Business English
+      - Computer Literacy
+      - Windows 7
+      - CompTIA A+ Hardware
+      - CompTIA A+ Software
+      - CompTIA Network+
+      - Client Network Operating System
+      - Server Network Operating System
+
+  - title: National Senior Certificate (Grade 12)
+    institution: Groote Schuur High School
+    kind: schooling
+    completed: 2011
+    featured: false
+    subjects:
+      - English
+      - Afrikaans (2nd Language)
+      - Physical Science
+      - Mathematics
+      - Life Science
+      - Life Orientation
+      - Computer Applications Technology
+
+# Currently studying. Shown as a live panel on the home page.
+in_progress:
+  - AWS SysOps Administrator
+  - AWS DevOps Engineer
+  - AWS Security Specialty
+  - Python
+  - Kubernetes (CKA)

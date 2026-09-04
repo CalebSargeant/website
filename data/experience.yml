@@ -1,0 +1,638 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Career history. THE source for three renderings:
+#   * the site's /experience timeline   (company, title, dates, highlights)
+#   * the CV PDF                        (company, title, dates, highlights)
+#   * the JDs & Duties PDF              (everything, including `duties`)
+#
+# Field notes
+#   start / end   YYYY-MM. `end: present` means current. Sorting and every
+#                 duration on the site is computed from these. Never write a
+#                 duration by hand.
+#   focus         Tags the CV filter uses: platform | cloud | network |
+#                 security | support. A role may carry several.
+#   highlights    3-6 achievement bullets. These are what a recruiter reads.
+#   duties        The long-form record, grouped. Only the JDs & Duties PDF and
+#                 the expandable panel on /experience render these.
+#   stack         Chips shown on the role card. Keep to ~10 of the real ones.
+# ═══════════════════════════════════════════════════════════════════════════
+
+roles:
+  - id: pinkroccade-cloud-engineer
+    company: PinkRoccade
+    title: Cloud Engineer
+    location: Netherlands
+    start: 2025-06
+    end: present
+    type: Permanent
+    focus: [platform, cloud]
+    summary: >-
+      Cloud and platform engineering for local-government software: Kubernetes
+      platforms, infrastructure as code and the migration path off legacy
+      application stacks.
+    stack: [Kubernetes, Azure, Terraform, GitHub Actions, Helm, Linux, Python]
+    highlights:
+      # TODO(caleb): replace these with the specifics you are happy to publish.
+      - Cloud and Kubernetes platform engineering for government-sector workloads.
+      - Infrastructure as code and CI/CD for application teams.
+      - Migration and modernisation of legacy application platforms.
+    duties: []
+
+  - id: tengen-devops-engineer
+    company: tengen
+    title: DevOps Engineer
+    location: Remote · South Africa
+    start: 2023-02
+    end: present
+    type: Contract
+    focus: [platform, cloud, network, security]
+    summary: >-
+      Sole DevOps engineer for a multi-cloud estate: GitOps Kubernetes, Terraform
+      modules, WireGuard/MikroTik networking, and the monitoring that keeps a
+      production camera fleet honest.
+    stack: [Kubernetes, FluxCD, Terraform, Ansible, AWS, Azure, GCP, Docker, MikroTik, Zabbix, MongoDB]
+    highlights:
+      - Ran fully declarative Kubernetes clusters on FluxCD, with Kustomize and Helm templates per environment.
+      - Wrote and maintained Terraform modules for EKS, VPCs, subnets, IAM, databases and VPNs across AWS, Azure and GCP.
+      - Secured infrastructure secrets with SOPS (GPG/AGE) stored in Git and decrypted in CI.
+      - Upgraded production MongoDB from 4.4 to 7 with replica sets, staging/prod separation and offsite backups.
+      - Cut long-term storage cost by automating disk cleanup and moving backups to S3 Glacier with lifecycle rules.
+      - Built and ran the production camera platform for live plate recognition, with remote HTTPS, NTP/DNS sync and reverse proxies.
+    duties:
+      - group: Infrastructure automation & cloud platforms
+        items:
+          - Deployed and configured applications and services using Ansible, Docker and Kubernetes.
+          - Managed infrastructure on AWS, Azure and GCP, including provisioning, backup strategies and cost optimisation.
+          - Wrote and maintained Terraform modules to provision EKS clusters, VPCs, subnets, IAM, databases and VPNs.
+          - Automated complex workflows to improve deployment reliability and infrastructure consistency with GitHub Actions, Terraform and Ansible.
+      - group: Kubernetes, GitOps & secrets management
+        items:
+          - Managed Kubernetes clusters using GitOps workflows with FluxCD, enabling fully declarative cluster state and automated deployments.
+          - Created and managed Kustomize and Helm templates for reusable, environment-specific Kubernetes configuration.
+          - Secured infrastructure secrets with SOPS using GPG-encrypted/AGE secrets stored in Git and integrated into CI/CD pipelines.
+          - Designed secure multi-environment architecture with RBAC, service accounts and namespace segregation.
+          - Evaluated Rancher against Atlantis for Terraform automation and GitOps workflow management.
+          - Refactored Terraform repositories for modularity, security and scalability.
+      - group: Networking, VPNs & security
+        items:
+          - Deployed and maintained WireGuard and L2TP VPNs, configuring secure tunnels between MikroTik routers, firewalls and cloud environments.
+          - Resolved VPN connectivity issues, managed access for the internal team and external partners, and audited VPN/firewall logs.
+          - Configured and maintained firewalls (SonicWall, MikroTik, FortiGate), ensuring proper routing and secure network segmentation.
+          - Hardened infrastructure based on penetration-test results, including closing unused ports, hardening routers and auditing SSH access.
+      - group: Monitoring, logging & observability
+        items:
+          - Implemented and maintained Zabbix monitoring for cameras, routers, VPNs and VM infrastructure.
+          - Tuned alerting to reduce noise in Slack and improve actionable insight, including alert-duplication fixes and S3 lifecycle alerting.
+          - Automated monitoring for disk usage, Mongo/MySQL performance and system resource thresholds using scripting and GitHub Actions.
+      - group: CI/CD & deployment engineering
+        items:
+          - Built and maintained CI/CD pipelines with GitHub Actions, supporting PR workflows, automated testing, DB seeding and production rollouts.
+          - Dockerised multiple backend and frontend services, deployed with PM2, and implemented alerting for process failures and API throttling.
+          - Documented rollback strategies, staging/production separation and release playbooks to improve developer confidence and safety.
+      - group: Infrastructure management
+        items:
+          - Managed VMs across AWS, Azure and on-prem, including disk expansion, image issues, high CPU/disk usage and network availability.
+          - Implemented disk-cleanup automation, S3 lifecycle rules, and moved backups to S3 Glacier to reduce long-term storage costs.
+          - Developed and documented disaster-recovery plans and procedures to rebuild legacy environments.
+      - group: Database operations
+        items:
+          - Upgraded MongoDB clusters from 4.4 to 7, including migration, replica sets, staging/prod separation and offsite backups.
+          - Maintained and tuned MySQL for staging and production, resolving connectivity issues, timezone misalignments and user access management.
+          - Built backup and monitoring scripts for the Zabbix DB, MongoDB and SonicWall configurations, ensuring recoverability and auditability.
+      - group: Camera & IoT infrastructure
+        items:
+          - Deployed and maintained production cameras for live plate recognition, including remote HTTPS setup, NTP/DNS sync and reverse proxies.
+          - Troubleshot camera-specific issues such as intermittent reads, high data usage, timezone errors and daily reboots.
+          - Built tools for retrieving images, rebooting failing cameras and confirming network routing through the firewall.
+          - Collaborated with third parties and partners on camera rollouts, VPN routing, IP whitelisting and site troubleshooting.
+      - group: Documentation & support
+        items:
+          - Authored internal documentation for VPN and WireGuard setup, camera setup and HTTPS integrations, backup strategy and DR procedures, and infrastructure diagrams and rollout plans.
+          - Created onboarding guides for engineers, filled gaps in legacy systems, and documented legacy rebuild strategies for disaster scenarios.
+          - Provided consistent support to team members and clients on DB/VPN access, SSH issues and deployment failures.
+      - group: Internal tools & developer experience
+        items:
+          - Improved Git workflows, including protected branches and a branching strategy for IaC and application codebases.
+          - Developed scripts for common operations such as VPN status checks, Docker container backups, MongoDB cleanups and certificate renewals.
+          - Participated in tool evaluations (DefectDojo, SonarQube, Infracost) and ensured integrations were functioning in CI/CD.
+          - Improved developer UX by Dockerising dev environments, linking PM2 processes to GitHub repos and enabling fast local onboarding.
+      - group: Collaboration & communication
+        items:
+          - Participated in cross-functional collaboration with developers, system administrators and infrastructure engineers.
+          - Held onboarding meetings, camera POC planning sessions and infrastructure design workshops.
+          - Communicated directly with stakeholders to resolve critical issues, support networking configuration and plan infrastructure rollouts.
+
+  - id: budget-thuis-platform-engineer
+    company: Budget Thuis
+    title: Platform Engineer
+    location: Amsterdam, Netherlands
+    # One role, two locations: started remotely from Cape Town in January 2024
+    # and relocated to Amsterdam in May. Kept as a single entry, because splitting it
+    # put the same job title twice in a row on the timeline, which reads as a
+    # data error rather than as a relocation.
+    location_note: Remote from Cape Town until May 2024
+    start: 2024-01
+    end: 2025-05
+    type: Permanent
+    focus: [platform, cloud, security]
+    summary: >-
+      Azure platform engineering for a Dutch energy and telecoms provider:
+      AKS, Terraform, the internal developer platform, and the CI/CD that
+      hundreds of .NET services ship through.
+    stack: [Azure, AKS, Terraform, Ansible, GitHub Actions, TeamCity, Helm, FluxCD, RabbitMQ, Prometheus, Grafana, Entra ID]
+    highlights:
+      - Designed, built and ran Azure infrastructure as code with Terraform: AKS clusters, ACR, VNets, NSGs and identity integrations.
+      - Led the migration of legacy Linux VMs to microservices on AKS.
+      - Built the internal developer platform: reusable DRY infrastructure modules that bootstrap a new team's environments and repos.
+      - Rolled out observability (Prometheus, Grafana, Blackbox Exporter) across dev, test, acceptance and production.
+      - Integrated Microsoft Entra ID with Kubernetes RBAC, and audited IP whitelisting, SSO and certificate management.
+      - Stood in as Scrum Master for the platform team, running retrospectives and turning actions into prioritised engineering work.
+      - Started the role remotely from Cape Town and relocated to Amsterdam after five months.
+    duties:
+      - group: Infrastructure engineering
+        items:
+          - Design, implement and manage Azure cloud infrastructure using Terraform (AKS clusters, ACR, VNets, NSGs, identity integrations).
+          - Lead the migration of legacy Linux VMs to modern microservices on AKS.
+          - Manage and maintain RabbitMQ clusters on AKS using FluxCD and Helm, including vhost configuration, authentication, resource setup, ingress and metrics collection.
+          - Implement observability stacks, including Prometheus, Grafana and Blackbox Exporter, across all environments (dev, test, acc, prod).
+          - Investigate and resolve connectivity and performance issues (Redis timeouts, RabbitMQ stability, disk-space errors).
+      - group: CI/CD and developer tooling
+        items:
+          - Build, improve and debug GitHub Actions workflows and TeamCity pipelines for .NET and containerised applications.
+          - Standardise and document GitHub configuration practices: org secrets, repo management, fork setups and onboarding new developers.
+          - Investigate and enable cost-efficient GitHub Actions usage and storage options (logs, caching, runner disk space).
+          - Set up and manage self-hosted GitHub runners, including Windows-based runners with Bash scripting capabilities.
+          - Enable Azure authentication during test workflows and optimise .NET restore issues in pipelines.
+      - group: Internal developer platform
+        items:
+          - Develop and maintain reusable infrastructure modules following DRY principles.
+          - Bootstrap environments and repositories for internal teams (Mobile Backend, Web API teams).
+          - Establish shared environment agreements, naming conventions and access controls (GitHub, Azure, APIM).
+          - Create onboarding guides, request forms and documentation to support internal teams in using the platform efficiently.
+          - Design internal API management flows and support APIM configuration for public-facing APIs and internal services.
+      - group: Security & identity
+        items:
+          - Integrate Microsoft Entra ID (Azure AD) with Kubernetes RBAC for role-based access.
+          - Implement and audit IP whitelisting, SSO across internal services, and certificate management.
+          - Ensure secrets and variable management across GitHub and Azure adhere to least-privilege and automation best practices.
+      - group: Platform operations & support
+        items:
+          - Provide cross-team support and runbooks for day-to-day developer issues (GitHub, Redis, TeamCity, environment provisioning).
+          - Rotate into a support roster and document support schedules and processes.
+          - Set up a service-desk system for the platform team, including intake forms and ticket triaging for internal requests.
+          - Troubleshoot production and test issues, including .NET application deployments, AKS issues and on-prem system challenges.
+      - group: Documentation & process enablement
+        items:
+          - Write and maintain extensive documentation in Confluence for platform procedures, onboarding, observability, CI/CD and infrastructure standards.
+          - Update and document changes to monitoring stacks and deployment pipelines.
+          - Capture action items from retrospectives and help enforce best practices across sprints.
+      - group: Scrum Master duties
+        items:
+          - Temporarily act as Scrum Master for the platform team, facilitating retrospectives, managing sprints and organising ceremonies.
+          - Ensure action items from retrospectives are translated into concrete engineering tasks and prioritised.
+
+  - id: byte-orbit-devsecops-engineer
+    company: Byte Orbit
+    title: DevSecOps Engineer
+    location: Cape Town, South Africa
+    start: 2022-11
+    end: 2023-12
+    type: Permanent
+    focus: [security, cloud, platform]
+    summary: >-
+      The security half of a product engineering org: AWS WAF and Cisco FTD in
+      Terraform, the application-security toolchain (Dependency-Track, DefectDojo,
+      SonarQube), and ZTNA evaluations.
+    stack: [Terraform, AWS, Cisco FTD, GitLab CI, OWASP Dependency-Track, DefectDojo, SonarQube, Datadog, Duo, Trivy, ZAP]
+    highlights:
+      - Wrote the Terraform for AWS WAF, a Cisco FTD Geneve/GWLB transit gateway, Dependency-Track, DefectDojo and SonarQube across environments.
+      - Stood up the application-security toolchain end to end and wired it into GitLab CI with Sonar, dependency checks, Trivy and ZAP.
+      - Ran the vulnerability response loop, monitoring alerts, risk-assessing new findings and driving them to closure as tickets.
+      - Delivered ZTNA proof-of-concepts (Duo Network Gateway, ZScaler, Cisco Umbrella SIG) and the SSO/SAML integrations behind them.
+      - Contributed the ISO 27001 documentation and reported weekly on security industry trends to the Information Security Council.
+    duties:
+      - group: Infrastructure as code
+        items:
+          - Write Terraform code for different environments: AWS WAF, Cisco FTD GWLB and transit gateway, OWASP Dependency-Track, DefectDojo, SonarQube.
+          - Cisco FTD NGFW install and configure as a POC in AWS with a Geneve tunnel GWLB, using Terraform.
+          - Rotate S3 access keys in AWS.
+      - group: Application security toolchain
+        items:
+          - Install and configure OWASP Dependency-Track, configure it to send OpsGenie alerts, and integrate it with DefectDojo.
+          - Install and configure SonarQube.
+          - Install and configure DefectDojo.
+          - Modify and secure GitLab CI/CD pipelines with Sonar, dependency check, Trivy, ZAP and similar.
+          - GitLab CI/CD branch permissions, security audit and configuration.
+      - group: Vulnerability & incident response
+        items:
+          - Receive, investigate and close OpsGenie alerts relating to security incidents.
+          - Monitor all security alerts for the organisation, liaise with teams and risk-assess new vulnerabilities, logging them as tickets to get them resolved.
+          - Collaborate with teams on pentest report findings and get them resolved.
+          - Write documentation on security risks and how to mitigate them.
+          - Weekly investigation and reporting of security industry trends for Information Security Council meetings.
+      - group: Identity, access & zero trust
+        items:
+          - Duo Network Gateway POC as a ZTNA solution: install and configure, get HTTPS connections working, configure DNG with SSO and protect applications behind it.
+          - ZScaler POC as a ZTNA solution.
+          - Cisco Umbrella SIG trial and POC.
+          - SAML configurations with various applications using JumpCloud.
+          - Integrate Duo with Datadog.
+          - 1Password: administer access and policies.
+          - Audit the use of Apple Developer Consoles.
+      - group: Governance
+        items:
+          - ISO 27001 documentation and collaboration with teams.
+          - Investigate a fingerprinting solution for a client.
+
+  - id: mindspring-devops-engineer
+    company: Mindspring Computing
+    title: DevOps Engineer
+    location: Cape Town, South Africa
+    start: 2021-09
+    end: 2022-11
+    type: Permanent
+    focus: [platform, cloud, network]
+    summary: >-
+      The generalist DevOps seat at an MSP: GCP/Azure/AWS administration, Jenkins
+      and Bamboo, Ansible-managed infrastructure, and the monitoring and backup
+      estate for a book of clients.
+    stack: [GCP, Azure, AWS, Ansible, Jenkins, Bamboo, Docker, Nagios, Prometheus, Grafana, ELK, MySQL, MongoDB, MikroTik, FortiGate]
+    highlights:
+      - Migrated the organisation from Bitbucket to GitHub, and deployed applications to GCP App Engine.
+      - Installed and ran Prometheus, Alertmanager and Grafana via Docker and Ansible, with granular alerting into Slack.
+      - Wrote the automation that starts and stops cloud instances overnight to cut spend.
+      - Configured MikroTik route failover for fibre outages, with notification, and ran a zero-trust IPTables policy via Ansible.
+      - Built the backup estate: Veeam on Hyper-V, scripted FTP and cloud backups, and Hyper-V replication.
+    duties:
+      - group: Deployments & Git
+        items:
+          - Git merge pull requests and deploy to the app server.
+          - Rebase branches using Git and resolve merge conflicts.
+          - Deploy applications to GCP App Engine.
+          - Migrate from Bitbucket to GitHub.
+      - group: CI/CD
+        items:
+          - Install, configure and maintain Atlassian Bamboo.
+          - Install, configure and maintain Jenkins.
+          - Write Bitbucket pipelines.
+      - group: Cloud administration
+        items:
+          - Resize instances in GCP and work with GCP billing accounts.
+          - Office 365 and Google Admin administration.
+          - Create a script to automatically start and stop instances overnight to save costs.
+          - GCP / Azure / AWS cloud infrastructure management.
+          - Cloud migration investigation of on-premise servers.
+      - group: Infrastructure configuration & administration
+        items:
+          - Configure the UniFi controller in Docker via Ansible.
+          - Configure IPTables via Ansible.
+          - Resize root partition sizes on servers and clear disk space on small-disk servers.
+          - Script FTP backups, backups to Bitbucket, and backups to a cloud server across the whole environment.
+          - Configure Veeam backups on Hyper-V servers and set up Hyper-V replication.
+          - Configure Windows server backups.
+          - Test SFTP server connectivity; set up SFTP and OpenVPN servers.
+          - Set up crontabs on servers.
+          - Investigate certificate issues on Ubuntu/CentOS with Let's Encrypt root cert expiry.
+          - Nginx configuration.
+      - group: Monitoring & logging
+        items:
+          - Nagios XI and Core configuration and maintenance.
+          - Install and configure Prometheus, Alertmanager and Grafana via Docker and Ansible.
+          - Set up granular alerting on Prometheus and configure Prometheus Slack alerting.
+          - Work with Datadog monitoring.
+          - Install and configure an ELK stack server.
+      - group: Database administration
+        items:
+          - MySQL/Postgres database backups, replication configuration and maintenance.
+          - MySQL/Postgres create users and grant permissions; update fields after select queries.
+          - Investigate MongoDB alerts and upgrade the MongoDB cloud cluster.
+      - group: Networking & security
+        items:
+          - Install and configure a FortiGate 30e.
+          - Install and configure MikroTik RouterOS.
+          - MikroTik route failover when fibre goes down, with notification.
+          - Blocking and permitting IP addresses, and NAT with IPTables.
+          - Configure IPTables zero-trust; audit IPTables rules.
+          - SSH key management.
+      - group: Documentation & other
+        items:
+          - Write documentation on RAID disk failure in the datacentre to mitigate downtime.
+          - Create documentation on CI/CD, document incident reports, and document migrating physical instances to GCP/AWS/Azure.
+          - API calls via Postman.
+          - Penetration testing.
+          - Work with MailScanner.
+          - Agile methodologies.
+
+  - id: thinkst-senior-security-engineer
+    company: Thinkst Applied Research
+    title: Senior Security Engineer
+    location: Cape Town, South Africa
+    start: 2020-10
+    end: 2021-09
+    type: Permanent
+    focus: [security, cloud, network]
+    summary: >-
+      Deep technical support and research for Canary, the deception platform:
+      deployments across every major cloud and hypervisor, protocol-level
+      troubleshooting, and published security write-ups.
+    stack: [AWS, GCP, Azure, VMware, OpenStack, Python, PowerShell, Bash, SAML/SSO, Syslog, DNS]
+    highlights:
+      - Supported Canary and Canarytoken deployments across AWS, GCP, Azure, on-prem and VMware, including DNS-tunnelling and HTTP channel configuration.
+      - Found a way to get Canary running on OpenStack.
+      - Wrote Canarytoken deployments and console configuration in Python, PowerShell and Bash, and assisted customers with API deployments.
+      - Researched security vulnerabilities and exploits and published write-ups (pass-the-hash and others) on the security blog.
+      - Ran SAML/SSO configuration, webhooks and syslog integrations for enterprise customers.
+    duties:
+      - group: Support engineering
+        items:
+          - Configuring and updating SAML/SSO.
+          - Enabling and deploying Canary in AWS/GCP/Azure/on-prem/VMware.
+          - Canary-related deployments and questions (DNS tunnelling, how it is configured).
+          - Canarytoken deployments and questions (DNS/HTTP channels, how they are configured).
+          - Troubleshoot and resolve offline Canaries and Canaries with stuck settings.
+          - Configuring and enabling features for the Canary Console.
+          - Troubleshooting and resolving API access and usage; configuring webhooks; enabling and configuring syslog.
+          - Set up, troubleshoot and resolve Canary issues over videoconference.
+          - Answering general security questions, with deep understanding of TCP/IP protocols (DNS, DHCP, SSH, SFTP, HTTP/S, LDAP) and of cloud technologies.
+      - group: Scripting
+        items:
+          - Canarytoken deployments via Python, PowerShell and Bash.
+          - Generating Canary deployment config, and Canary console config and Linux commands in Bash.
+          - Assist customers with API deployments.
+      - group: Research & projects
+        items:
+          - Found a way to get Canary running on OpenStack.
+          - Post write-ups of research and learning done on security topics (pass-the-hash and others).
+          - Research security vulnerabilities and exploits, and write security blog posts about them.
+
+  - id: kurtosys-senior-network-security-engineer
+    company: Kurtosys Systems
+    title: Senior Network Security Engineer
+    location: Cape Town, South Africa
+    start: 2020-07
+    end: 2020-10
+    type: Permanent
+    focus: [network, security]
+    summary: >-
+      Promotion into the senior seat on the same global network, with design and
+      architecture input, Azure migration and the PKI and MFA rollouts.
+    stack: [Cisco ASA, FirePOWER, Azure, AWS, OpenStack, Zabbix, Azure Sentinel, FreeRADIUS, Duo, BGP, OSPF]
+    highlights:
+      - Implemented MFA for remote-access VPN and network device management access (Duo, Google Authenticator).
+      - Implemented Microsoft PKI: a standalone root and enterprise subordinate CA environment.
+      - Migrated virtualised and physical servers to Azure, and migrated Windows NPS to cloud-based FreeRADIUS.
+      - Built VPN tunnels between ASA, Azure and AWS, and scripted the DR procedure with Azure.
+      - Implemented network L2 and L3 redundancy and failover, and Syslog into Azure Sentinel.
+    duties:
+      - group: Projects
+        items:
+          - Implement MFA for remote-access VPN and network device management access (Duo, Google Authenticator).
+          - Build Zabbix server monitoring in and between the datacentre and corporate environments.
+          - Implement Syslog with Azure Sentinel.
+          - Implement network L2 and L3 redundancy/failover.
+          - Virtual office migration of virtualised and physical servers to cloud-based services and virtualised instances in Azure.
+          - Migration of Windows NPS to cloud-based FreeRADIUS instances.
+          - Implement Microsoft PKI (standalone root and enterprise subordinate CA environment).
+          - Build VPN tunnels from and between ASA, Azure and AWS.
+          - Scripted DR procedure with Azure.
+          - FirePOWER, NGFWv and ASAv implementation.
+          - Re-cable the entire server room.
+      - group: Roles & responsibilities
+        items:
+          - Deployment and configuration of network devices, by manual process (to be identified for automation) or automated process.
+          - Development and improvement of network devices or virtualised functionalities.
+          - Development of reporting on the effectiveness of the processes.
+          - Contribute to design and architecture of the network.
+          - Monitoring of global network infrastructure and services.
+          - Provide network support to major infrastructure projects.
+          - Coordination of change control and deployment processes.
+          - Network device and service hardening.
+          - Provide 2nd/3rd line network support to infrastructure and engineering teams.
+          - Help maintain reliable operation of the network infrastructure.
+
+  - id: kurtosys-network-security-engineer
+    company: Kurtosys Systems
+    title: Network Security Engineer
+    location: Cape Town, South Africa
+    start: 2017-12
+    end: 2020-07
+    type: Permanent
+    focus: [network, security]
+    summary: >-
+      Two and a half years on a global, multi-datacentre financial-services
+      network: Cisco ASA and FirePOWER, high availability across layers, and
+      packet-level diagnostics.
+    stack: [Cisco ASA, FirePOWER, Cisco ISE, OpenStack, AWS, Active Directory, Ansible, RANCID, Zabbix, Graylog, BGP, OSPF, HSRP]
+    highlights:
+      - Ran network security on Cisco ASA (ACLs, stateful inspection and threat detection) across a global estate.
+      - Implemented high availability across multiple layers (HSRP and others) and dynamic routing with BGP, OSPF and EIGRP.
+      - Diagnosed at packet level on Linux and Cisco, including decrypting TLS 1.2 in Wireshark with ephemeral keys.
+      - Automated network configuration with Ansible and RANCID under Git-based configuration management.
+      - Ran 802.1x and RADIUS in a mixed FreeRADIUS/Windows NPS environment, and Cisco ISE BYOD.
+    duties:
+      - group: Network engineering
+        items:
+          - Management of the physical and data-link layers, mainly all types of Ethernet up to 10G over fibre or UTP.
+          - Deep understanding of the TCP/IP protocols (DNS, DHCP, SSH, SFTP, HTTP/S, LDAP, RDP).
+          - Diagnostics and troubleshooting, including capturing and analysing packets on Linux or Cisco devices (decrypting TLS 1.2 with Wireshark using ephemeral keys).
+          - Network security, ACL, stateful inspection and threat detection, predominantly on the Cisco ASA firewall.
+          - Conventional data centre and corporate networking.
+          - Implementation of high availability across multiple layers (HSRP and other).
+          - Dynamic and static routing (BGP, OSPF, EIGRP).
+          - Understanding load-balancing technologies (L4-L7, SSH/HTTPS).
+          - Ethernet, fibre and wireless connectivity including 10GE and 802.11ac.
+          - Intrusion prevention and detection systems.
+          - Network device licensing.
+      - group: Cloud & virtualisation
+        items:
+          - OpenStack networking (Nova, OpenStack CLI, GUI).
+          - AWS networking (VPC, VPN, EIP).
+          - AnyConnect remote-access VPN; IPsec and SSL VPN technologies.
+          - Microsoft Hyper-V (2012/2012 R2/2016) and Microsoft Failover Clustering.
+      - group: Platforms & identity
+        items:
+          - Linux (Ubuntu) and Windows (7-10, Server 2012 to 2016) administration for network services.
+          - Understanding of domain services on Windows Servers and all related protocols.
+          - Active Directory (Windows 2012 R2/2016, forests with multiple child domains); hierarchical AD design and implementation.
+          - 802.1x, RADIUS in a mixed environment, FreeRADIUS, Windows NPS.
+          - Cisco ISE BYOD.
+          - DNS (MS, BIND); SSH and (S)FTP using AD authentication from Linux.
+      - group: Automation & monitoring
+        items:
+          - BASH scripting.
+          - Network automation (RANCID, Ansible) and Git-based configuration management.
+          - Central log aggregation using Logstash, Graylog and ElasticSearch.
+          - SNMP monitoring with data collection (Cacti, Zabbix); infrastructure monitoring (Nagios, Zabbix).
+          - Network device configuration backup (RANCID).
+          - Bandwidth testing, monitoring and reporting (NetFlow, AWS cost analyser).
+          - Compute-node acceptance testing using performance testing tools.
+          - Ubiquiti UniFi wireless systems.
+      - group: Ways of working
+        items:
+          - Working on multiple projects in a controlled and organised manner.
+          - Working independently on projects or BAU tasks.
+          - Working as part of a geographically dispersed team.
+
+  - id: dimension-data-security-engineer
+    company: Dimension Data
+    title: Security Engineer
+    location: Cape Town, South Africa
+    start: 2016-11
+    end: 2017-12
+    type: Permanent
+    focus: [security, network, support]
+    summary: >-
+      Managed-security engineering across a book of enterprise clients: Cisco
+      ASA, FortiGate and Juniper firewalls, site-to-site VPNs and ACL reviews.
+    stack: [Cisco ASA, FortiGate, Juniper, McAfee ePO, Bluecoat, Wireshark]
+    highlights:
+      - Configured and troubleshot site-to-site VPNs, ACLs and firewalls (Cisco ASA, FortiGate, Juniper) for enterprise clients.
+      - Ran zero-hit ACL reviews across all clients, and firewall upgrades on ASA and FortiGate.
+      - Owned incidents end to end, from first-line call through to closure and client reporting.
+    duties:
+      - group: Engineering
+        items:
+          - First-line support calls: configuring and troubleshooting site-to-site VPNs, configuring and maintaining ACLs, configuring and maintaining firewalls (Cisco ASA, FortiGate, Juniper).
+          - Creating and modifying routes; maintenance and changes to interfaces; NAT.
+          - Troubleshooting connectivity with captures, packet-tracers and Wireshark.
+          - Installing and configuring Cisco ASAs and FortiGates; firewall upgrades.
+          - Configuration and log backups.
+          - McAfee ePO maintenance and reporting; Bluecoat reporter reporting.
+          - Zero-hit ACL review of all clients.
+      - group: Service management
+        items:
+          - Identify problems prior to, or when, they occur, and log incidents in a timely manner.
+          - Liaise with all stakeholders to fast-track resolution; escalate where applicable.
+          - Full ownership in managing calls, with continuous feedback to clients.
+          - Update incidents with progress and resolution details.
+          - Design/config documentation; create and maintain network diagrams.
+          - Daily health checks; daily/weekly/monthly reports; SOPs and spares lists checked bi-annually.
+
+  - id: dimension-data-customer-support-engineer
+    company: Dimension Data
+    title: Customer Support Engineer
+    location: Cape Town, South Africa
+    start: 2015-03
+    end: 2016-11
+    type: Permanent
+    focus: [support, network]
+    summary: >-
+      End-to-end customer support for an enterprise client base, including a VIP
+      user group, plus the AD, Exchange and infrastructure administration behind it.
+    stack: [Active Directory, Exchange, Group Policy, DNS, DHCP, Windows Server, Cisco]
+    highlights:
+      - Provided 1st, 2nd and 3rd line support (telephonic, remote and onsite) across the client base, with a dedicated VIP support focus.
+      - Administered Active Directory, Group Policy, print, DNS and DHCP servers.
+      - Managed third-party vendors for cabling, boardrooms, printers and hardware call logging.
+    duties:
+      - group: Support
+        items:
+          - Log, assign, monitor and report on incidents and requests from users, and redirect unresolved problems to the relevant section.
+          - Provide an end-to-end customer interface to understand and drive customer requests to closure.
+          - Provide 1st, 2nd and 3rd line customer support (telephonic, remote and onsite) for all customers.
+          - Added focus on VIP support: frequent communication, follow-up, proactive checks and speedy turnaround times.
+          - Responsible for advanced fault finding, repair and configuration on all workstations, laptops, desktops and mobile devices.
+          - Provide hardware troubleshooting on IT infrastructure, like servers, switches, desktop telephones (Cisco), projectors and VC end points.
+          - Provide mobile device support (BlackBerry, Apple, Android, Nokia).
+      - group: Administration
+        items:
+          - Setup and maintenance of AD accounts; setup and management of MS Exchange Server accounts.
+          - Creating and maintaining Group Policy Objects.
+          - Administer and maintain Active Directory, Group Policy, print server, DNS server and DHCP server.
+          - Maintaining the IT asset register and assisting with IT-related procurement.
+          - Administrative support to IT Operations, such as managing backup drives to the disaster-recovery site.
+          - Engage with third-party vendors to ensure site requirements are carried out: building cabling, boardrooms and meeting rooms, printer and hardware call logging.
+          - Ensure ISO requirements are met and policies and procedures are adhered to.
+
+  - id: mmi-desktop-support-engineer
+    company: MMI Holdings (Carecross Health)
+    title: Desktop Support Engineer
+    location: Cape Town, South Africa
+    start: 2014-03
+    end: 2015-03
+    type: Permanent
+    focus: [support]
+    summary: >-
+      The whole IT department for a health business: desktops, servers, the
+      switched network, access control and everything in between.
+    stack: [Windows Server, Active Directory, Group Policy, DNS, DHCP, FSRM, Terminal Server, HP switches, Ubiquiti]
+    highlights:
+      - Ran service and IT support for the entire IT department, from workstation builds to Terminal Servers.
+      - Monitored, installed and maintained the HP switched network, and implemented and neatened network cabling.
+      - Administered the ImproNet security access-control system.
+    duties:
+      - group: Support & administration
+        items:
+          - Service and IT support for the entire IT department.
+          - Log, assign, monitor and report on incidents and requests from users; close off all logged calls.
+          - Administrative support to IT Operations, such as managing backup drives to the disaster-recovery site.
+          - Maintaining the IT asset register and assisting with IT-related procurement.
+          - Setup and maintenance of AD accounts; setup and management of MS Exchange Server accounts.
+          - Creating and maintaining Group Policy Objects.
+          - Windows DNS, DHCP and FSRM administration; troubleshooting and maintaining Windows Server.
+          - Management of the security access-control system (ImproNet).
+          - Installing, monitoring and maintaining Terminal Servers.
+      - group: Infrastructure
+        items:
+          - Monitoring, installing and maintaining the HP switched network.
+          - Network cabling implementation and neatening.
+          - Installing new workstations, thin stations and laptops.
+          - Setup new BlackBerry, iPhone and Android phones; setup and troubleshoot fax.
+          - Ubiquiti wireless administration.
+          - Create scripts using batch.
+          - Troubleshooting printers, and resolving software and hardware problems.
+          - Help 3G users remotely; troubleshoot and resolve any computer-related issue in the building.
+
+  - id: mindspring-it-support-engineer
+    company: Mindspring Computing
+    title: IT Support Engineer
+    location: Cape Town, South Africa
+    start: 2012-11
+    end: 2014-02
+    type: Permanent
+    focus: [support, network]
+    summary: >-
+      Where it started. MSP helpdesk covering client-side and server-side, on-site
+      work, and the self-taught programming that turned into everything after.
+    stack: [CentOS, Windows Server, Nagios XI, Linux mail, DNS, PHP, Bash, Git]
+    highlights:
+      - Ran helpdesk across client-side (Windows, Mac, Office, ADSL) and server-side (CentOS/RHEL 5+, Windows Server 2003+).
+      - Administered Linux mail (domains, forwards, relays, queues and DNS records) and ADSL/server monitoring with Nagios XI.
+      - Tested and set up a Git server and a ThinStation server for the business.
+      - Taught myself PHP, HTML, CSS, VBS, batch and Bash in quiet hours, and built an app that auto-logs into servers using KeePass and PHP.
+      - Built and shipped two client websites (kaytrad.co.za, saasie.co.za).
+    duties:
+      - group: Helpdesk, client side
+        items:
+          - Workstations from Windows 98 onwards, and macOS.
+          - Troubleshoot and resolve problems with any version of Outlook on Windows and Mac, and with Office products.
+          - Troubleshoot and resolve problems with ADSL; top-up bandwidth for clients.
+          - Troubleshoot and resolve network issues; setup printers; install required software.
+          - Clear computers of virus/malware/adware; fix Java problems for internet banking.
+          - Resolve any browser-related issue (Chrome, Firefox, IE); used vTiger CRM for helpdesk ticketing.
+      - group: Helpdesk, server side
+        items:
+          - CentOS Linux servers (RHEL 5 and later), command line mostly; Windows Server 2003 and later, and SBS 2003 and later.
+          - Linux/Windows server maintenance; ADSL/server monitoring using Nagios XI.
+          - Create new domains, out-of-office messages, mail forwards, new email users, and add users to the relay server (Linux).
+          - Create and edit DNS records; recover mail; check and clear mail queues; test mail server connectivity using telnet.
+          - Setup VPN connections; troubleshoot and resolve DNS and DynDNS issues.
+      - group: Technical work at the office
+        items:
+          - Create Ethernet cables; reinstall Windows/Mac/Linux machines; install new Windows/Linux servers and workstations.
+          - Test hard-drive integrity and recover client data; troubleshoot hardware and quote via finance.
+          - Research and test new technologies; test and set up a Git server and a ThinStation server.
+          - Neaten cabling; write up proposals; setup and configure new routers; troubleshoot UPS issues.
+          - Password recovery of Windows/Linux/Mac machines.
+      - group: On-site support
+        items:
+          - Scheduled visits and callouts when the helpdesk could not solve the problem.
+          - Maintenance of workstations and servers; setup new computers; install printers; setup fax.
+          - Solve network issues; setup switches, routers and cabling; cover for assigned technicians.
+          - Three months as an in-house technician at a Mindspring client: server installs, Kaseya and ManageEngine evaluation, SQL Server audit, Hyper-V installs and replication, Windows Deployment Services.
+      - group: Development experience
+        items:
+          - Learned to program in PHP, HTML, CSS, VBS, batch and Bash during quiet office hours, and developed test programs in those languages.
+          - Developed an application that auto-logs into servers and services using KeePass and PHP.
+          - Upload created websites via FTP/cPanel; edit websites using Joomla/WordPress.
+          - Created scripts to make my work easier.
+          - Websites created: kaytrad.co.za and saasie.co.za.

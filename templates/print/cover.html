@@ -1,0 +1,65 @@
+<!doctype html>
+{#
+  The cover letter. One sheet, deliberately generic: the salutation and the
+  four paragraphs come from profile.cover_letter, so tailoring the letter for a
+  specific employer is an edit to data/profile.yml and a rebuild, never an edit
+  to this file.
+
+  No date line. The PDF is regenerated on deploy rather than on send, and a
+  letter stamped with a month that has already passed reads worse than one with
+  no date at all.
+#}
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }}</title>
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=block">
+<link rel="stylesheet" href="/assets/print.css">
+</head>
+<body>
+
+<article class="sheet">
+  <header class="cover-head">
+    <h1>{{ profile.name }}</h1>
+    <p class="cover-role">{{ profile.headline }}</p>
+
+    <p class="cover-contact">
+      <span><b>Web</b><span>{{ profile.links.website | replace('https://', '') }}</span></span>
+      <span><b>Docs</b><span>{{ profile.links.docs | replace('https://', '') }}</span></span>
+      <span><b>GitHub</b><span>{{ profile.links.github | replace('https://', '') }}</span></span>
+      <span><b>Email</b><span>{{ profile.contact.email }}</span></span>
+      <span><b>Phone</b><span>{{ profile.contact.phone }}</span></span>
+    </p>
+
+    {# Absolute URLs, not the site-relative paths in `pdfs`: these have to
+       resolve when the letter is read as a PDF on someone else's machine. #}
+    <p class="cover-docs">
+      <span><b>CV</b><a href="{{ site.base_url }}{{ pdfs.cv }}">{{ site.base_url | replace('https://', '') }}{{ pdfs.cv }}</a></span>
+      <span><b>Duties</b><a href="{{ site.base_url }}{{ pdfs.jds }}">{{ site.base_url | replace('https://', '') }}{{ pdfs.jds }}</a></span>
+    </p>
+  </header>
+
+  <div class="letter">
+    <p class="salutation">{{ profile.cover_letter.salutation }}</p>
+
+    {% for paragraph in profile.cover_letter.paragraphs %}
+    <p>{{ paragraph }}</p>
+    {% endfor %}
+
+    <p class="signoff">{{ profile.cover_letter.sign_off }}</p>
+    <p class="signature">{{ profile.name }}</p>
+    <p class="signature-sub">{{ profile.headline }} · {{ profile.location }}</p>
+  </div>
+
+  <footer class="sheet-foot">
+    <span>{{ profile.name }} · {{ profile.contact.email }} · {{ profile.contact.phone }}</span>
+    <span>{{ profile.links.website | replace('https://', '') }}</span>
+  </footer>
+</article>
+
+</body>
+</html>

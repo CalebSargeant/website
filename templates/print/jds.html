@@ -1,0 +1,139 @@
+<!doctype html>
+{#
+  Job Descriptions & Duties: the long-form record behind the CV, one section
+  per role, a dozen or so A4 pages.
+
+  Unlike cv.html this is NOT hand-paginated. A dozen fixed sheets would have to
+  be re-balanced by hand every time a duty line changes, so the whole document
+  is one flowing container and print.css owns the breaks: `@page flow` supplies
+  the gutter and `.duty-group { break-inside: avoid }` keeps a heading with its
+  list.
+
+  That container is a one-cell table for one reason: Chromium repeats a <thead>
+  on every printed page and reserves layout space for it, which is the only
+  reliable way to get a running header out of a paged HTML document. It carries
+  no data, hence role="presentation".
+#}
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }}</title>
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=block">
+<link rel="stylesheet" href="/assets/print.css">
+</head>
+<body>
+
+{# A role with no duties recorded is left out entirely, contents included. #}
+{% set duty_roles = roles | selectattr('duties') | list %}
+
+<table class="flow" role="presentation">
+<thead>
+  <tr><td>
+    <div class="run-head">
+      <span>{{ profile.name }}</span>
+      <span>{{ profile.headline }}</span>
+    </div>
+  </td></tr>
+</thead>
+<tbody>
+  <tr><td>
+
+  <header class="jd-title">
+    <p class="kicker">Job descriptions &amp; duties</p>
+    <h1>{{ profile.name }}</h1>
+    <p class="jd-sub">{{ profile.headline }}</p>
+    <p class="jd-meta">
+      {{ profile.location }} · {{ profile.contact.email }} ·
+      {{ profile.contact.phone }} ·
+      {{ profile.links.website | replace('https://', '') }}
+    </p>
+    <p class="jd-intro">
+      The full record of what each role actually involved, grouped by area of
+      work. The CV is the two-page summary of this document. Both are generated
+      from the same source, so nothing here contradicts anything there.
+    </p>
+
+    <div class="jd-facts">
+      {% for stat in profile.stats %}
+      <div>
+        <b>{{ stat.value }}{{ stat.get('suffix', '') }}</b>
+        <span>{{ stat.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </header>
+
+  <section>
+    <h2 class="sec-head">Contents</h2>
+    <ol class="jd-toc">
+      {% for role in duty_roles %}
+      <li>
+        <a class="toc-row" href="#{{ role.id }}">
+          <span>
+            <span class="toc-org">{{ role.company }}</span>
+            <span class="toc-title">{{ role.title }}</span>
+          </span>
+          <span class="toc-when">{{ role.start_short }} &ndash; {{ role.end_short }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+
+  {% for role in duty_roles %}
+  {# The first section opens a fresh sheet so the contents page stands alone;
+     everything after that flows. #}
+  <section class="jd-role{% if loop.first %} page{% endif %}" id="{{ role.id }}">
+    <header class="jd-role-head">
+      <h2>{{ role.company }}</h2>
+      <p class="jd-role-title">{{ role.title }}</p>
+      <p class="jd-role-meta">
+        {{ role.start_label }} &ndash; {{ role.end_label }} ·
+        {{ role.duration }} · {{ role.location }} · {{ role.type }}{% if role.get('location_note') %} ·
+        {{ role.location_note }}{% endif %}
+      </p>
+    </header>
+
+    {% if role.get('summary') %}
+    <p class="jd-role-summary">{{ role.summary }}</p>
+    {% endif %}
+
+    {% if role.get('duties_shared_with') %}
+    <p class="jd-note">
+      The same position as the other {{ role.duties_shared_with }} entry, worked
+      from a different location. The duty list is identical and is repeated here
+      in full so this section stands on its own.
+    </p>
+    {% endif %}
+
+    {# `group['items']` and not `group.items`: Jinja resolves an attribute
+       before a key, and dict.items is a method, so the dotted form would
+       render the bound method instead of the list. #}
+    {% for group in role.duties %}
+    <div class="duty-group">
+      <h3>{{ group.group }}</h3>
+      <ul class="duty-list">
+        {% for duty in group['items'] %}
+        <li>{{ duty }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </section>
+  {% endfor %}
+
+  <p class="jd-end">
+    End of record · {{ duty_roles | length }} roles documented ·
+    {{ profile.name }} · {{ profile.links.website | replace('https://', '') }}
+  </p>
+
+  </td></tr>
+</tbody>
+</table>
+
+</body>
+</html>

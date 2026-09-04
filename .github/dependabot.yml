@@ -1,0 +1,40 @@
+# `cooldown` holds a newly published version back for 7 days before Dependabot
+# will propose it, so a compromised or yanked release has a window to be caught
+# and pulled before it reaches a PR here. GitHub already applies 3 days
+# implicitly; 7 is the hardened value, and it has to be repeated per
+# `package-ecosystem` because there is no file-level key for it. Version updates
+# only: GitHub exempts security updates, so an advisory fix still opens its PR
+# immediately.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions-version:
+        applies-to: version-updates
+        patterns: ["*"]
+      actions-security:
+        applies-to: security-updates
+        patterns: ["*"]
+
+  # requirements.txt carries floors rather than pins, so most upgrades need no PR
+  # at all. Dependabot still earns its keep here for the one case floors cannot
+  # cover: an advisory that raises the minimum safe version, which arrives as a
+  # PR that bumps the floor.
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      pip-version:
+        applies-to: version-updates
+        patterns: ["*"]
+      pip-security:
+        applies-to: security-updates
+        patterns: ["*"]

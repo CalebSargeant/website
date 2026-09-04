@@ -1,0 +1,65 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Courses and training. Source for /education's courses section and the CV's
+# COURSES column. `featured: true` selects the CV's shortlist.
+# ═══════════════════════════════════════════════════════════════════════════
+
+courses:
+  - title: AWS Certified Cloud Practitioner
+    institution: Udemy
+    date: 2022-12
+    duration: 14.5 hours
+    featured: true
+  - title: Kubernetes
+    institution: Udemy
+    date: 2022-08
+    duration: 20 hours
+    featured: true
+  - title: Docker, Swarm, Kubernetes
+    institution: Udemy
+    date: 2022-08
+    duration: 20 hours
+    featured: false
+  - title: Ethical Hacking
+    institution: Udemy
+    date: 2022-07
+    duration: 16 hours
+    featured: true
+  - title: Linux
+    institution: Udemy
+    date: 2022-05
+    duration: 35.5 hours
+    featured: true
+  - title: MikroTik MTCNA
+    institution: Udemy
+    date: 2022-03
+    duration: 13 hours
+    featured: true
+  - title: "Net DevOps: Cisco Python, Automation, NETCONF, SDN, Docker"
+    institution: Udemy
+    date: 2020-05
+    duration: 20 hours
+    featured: false
+  - title: Cisco WSA
+    institution: Torque IT
+    location: Bellville, Cape Town
+    date: 2017-09
+    duration: 2 days
+    featured: true
+  - title: F5 Networks
+    institution: Networks Unlimited
+    location: Woodmead, Johannesburg
+    date: 2017-06
+    duration: 3 days
+    featured: true
+  - title: ITIL Foundation
+    institution: Torque IT
+    location: Bellville, Cape Town
+    date: 2015-08
+    duration: 3 days
+    featured: false
+  - title: Work Readiness Programme
+    institution: The Business Institute of South Africa (TBISA)
+    location: Observatory, Cape Town
+    date: 2012-11
+    duration: 5 days
+    featured: false

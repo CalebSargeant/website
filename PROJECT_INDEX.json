@@ -1,0 +1,184 @@
+{
+  "generated": "2026-09-04",
+  "summary": "Caleb Sargeant's personal site and CV (www.calebsargeant.com). data/*.yml is the single source of truth; scripts/build.py renders it with Jinja2 into dist/, which ships as Cloudflare Workers static assets. The same data renders three A4 print sheets that Playwright prints to the CV, JDs & Duties and cover-letter PDFs. No framework, no bundler: one site stylesheet, one print stylesheet, progressive-enhancement JS only.",
+  "entrypoints": [
+    "scripts/build.py:main",
+    "scripts/render_pdf.py:main",
+    "scripts/render_images.py:main",
+    "templates/base.html"
+  ],
+  "modules": {
+    "data": {
+      "path": "data",
+      "purpose": "THE source of truth. Every fact about Caleb is written here once and nowhere else; the site and all three PDFs are renderings of these five files. Never edit a rendered page or a PDF.",
+      "exports": [
+        "data/profile.yml",
+        "data/experience.yml",
+        "data/education.yml",
+        "data/courses.yml",
+        "data/skills.yml"
+      ],
+      "files": {
+        "data/profile.yml": "The person: name, headline, tagline, location, contact, links, summary, the cover-letter paragraphs, the home-page stats and the availability banner.",
+        "data/experience.yml": "Every role, newest sorted at build time: id, company, title, dates (YYYY-MM or `present`), focus tags, summary, stack chips, highlights (CV) and grouped duties (JDs PDF). `duties_see` borrows another role's duty list.",
+        "data/education.yml": "Certifications, qualifications and schooling, plus `in_progress`. `featured: true` selects the CV's short education list.",
+        "data/courses.yml": "Courses and training with institution, date and duration. `featured: true` selects the CV's course shortlist.",
+        "data/skills.yml": "Grouped technical skills with a 1 to 5 level and optional years, plus soft skills. `cv: true` selects the CV's HIGHLIGHTS block."
+      },
+      "depends_on": []
+    },
+    "templates": {
+      "path": "templates",
+      "purpose": "Jinja templates, rendered with StrictUndefined so a typo fails the build. Site pages extend base.html and override blocks; the print sheets are standalone documents that link only assets/print.css. Layout only, never content.",
+      "exports": [
+        "templates/base.html",
+        "templates/home.html",
+        "templates/experience.html",
+        "templates/education.html",
+        "templates/cv.html",
+        "templates/contact.html",
+        "templates/404.html",
+        "templates/print/cv.html",
+        "templates/print/jds.html",
+        "templates/print/cover.html",
+        "templates/social/og.html"
+      ],
+      "files": {
+        "templates/base.html": "Owns doctype, head, the pre-paint theme bootstrap, the sticky nav built from `nav`, the footer, the command-palette markup and the script tags. Derives title and meta description from `page`, so a child never sets them.",
+        "templates/home.html": "Home: hero with the #hero-net canvas, availability, stats, skill matrix, current roles, links out.",
+        "templates/experience.html": "The timeline: every role as a .tl-card, with the full duty list inside a keyboard-operable <details>.",
+        "templates/education.html": "Certifications, qualifications, what is in progress, and the course list.",
+        "templates/cv.html": "The CV on screen, with the focus filter toolbar and a link to the PDF.",
+        "templates/contact.html": "Email, phone, LinkedIn, GitHub, docs and the booking link.",
+        "templates/404.html": "Not-found page, served with a real 404 by the Worker.",
+        "templates/print/cv.html": "A4 CV sheet, two columns, budgeted at 1 to 2 pages. Printed to Caleb_Sargeant_CV.pdf.",
+        "templates/print/jds.html": "A4 job-descriptions sheet: contents page plus every role's full duty list. Grows with the data by design.",
+        "templates/print/cover.html": "A4 cover letter from profile.yml's cover_letter block. One page.",
+        "templates/social/og.html": "The 1200x630 Open Graph card. Rendered to a committed PNG by scripts/render_images.py, not part of the site build."
+      },
+      "depends_on": ["data", "assets"]
+    },
+    "assets": {
+      "path": "assets",
+      "purpose": "House style and behaviour, copied into dist/ byte for byte. site.css holds every design token and component; the JS is progressive enhancement only, so the site is complete without it. print.css is a separate stylesheet used only by templates/print/*.",
+      "exports": [
+        "assets/site.css",
+        "assets/site.js",
+        "assets/hero-net.js",
+        "assets/print.css",
+        "assets/mark.svg",
+        "assets/favicon.svg",
+        "assets/og/og-default.png",
+        "assets/img/caleb.jpg"
+      ],
+      "files": {
+        "assets/site.css": "Every token (dark default, light theme override) and every component in docs/design-system.md. One stylesheet for the whole site.",
+        "assets/site.js": "Progressive enhancement: reveal-on-scroll, nav solidify and mobile toggle, theme swap, count-up, typewriter, skill meters, timeline spine, command palette, cursor glow, scroll rail. All motion gated on prefers-reduced-motion.",
+        "assets/hero-net.js": "The hero canvas (#hero-net): a small animated network graph, DPR-scaled to its parent, capped at about 34 nodes, paused when off-screen or the tab is hidden, one static frame under reduced motion.",
+        "assets/print.css": "Print-only stylesheet: light ground, @page A4 with zero margin, a 210x297mm .sheet with its own 14mm padding, and the break-inside rules. No dark tokens, no animation.",
+        "assets/mark.svg": "The personal mark used in the nav brand and the OG card.",
+        "assets/favicon.svg": "Favicon source. The PNG icons and favicon.ico are generated from it by scripts/render_images.py.",
+        "assets/og/og-default.png": "Generated 1200x630 social card, committed. Re-render it after editing templates/social/og.html.",
+        "assets/img/caleb.jpg": "Portrait, with caleb-320.jpg as the small variant.",
+        "assets/apple-touch-icon.png": "Generated 180x180 touch icon, committed.",
+        "assets/favicon-32.png": "Generated 32x32 icon, committed; also packed into favicon.ico.",
+        "assets/favicon-16.png": "Generated 16x16 icon, committed; also packed into favicon.ico."
+      },
+      "depends_on": []
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "The build pipeline. build.py is the hub and the only place page metadata lives; render_pdf.py imports its PDFS list rather than keeping a copy. render_images.py is out of band, run by hand.",
+      "exports": [
+        "scripts/build.py",
+        "scripts/render_pdf.py",
+        "scripts/render_images.py"
+      ],
+      "files": {
+        "scripts/build.py": "Loads data/*.yml, enriches roles (labels, durations, duties_see resolution, sorting), renders every entry in PAGES into dist/, copies assets and the root files, and writes sitemap.xml stamped to the build date. PAGES and PDFS are the site's page and document registries. Also serves dist/ with --serve.",
+        "scripts/render_pdf.py": "Serves dist/ on an ephemeral localhost port and drives Playwright's Chromium to print the three sheets to dist/downloads/. Awaits document.fonts.ready, prints A4 with zero margins, warns past the MAX_PAGES budget. `--check` asserts the PDFs exist and are non-trivial.",
+        "scripts/render_images.py": "Generates the committed images: the OG card from templates/social/og.html and the raster favicons plus favicon.ico from assets/favicon.svg. Run by hand, not by the build."
+      },
+      "depends_on": ["data", "templates", "assets"]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "The two contracts. Normative, not notes: a class name or a variable name here is the name in the CSS, the JS and the templates. Internal, never published to the site.",
+      "exports": [
+        "docs/design-system.md",
+        "docs/template-context.md"
+      ],
+      "files": {
+        "docs/design-system.md": "Tokens, layout primitives, the exact class names / ids / data-attributes, the animation catalogue, the print rules, and the non-negotiable accessibility floor in section 6.",
+        "docs/template-context.md": "Every variable build.py hands a template, the enriched role fields, and the base.html block contract."
+      },
+      "depends_on": []
+    },
+    "config": {
+      "path": "wrangler.toml",
+      "purpose": "Delivery and tooling config. The Worker is assets-only (no `main`), which is what keeps _headers authoritative. The crawl and disclosure surface sits at the repo root and is copied into dist/ verbatim.",
+      "exports": [
+        "wrangler.toml",
+        "_headers",
+        "Makefile",
+        "requirements.txt",
+        "robots.txt",
+        "llms.txt",
+        ".well-known/security.txt",
+        "favicon.ico"
+      ],
+      "files": {
+        "wrangler.toml": "The assets-only Worker: dist/ as the asset directory, 404-page not-found handling, workers_dev off with preview_urls explicitly on, and www.calebsargeant.com as the custom domain.",
+        "_headers": "CSP, HSTS, Permissions-Policy and cache policy. Authoritative only because the Worker has no code in the request path.",
+        "Makefile": "The front door: install, build, pdf, serve, clean. Everything real is in scripts/build.py.",
+        "requirements.txt": "jinja2, pyyaml, playwright. Floors rather than pins, because none of it ships in the built site.",
+        "robots.txt": "Content Signals, and a Disallow on /print/ so the print sheets do not compete with the pages they mirror.",
+        "llms.txt": "Markdown map of the site for AI assistants, so they answer from a primary source instead of scraping HTML.",
+        ".well-known/security.txt": "RFC 9116 disclosure contact. Its Expires is hand-set; nothing stamps it.",
+        "favicon.ico": "Generated 16+32 icon at the repo root so /favicon.ico resolves. Committed."
+      },
+      "depends_on": ["scripts"]
+    },
+    "ci": {
+      "path": ".github/workflows",
+      "purpose": "Deploy pipeline. Installs the Python deps and Chromium, builds the site and the PDFs, then publishes. Production on main, an aliased preview URL on a pull request.",
+      "exports": [".github/workflows/deploy.yml"],
+      "files": {
+        ".github/workflows/deploy.yml": "Push to main: build + PDFs, then `wrangler deploy`. Pull request: build + PDFs, then `wrangler versions upload` and the preview URL posted back on the PR. Needs CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, and Node 22 or newer for Wrangler."
+      },
+      "depends_on": ["scripts", "config"]
+    }
+  },
+  "callgraph_highlights": [
+    {
+      "caller": "scripts/build.py:main",
+      "calls": ["build_context", "render", "copy_static", "write_sitemap", "scripts/render_pdf.py"],
+      "note": "One pass: load the five YAML files, enrich roles, render every entry in PAGES, copy assets and root files, write the sitemap. dist/ is deleted first, so nothing survives a build that was not produced by it. --pdf shells out to render_pdf.py afterwards."
+    },
+    {
+      "caller": "scripts/render_pdf.py:render_all",
+      "calls": ["build.PDFS", "playwright.chromium", "dist/print/*"],
+      "note": "Prints what is already in dist/, it does not render templates. The document list is imported from build.py, so adding a fourth sheet to PAGES and PDFS is the only edit needed to get a fourth PDF."
+    },
+    {
+      "caller": "templates/*.html",
+      "calls": ["templates/base.html", "assets/site.css", "assets/site.js", "assets/hero-net.js"],
+      "note": "Every site page extends base.html and links the one stylesheet and the one script. The print sheets deliberately do not: they are standalone documents linking assets/print.css only, with no JS."
+    },
+    {
+      "caller": "data/*.yml",
+      "calls": ["site pages", "Caleb_Sargeant_CV.pdf", "Caleb_Sargeant_JDs_and_Duties.pdf", "Caleb_Sargeant_Cover_Letter.pdf"],
+      "note": "The invariant this repo exists to hold: one fact, one place, four renderings. `highlights` feed the CV, `duties` feed the JDs PDF and the /experience details panel, `cover_letter` feeds the letter. Editing a rendering instead of the data is always the bug."
+    }
+  ],
+  "hotspots": [
+    "data/experience.yml",
+    "scripts/build.py",
+    "assets/site.css",
+    "assets/site.js",
+    "templates/base.html",
+    "templates/home.html",
+    "templates/print/cv.html",
+    "docs/design-system.md"
+  ]
+}

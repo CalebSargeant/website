@@ -1,0 +1,96 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# The person. Everything about "who this is" lives here and nowhere else.
+#
+# This file is SOURCE. The website, the CV PDF, the JDs & Duties PDF and the
+# cover letter are all RENDERINGS of it. Never edit a rendered page or a PDF.
+# edit here and run `make build`.
+# ═══════════════════════════════════════════════════════════════════════════
+
+name: Caleb Sargeant
+# Shown under the name everywhere. Keep it short enough for one line on A4.
+headline: Network, Security & DevOps Engineer
+# The one-line positioning used in <title>, OG cards and the CV header.
+tagline: Platform, cloud, network and security engineering since 2012.
+location: Eindhoven, Netherlands
+nationality_note: EU work-authorised (living and working in the Netherlands)
+
+contact:
+  email: contact@calebsargeant.com
+  phone: "+31 68 201 6886"
+  # Tel href form, no spaces. Kept separate so the display form stays readable.
+  phone_href: "+31682016886"
+
+links:
+  website: https://www.calebsargeant.com
+  docs: https://docs.calebsargeant.com
+  github: https://github.com/CalebSargeant
+  linkedin: https://www.linkedin.com/in/calebsargeant/
+  credly: https://www.credly.com/users/calebsargeant/badges
+  udemy: https://www.udemy.com/user/caleb-sargeant/
+  booking: https://cal.com/calebsargeant/personal
+
+# The "about me" paragraph. Used verbatim on the home page and in the CV.
+summary: >-
+  I have worked in IT since 2012, specialising in platform engineering,
+  automation, infrastructure as code, networking and security. I have run
+  everything from bare-metal server rooms to virtualised platforms and
+  cloud-native architectures, and I care about systems that are reliable,
+  maintainable and boring in production. I take ownership of complex technical
+  problems, whether that is optimising CI/CD, designing infrastructure as code,
+  or securing networks and workloads, and I value clear, pragmatic communication.
+
+# Longer form, cover-letter voice. Rendered into the cover letter PDF.
+cover_letter:
+  salutation: To Whom It May Concern,
+  paragraphs:
+    - >-
+      Since 2012 I have worked across a wide range of IT domains, with a strong
+      focus on platform engineering, automation, infrastructure as code,
+      networking and security. I care about building reliable,
+      maintainable systems, and I approach every challenge with a mindset geared
+      towards clarity, consistency and improvement.
+    - >-
+      My experience spans DevOps, network security, cloud and hybrid
+      infrastructure, as well as systems automation, scripting and open-source
+      tooling. I have operated in diverse environments, from bare-metal servers
+      to virtualised platforms and cloud-native architectures, delivering
+      solutions that are secure, scalable and maintainable. I am comfortable
+      taking ownership of complex technical problems, whether that involves
+      optimising CI/CD pipelines, designing infrastructure as code, or securing
+      networks and workloads. I value clear, pragmatic communication and enjoy
+      collaborating with colleagues to build systems that meet real-world needs.
+    - >-
+      You are welcome to explore my website, documentation and GitHub, where you
+      will find practical examples of my engineering approach and problem-solving
+      mindset.
+    - >-
+      If you have any questions or would like to discuss the role in more detail,
+      I would be happy to connect. Thank you for your time and consideration.
+  sign_off: Sincerely,
+
+# Counters on the home page. `value` may be a number (counts up) or a string.
+# `since` lets the year-based ones stay correct without anyone editing them:
+# build.py computes `datetime.now().year - since` when `since` is present.
+stats:
+  - label: Years in IT
+    since: 2012
+    suffix: "+"
+  - label: Engineering roles
+    value: 12
+  - label: Countries worked in
+    value: 2
+  - label: Certifications
+    value: 8
+
+# Anything true and human. Keeps the site from reading like a spec sheet.
+interests:
+  - Powerlifting
+  - Outdoor activities
+  - Family time
+  - Home lab and self-hosting
+
+# Availability banner on the home page. Set `show: false` to hide it entirely.
+availability:
+  show: true
+  state: open           # open | selective | closed
+  text: Open to platform, cloud and network/security engineering conversations.

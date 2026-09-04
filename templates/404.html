@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body_class %}page-404{% endblock %}
+
+{% block content %}
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">HTTP 404</p>
+      <h1 class="mono grad-text">404</h1>
+      <p class="lead">There is nothing at that address. It has either moved, or the link that
+        sent you here was wrong. Everything on the site is one hop away.</p>
+    </div>
+
+    <div class="cta-row">
+      {% for item in nav %}
+      <a class="btn btn-ghost" href="{{ item.path }}">{{ item.nav }}</a>
+      {% endfor %}
+      <a class="btn btn-sig" data-magnetic href="{{ pdfs.cv }}" download>Download the CV</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
