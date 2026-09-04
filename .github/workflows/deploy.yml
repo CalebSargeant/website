@@ -83,6 +83,7 @@ jobs:
         run: python scripts/build.py --pdf
 
       - name: Deploy
+        id: deploy
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -92,11 +93,49 @@ jobs:
           # comes from wrangler.toml, so this stays a bare deploy.
           command: deploy
 
+      # `wrangler deploy` reports a failed custom-domain attach as the bare line
+      #     A request to the Cloudflare API (.../domains/records) failed.
+      # with the API's own error body swallowed, which is not enough to tell the
+      # two causes apart. WRANGLER_LOG=debug prints the response, and the upload
+      # is idempotent, so re-running it costs nothing but the log.
+      - name: Explain the deploy failure
+        if: failure() && steps.deploy.outcome == 'failure'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_LOG: debug
+        run: |
+          echo "::group::Wrangler debug output"
+          npx --yes wrangler@4.114.0 deploy 2>&1 | tail -120 || true
+          echo "::endgroup::"
+          cat <<'NOTE'
+          ::error::The assets uploaded but the www.calebsargeant.com custom domain
+          could not be attached. There are only two causes worth checking:
+
+            1. www.calebsargeant.com already has its own DNS record. Cloudflare
+               refuses to attach a Worker custom domain over one. Delete the record
+               in the dashboard (DNS -> Records) and re-run this workflow; Wrangler
+               then creates the right record itself. NOTE: while the old record is
+               the live site, deleting it is what takes that site down.
+
+            2. CLOUDFLARE_API_TOKEN is missing Zone -> Workers Routes: Edit for the
+               calebsargeant.com zone. That permission, not DNS: Edit, is what lets
+               a deploy attach a custom domain. Re-mint from Cloudflare's
+               "Edit Cloudflare Workers" template and scope the zone permission to
+               calebsargeant.com.
+          NOTE
+
   preview:
     name: Deploy preview
     # Fork PRs cannot read secrets, so the upload would fail with a confusing
-    # "authentication error" instead of an honest skip.
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    # "authentication error" instead of an honest skip. Dependabot is the same
+    # story for a different reason: its PRs run against the `dependabot` secrets
+    # context, which does not contain CLOUDFLARE_API_TOKEN, so every dependency
+    # bump failed here until it was skipped explicitly.
+    if: >-
+      github.event_name == 'pull_request'
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: read

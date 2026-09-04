@@ -34,3 +34,24 @@ Things that go wrong in this stack. Symptom, cause, fix.
 - **PR previews stop producing a URL.** `preview_urls` defaults to whatever `workers_dev` is, and `workers_dev = false` here to avoid a duplicate indexable copy of the site. The explicit `preview_urls = true` is what keeps previews working; check that line first. Also note `wrangler versions upload` uploads a version of an existing Worker, so `main` has to have deployed at least once.
 - **Deploy fails with `Wrangler requires Node.js v22`.** Wrangler 4.x refuses older Node. The workflow pins `actions/setup-node`; do not remove it.
 - **A print sheet turns up in search results.** `robots.txt` disallows `/print/` and those pages are `sitemap: False`. Keep both when adding a fourth sheet, or the sheet competes with the page it is a print copy of.
+
+**Cloudflare deploy: assets upload, then "Some triggers failed to deploy"**
+`wrangler deploy` uploads every asset and only then attaches the custom domain, so a
+failure at `/workers/scripts/<name>/domains/records` means the site is uploaded but
+unreachable on www. Wrangler swallows the API error body, so the log alone cannot tell
+the two causes apart, which is why the workflow has an `Explain the deploy failure`
+step that re-runs with `WRANGLER_LOG=debug`.
+- The hostname already has its own DNS record. Cloudflare will not attach a Worker
+  custom domain over one, and `override_existing_dns_record` is not exposed by the CLI.
+  Delete the record in the dashboard, then re-run. This is the case when the hostname
+  is still serving whatever it served before, as www.calebsargeant.com did for the
+  Google Sites version.
+- The API token lacks **Zone -> Workers Routes: Edit** for that zone. This, not
+  `DNS: Edit`, is the permission that attaches a custom domain, and a token scoped to
+  the account but to no zone (or to the wrong one) fails here and nowhere else.
+
+**Dependabot PRs cannot read repo secrets**
+They run against GitHub's separate `dependabot` secrets context, so any job needing
+`CLOUDFLARE_API_TOKEN` fails on every dependency bump. Guarding on
+`github.event.pull_request.head.repo.full_name == github.repository` does not cover it,
+because a Dependabot PR is not a fork. Skip on `github.actor != 'dependabot[bot]'` too.
