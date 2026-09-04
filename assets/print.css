@@ -252,11 +252,11 @@ h1, h2, h3 { break-after: avoid; margin: 0; }
 /* ── sidebar ── */
 
 .cv-portrait {
-  width: 38mm;
-  height: 38mm;
+  width: 44mm;
+  height: 44mm;
   border-radius: 50%;
   object-fit: cover;
-  object-position: center 22%;
+  object-position: center center;
   /* A ring rather than a border so the crop stays a true circle. */
   box-shadow: 0 0 0 0.5mm var(--paper), 0 0 0 0.9mm var(--accent);
   margin: 1mm 0 5.5mm 1mm;

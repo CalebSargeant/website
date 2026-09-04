@@ -689,6 +689,10 @@ body.menu-open .nav-toggle > span:nth-child(3) { transform: translateY(-6px) rot
               box-shadow var(--dur) var(--ease);
 }
 
+/* site.js writes the magnetic offset to `translate`, a separate property from
+   `transform`, so the two compose and neither has to know about the other. */
+.btn[data-magnetic] { will-change: transform, translate; }
+
 .btn:hover { --btn-lift: -2px; }
 .btn:active { --btn-lift: 0px; }
 
@@ -2124,13 +2128,13 @@ dialog.cmdk:not([open]) { display: none; }
 .hero-intro {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 18px;
   flex-wrap: wrap;
 }
 
 .hero-portrait {
-  width: 64px;
-  height: 64px;
+  width: 96px;
+  height: 96px;
   /* A hairline plus the accent ring, so the photo reads as part of the system
      rather than as a picture dropped onto it. */
   border: 1px solid var(--line-2);
@@ -2147,15 +2151,15 @@ dialog.cmdk:not([open]) { display: none; }
 .cv-head-text { flex: 1 1 320px; min-width: 0; }
 
 .cv-portrait {
-  width: 112px;
-  height: 112px;
+  width: 168px;
+  height: 168px;
   border: 1px solid var(--line-2);
   box-shadow: 0 0 0 5px color-mix(in oklab, var(--sig) 10%, transparent);
 }
 
 @media (max-width: 560px) {
-  .cv-portrait { width: 84px; height: 84px; }
-  .hero-portrait { width: 52px; height: 52px; }
+  .cv-portrait { width: 124px; height: 124px; }
+  .hero-portrait { width: 76px; height: 76px; }
 }
 
 

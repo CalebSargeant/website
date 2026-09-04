@@ -90,7 +90,7 @@
     </div>
 
     <div class="cv-actions">
-      <a class="btn btn-sig" href="{{ pdfs.cv }}" download>{{ icon("download") }} Download PDF</a>
+      <a class="btn btn-sig" data-magnetic href="{{ pdfs.cv }}" download>{{ icon("download") }} Download PDF</a>
       <a class="btn btn-ghost" href="/print/cv/">{{ icon("printer") }} Print view</a>
       <p class="mono cv-stamp">Generated from data/ on {{ build_date }}</p>
     </div>
@@ -107,7 +107,7 @@
       {# ── header ───────────────────────────────────────────────────────── #}
       <header class="cv-head reveal" style="--d:0">
         <img class="cv-portrait" src="/assets/img/caleb.jpg" alt="Caleb Sargeant"
-             width="112" height="112" decoding="async">
+             width="168" height="168" decoding="async">
         <div class="cv-head-text">
         <h1 class="cv-name">{{ profile.name }}</h1>
         <p class="cv-headline">{{ profile.headline }}</p>

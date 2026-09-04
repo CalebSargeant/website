@@ -11,10 +11,15 @@ templates/social/og.html.
 
 Outputs
     assets/og/og-default.png     1200x630, the Open Graph / Twitter card
-    assets/apple-touch-icon.png  180x180
-    assets/favicon-32.png        32x32
-    assets/favicon-16.png        16x16
+    assets/apple-touch-icon.png  180x180, square and opaque (iOS masks it itself)
+    assets/favicon-32.png        32x32, circular, transparent
+    assets/favicon-16.png        16x16, circular, transparent
     favicon.ico                  16+32, at the repo root so /favicon.ico resolves
+
+The favicons are the portrait, not the mark. A photo scaled to 16px is mush
+unless it is cropped to the face first, so FACE_CROP below zooms and re-centres
+assets/img/caleb.jpg rather than letting the whole head-and-shoulders shrink
+into the tab. Adjust those two numbers if the photo is ever replaced.
 
 Needs Playwright's Chromium:
     python3 -m pip install -r requirements.txt
@@ -23,12 +28,20 @@ Needs Playwright's Chromium:
 
 from __future__ import annotations
 
+import base64
 import importlib.util
 import struct
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+
+# How the portrait is framed for an icon. `zoom` is the CSS background-size as a
+# percentage: 210 means the photo is drawn at 2.1x the icon box, so only the
+# middle stays. `focus` is background-position, tuned so the crop lands on the
+# face rather than the collar. Check the 16px output after changing either: that
+# is the size that decides whether this reads as a person or as a smudge.
+FACE_CROP = {"zoom": 188, "focus": "50% 21%"}
 
 
 def load_build_module():
@@ -83,7 +96,27 @@ def main() -> int:
 
     (ROOT / "assets" / "og").mkdir(parents=True, exist_ok=True)
     og_out = ROOT / "assets" / "og" / "og-default.png"
-    icon_svg = (ROOT / "assets" / "favicon.svg").read_text(encoding="utf-8")
+    # Inlined as a data: URI, not linked as file://. A page built with
+    # set_content has an opaque origin, and Chromium refuses to load a file://
+    # subresource into it: the screenshot comes back a blank 108-byte PNG with
+    # no error anywhere. Same trap as render_pdf.py's reason for serving dist/
+    # over real HTTP.
+    portrait_b64 = base64.b64encode(
+        (ROOT / "assets" / "img" / "caleb.jpg").read_bytes()).decode("ascii")
+    portrait = "data:image/jpeg;base64," + portrait_b64
+
+    def icon_html(size: int, circular: bool) -> str:
+        """One div, the photo as a zoomed background, optionally circle-masked."""
+        return (
+            "<style>html,body{margin:0;padding:0;background:transparent}"
+            f"i{{display:block;width:{size}px;height:{size}px;"
+            f"background-image:url('{portrait}');"
+            f"background-size:{FACE_CROP['zoom']}% auto;"
+            f"background-position:{FACE_CROP['focus']};"
+            "background-repeat:no-repeat;"
+            + ("border-radius:50%;" if circular else "")
+            + "}</style><i></i>"
+        )
 
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
@@ -98,18 +131,20 @@ def main() -> int:
             page.close()
             print(f"  {og_out.relative_to(ROOT)}  1200x630")
 
-            # Favicons, rasterised from the one SVG source so they can never
-            # disagree with it.
+            # Favicons, cropped from the portrait. The tab icon is Caleb's face:
+            # on a personal site that identifies the tab faster than a mark does.
             for size in (180, 32, 16):
-                name = "apple-touch-icon.png" if size == 180 else f"favicon-{size}.png"
+                apple = size == 180
+                name = "apple-touch-icon.png" if apple else f"favicon-{size}.png"
                 target = ROOT / "assets" / name
                 page = browser.new_page(viewport={"width": size, "height": size},
                                         device_scale_factor=1)
-                page.set_content(
-                    "<style>html,body{margin:0;padding:0}svg{display:block;"
-                    f"width:{size}px;height:{size}px}}</style>{icon_svg}",
-                    wait_until="load")
-                page.screenshot(path=str(target), omit_background=False)
+                # iOS applies its own rounded mask and composites onto black, so
+                # the touch icon is square and opaque; the tab icons are circles
+                # on transparency, which is what reads cleanly beside a favicon
+                # row of other sites.
+                page.set_content(icon_html(size, circular=not apple), wait_until="load")
+                page.screenshot(path=str(target), omit_background=not apple)
                 page.close()
                 print(f"  {target.relative_to(ROOT)}  {size}x{size}")
         finally:
