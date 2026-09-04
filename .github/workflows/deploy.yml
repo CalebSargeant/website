@@ -95,34 +95,63 @@ jobs:
 
       # `wrangler deploy` reports a failed custom-domain attach as the bare line
       #     A request to the Cloudflare API (.../domains/records) failed.
-      # with the API's own error body swallowed, which is not enough to tell the
-      # two causes apart. WRANGLER_LOG=debug prints the response, and the upload
-      # is idempotent, so re-running it costs nothing but the log.
+      # and that is all you get: WRANGLER_LOG=debug sanitises the request and
+      # never logs the response body, so the API's own error code never reaches
+      # the log. These read-only probes get it instead.
+      #
+      # The decisive one is the third. Listing a zone's Workers routes requires
+      # Workers Routes: Read, which Workers Routes: Edit implies, and Edit on
+      # that zone is exactly the permission that attaches a custom domain. So a
+      # 403 there means the token is wrong, and a 200 means the token is fine
+      # and the hostname must already hold a DNS record Cloudflare will not
+      # attach over. Nothing here writes anything.
       - name: Explain the deploy failure
         if: failure() && steps.deploy.outcome == 'failure'
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          WRANGLER_LOG: debug
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          echo "::group::Wrangler debug output"
-          npx --yes wrangler@4.114.0 deploy 2>&1 | tail -120 || true
-          echo "::endgroup::"
+          set -u
+          api() { curl -sS -o /tmp/body -w '%{http_code}' \
+                    -H "Authorization: Bearer $CF_TOKEN" "https://api.cloudflare.com/client/v4$1"; }
+
+          echo "--- token status ---"
+          api "/user/tokens/verify" >/tmp/code || true
+          echo "HTTP $(cat /tmp/code)  $(jq -c '.result.status // .errors' /tmp/body 2>/dev/null)"
+
+          echo "--- can the token see the calebsargeant.com zone? ---"
+          api "/zones?name=calebsargeant.com" >/tmp/code || true
+          ZCODE=$(cat /tmp/code)
+          ZONE=$(jq -r '.result[0].id // empty' /tmp/body 2>/dev/null)
+          echo "HTTP $ZCODE  zone_id=${ZONE:-<none visible>}"
+          [ -n "$ZONE" ] || jq -c '.errors' /tmp/body 2>/dev/null || true
+
+          VERDICT="could not determine"
+          if [ -n "$ZONE" ]; then
+            echo "--- Workers Routes permission on that zone (the decisive check) ---"
+            api "/zones/$ZONE/workers/routes" >/tmp/code || true
+            RCODE=$(cat /tmp/code)
+            echo "HTTP $RCODE  $(jq -c '.errors // "ok"' /tmp/body 2>/dev/null)"
+            case "$RCODE" in
+              403|401) VERDICT="TOKEN. CLOUDFLARE_API_TOKEN has no Workers Routes permission on the calebsargeant.com zone." ;;
+              200)     VERDICT="DNS. The token is scoped correctly, so www.calebsargeant.com must already hold a DNS record." ;;
+            esac
+          else
+            VERDICT="TOKEN. CLOUDFLARE_API_TOKEN cannot even see the calebsargeant.com zone."
+          fi
+
+          echo "::error::Assets uploaded; the www.calebsargeant.com custom domain did not attach. Cause: $VERDICT"
           cat <<'NOTE'
-          ::error::The assets uploaded but the www.calebsargeant.com custom domain
-          could not be attached. There are only two causes worth checking:
+          If the cause is TOKEN: re-mint CLOUDFLARE_API_TOKEN from Cloudflare's
+          "Edit Cloudflare Workers" template and set its Zone resource to include
+          calebsargeant.com. Workers Routes: Edit, not DNS: Edit, is what attaches a
+          custom domain. The shared MagmaMoose deploy token is scoped to its own zone,
+          which is why the asset upload (account-level) works and only this call fails.
 
-            1. www.calebsargeant.com already has its own DNS record. Cloudflare
-               refuses to attach a Worker custom domain over one. Delete the record
-               in the dashboard (DNS -> Records) and re-run this workflow; Wrangler
-               then creates the right record itself. NOTE: while the old record is
-               the live site, deleting it is what takes that site down.
-
-            2. CLOUDFLARE_API_TOKEN is missing Zone -> Workers Routes: Edit for the
-               calebsargeant.com zone. That permission, not DNS: Edit, is what lets
-               a deploy attach a custom domain. Re-mint from Cloudflare's
-               "Edit Cloudflare Workers" template and scope the zone permission to
-               calebsargeant.com.
+          If the cause is DNS: delete the existing www.calebsargeant.com record in the
+          dashboard (DNS -> Records), then re-run this workflow. Wrangler creates the
+          right record itself. That deletion is the cutover: whatever www serves today
+          goes down at that moment and comes back when this workflow next succeeds.
           NOTE
 
   preview:
