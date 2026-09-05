@@ -9,7 +9,7 @@
   role to data/experience.yml lengthens the table on sheet one by one row and
   cannot silently push content off the paper.
 #}
-<html lang="en-GB">
+<html lang="{{ locale.html_lang }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -52,22 +52,22 @@
       </header>
 
       <section class="cv-block">
-        <h2 class="sec-head">Profile</h2>
+        <h2 class="sec-head">{{ t('cv.section.profile') }}</h2>
         <p class="cv-summary">{{ profile.summary }}</p>
       </section>
 
       <section class="cv-block">
-        <h2 class="sec-head">Core skills</h2>
+        <h2 class="sec-head">{{ t('cv.section.skills') }}</h2>
         <ul class="cv-skills">
           {% for skill in cv_skills %}
           <li>{{ skill.name }}</li>
           {% endfor %}
         </ul>
-        <p class="cv-soft"><strong>Also:</strong> {{ soft_skills | join(' · ') }}</p>
+        <p class="cv-soft"><strong>{{ t('cv.also') }}:</strong> {{ soft_skills | join(' · ') }}</p>
       </section>
 
       <section class="cv-block">
-        <h2 class="sec-head">Experience</h2>
+        <h2 class="sec-head">{{ t('experience.title') }}</h2>
         <table class="cv-jobs">
           <tbody>
             {% for role in roles %}
@@ -89,10 +89,10 @@
     </div>
 
     <aside class="cv-side">
-      <img class="cv-portrait" src="/assets/img/caleb.jpg" alt="Caleb Sargeant" width="320" height="320">
+      <img class="cv-portrait" src="/assets/img/caleb.jpg" alt="{{ profile.name }}" width="320" height="320">
 
       <section class="side-block">
-        <h2 class="sec-head">Contact</h2>
+        <h2 class="sec-head">{{ t('contact.kicker') }}</h2>
         <ul class="side-list">
           <li class="side-line">{{ profile.location }}</li>
           <li class="side-line">{{ profile.contact.email }}</li>
@@ -106,7 +106,7 @@
       </section>
 
       <section class="side-block">
-        <h2 class="sec-head">Education</h2>
+        <h2 class="sec-head">{{ t('education.kicker') }}</h2>
         <ul>
           {% for item in featured_education %}
           <li class="edu-item">
@@ -118,7 +118,7 @@
       </section>
 
       <section class="side-block">
-        <h2 class="sec-head">Courses</h2>
+        <h2 class="sec-head">{{ t('print.courses') }}</h2>
         <ul>
           {% for course in featured_courses %}
           <li class="edu-item">
@@ -130,7 +130,7 @@
       </section>
 
       <section class="side-block">
-        <h2 class="sec-head">Interests</h2>
+        <h2 class="sec-head">{{ t('cv.section.interests') }}</h2>
         <p class="side-tags">{{ profile.interests | join(' · ') }}</p>
       </section>
     </aside>
@@ -139,15 +139,15 @@
 
   <footer class="sheet-foot">
     <span>{{ profile.name }} · {{ profile.headline }}</span>
-    <span>Page 1 of 2</span>
+    <span>{{ t('print.page_x_of_y', n=1, total=2) }}</span>
   </footer>
 </article>
 
 <!-- ── sheet two ───────────────────────────────────────────────────────── -->
 <article class="sheet">
   <div class="cv-cont">
-    <h2>Selected highlights</h2>
-    <p>{{ profile.name }} · Curriculum vitae</p>
+    <h2>{{ t('print.selected_highlights') }}</h2>
+    <p>{{ profile.name }} · {{ t('print.curriculum_vitae') }}</p>
   </div>
 
   <div class="cv-highlights">
@@ -167,15 +167,14 @@
   </div>
 
   <div class="cv-close">
-    <p><strong>Currently studying.</strong> {{ in_progress | join(', ') }}.</p>
-    <p><strong>The long version.</strong> The full duty lists are in the
-      Job Descriptions &amp; Duties document, and the same data drives
-      {{ site.base_url | replace('https://', '') }}. References available on request.</p>
+    <p><strong>{{ t('common.currently_studying') }}.</strong> {{ in_progress | join(', ') }}.</p>
+    <p><strong>{{ t('print.long_version_label') }}</strong>
+      {{ t('print.long_version', site=site.base_url | replace('https://', '')) }}</p>
   </div>
 
   <footer class="sheet-foot">
     <span>{{ profile.name }} · {{ profile.contact.email }}</span>
-    <span>Page 2 of 2</span>
+    <span>{{ t('print.page_x_of_y', n=2, total=2) }}</span>
   </footer>
 </article>
 

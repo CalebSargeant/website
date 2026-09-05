@@ -21,6 +21,7 @@
   "url": site.base_url ~ page.path,
   "name": page.title,
   "description": page.description,
+  "inLanguage": locale.html_lang,
   "mainEntity": {"@id": site.base_url ~ "/#person"},
   "significantLink": [
     site.base_url ~ pdfs.cv,
@@ -36,20 +37,21 @@
 <section class="section">
   <div class="wrap">
     <header class="section-head reveal" style="--d:0">
-      <p class="kicker">Contact</p>
-      <h1>Get in touch</h1>
-      <p class="lead">
-        Email is the quickest way to reach me. If it is easier to talk it through,
-        book a slot and pick a time that suits you.
-      </p>
+      <p class="kicker">{{ t('contact.kicker') }}</p>
+      <h1>{{ t('contact.title') }}</h1>
+      <p class="lead">{{ t('contact.lead') }}</p>
       {% if profile.availability.show %}
       {# One label per state, so a `closed` note never renders in the live green. #}
-      {% set state_labels = {"open": "Open to work", "selective": "Selective", "closed": "Not looking"} %}
+      {% set state_labels = {
+           "open": t('contact.state.open'),
+           "selective": t('contact.state.selective'),
+           "closed": t('contact.state.closed')
+         } %}
       <p>
         {% if profile.availability.state == 'open' %}
-        <span class="pill-live">{{ state_labels.get(profile.availability.state, 'Availability') }}</span>
+        <span class="pill-live">{{ state_labels.get(profile.availability.state, t('contact.state.unknown')) }}</span>
         {% else %}
-        <span class="chip">{{ state_labels.get(profile.availability.state, 'Availability') }}</span>
+        <span class="chip">{{ state_labels.get(profile.availability.state, t('contact.state.unknown')) }}</span>
         {% endif %}
         {{ profile.availability.text }}
       </p>
@@ -58,55 +60,49 @@
 
     <div class="grid-2">
       <article class="card reveal" style="--d:0">
-        <h2>Direct</h2>
+        <h2>{{ t('contact.direct') }}</h2>
 
-        <p class="kicker">Email</p>
+        <p class="kicker">{{ t('contact.email') }}</p>
         <p>
           <a class="mono" href="mailto:{{ profile.contact.email }}">{{ profile.contact.email }}</a>
           {# data-copy-label is the slot site.js swaps for "Copied", so the flash
              never eats the rest of the button. #}
           <button type="button" class="btn btn-ghost" data-copy="{{ profile.contact.email }}"
-                  aria-label="Copy my email address to the clipboard">
-            <span data-copy-label>Copy</span>
+                  aria-label="{{ t('contact.copy_aria') }}">
+            <span data-copy-label>{{ t('contact.copy') }}</span>
           </button>
         </p>
 
-        <p class="kicker">Phone</p>
+        <p class="kicker">{{ t('contact.phone') }}</p>
         <p><a class="mono" href="tel:{{ profile.contact.phone_href }}">{{ profile.contact.phone }}</a></p>
 
-        <p class="kicker">Location</p>
+        <p class="kicker">{{ t('contact.location') }}</p>
         <p>{{ profile.location }}<br>{{ profile.nationality_note }}</p>
 
         <div class="cta-row">
           <a class="btn btn-sig" data-magnetic href="{{ profile.links.booking }}"
-             rel="noopener" target="_blank">Book a slot</a>
+             rel="noopener" target="_blank">{{ t('contact.book_slot') }}</a>
         </div>
       </article>
 
       <article class="card reveal" style="--d:1">
-        <h2>Elsewhere</h2>
-        <p>The places where the work is visible.</p>
+        <h2>{{ t('footer.elsewhere') }}</h2>
+        <p>{{ t('contact.elsewhere_note') }}</p>
+        {# Each line is one sentence with its own anchor passed in, so a
+           translation can move the link inside the clause. The site names are
+           proper nouns and stay as they are in every language. See base.html
+           for why the sentence is escaped before the substitution. #}
+        {% set github_link %}<a href="{{ profile.links.github }}" rel="me noopener" target="_blank">GitHub</a>{% endset %}
+        {% set linkedin_link %}<a href="{{ profile.links.linkedin }}" rel="me noopener" target="_blank">LinkedIn</a>{% endset %}
+        {% set credly_link %}<a href="{{ profile.links.credly }}" rel="me noopener" target="_blank">Credly</a>{% endset %}
+        {% set udemy_link %}<a href="{{ profile.links.udemy }}" rel="me noopener" target="_blank">Udemy</a>{% endset %}
+        {% set docs_link %}<a href="{{ profile.links.docs }}" rel="noopener" target="_blank">docs.calebsargeant.com</a>{% endset %}
         <ul>
-          <li>
-            <a href="{{ profile.links.github }}" rel="me noopener" target="_blank">GitHub</a>
-            for infrastructure code, the homelab, and the source of this site.
-          </li>
-          <li>
-            <a href="{{ profile.links.linkedin }}" rel="me noopener" target="_blank">LinkedIn</a>
-            for the same history in the shape recruiters expect.
-          </li>
-          <li>
-            <a href="{{ profile.links.credly }}" rel="me noopener" target="_blank">Credly</a>
-            for verifiable certification badges.
-          </li>
-          <li>
-            <a href="{{ profile.links.udemy }}" rel="me noopener" target="_blank">Udemy</a>
-            for the course history behind the training list.
-          </li>
-          <li>
-            <a href="{{ profile.links.docs }}" rel="noopener" target="_blank">docs.calebsargeant.com</a>
-            for notes and runbooks, written as they are worked out.
-          </li>
+          <li>{{ (t('contact.link.github') | e).format(link=github_link) }}</li>
+          <li>{{ (t('contact.link.linkedin') | e).format(link=linkedin_link) }}</li>
+          <li>{{ (t('contact.link.credly') | e).format(link=credly_link) }}</li>
+          <li>{{ (t('contact.link.udemy') | e).format(link=udemy_link) }}</li>
+          <li>{{ (t('contact.link.docs') | e).format(link=docs_link) }}</li>
         </ul>
       </article>
     </div>
@@ -116,36 +112,33 @@
 <section class="section" id="downloads">
   <div class="wrap">
     <div class="section-head reveal" style="--d:0">
-      <p class="kicker">Downloads</p>
-      <h2>Documents</h2>
-      <p>
-        All three are rendered from the same data as this site on every deploy, so
-        they cannot disagree with what you read here.
-      </p>
+      <p class="kicker">{{ t('footer.downloads') }}</p>
+      <h2>{{ t('contact.documents') }}</h2>
+      <p>{{ t('contact.documents_note') }}</p>
     </div>
 
     <div class="grid-3">
       <article class="card reveal" style="--d:0">
-        <h3>CV</h3>
-        <p>Two pages. Roles, highlights, skills and education, laid out for a first read.</p>
+        <h3>{{ t('contact.doc.cv') }}</h3>
+        <p>{{ t('contact.doc.cv_note') }}</p>
         <div class="cta-row">
-          <a class="btn btn-ghost" href="{{ pdfs.cv }}" download>Download CV</a>
+          <a class="btn btn-ghost" href="{{ pdfs.cv }}" download>{{ t('nav.download_cv') }}</a>
         </div>
       </article>
 
       <article class="card reveal" style="--d:1">
-        <h3>JDs &amp; Duties</h3>
-        <p>The full duty lists, grouped by area, for anyone who needs the detail.</p>
+        <h3>{{ t('contact.doc.jds') }}</h3>
+        <p>{{ t('contact.doc.jds_note') }}</p>
         <div class="cta-row">
-          <a class="btn btn-ghost" href="{{ pdfs.jds }}" download>Download JDs &amp; Duties</a>
+          <a class="btn btn-ghost" href="{{ pdfs.jds }}" download>{{ t('cta.download_jds') }}</a>
         </div>
       </article>
 
       <article class="card reveal" style="--d:2">
-        <h3>Cover letter</h3>
-        <p>One page, general purpose. Ask for a version written for your role and you will get one.</p>
+        <h3>{{ t('contact.doc.cover') }}</h3>
+        <p>{{ t('contact.doc.cover_note') }}</p>
         <div class="cta-row">
-          <a class="btn btn-ghost" href="{{ pdfs.cover }}" download>Download cover letter</a>
+          <a class="btn btn-ghost" href="{{ pdfs.cover }}" download>{{ t('cta.download_cover') }}</a>
         </div>
       </article>
     </div>

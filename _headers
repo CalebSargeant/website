@@ -59,8 +59,8 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; form-action 'self' mailto:; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
 
 # NOTE ON HTML: there is deliberately no Cache-Control rule for pages here.
-# Adding one would have to live on /* , which also matches /assets/* and
-# /downloads/* and would collide with the rules below. Left alone, the Workers
+# Adding one would have to live on /* , which also matches /assets/* and every
+# /downloads/ rule below, and would collide with them. Left alone, the Workers
 # asset server serves HTML with an ETag and max-age=0, must-revalidate: a cheap
 # 304 on every visit and never a stale page. That is exactly the policy pages
 # rebuilt on every deploy want, so it stays the default rather than being
@@ -78,12 +78,22 @@
 /assets/*
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
-# The three PDFs are REGENERATED ON EVERY DEPLOY from data/, which is what stops
-# the published CV drifting from the site. Caching them for a year would undo
-# that: a recruiter would be handed the CV as it stood the last time their
-# browser happened to fetch it. Five minutes, with an hour of
-# stale-while-revalidate so a click is never blocked on a revalidation.
+# All six PDFs (three documents x two locales) are REGENERATED ON EVERY DEPLOY
+# from data/, which is what stops the published CV drifting from the site.
+# Caching them for a year would undo that: a recruiter would be handed the CV as
+# it stood the last time their browser happened to fetch it. Five minutes, with
+# an hour of stale-while-revalidate so a click is never blocked on a
+# revalidation.
+#
+# A path rule matches from the start of the path, so /downloads/* does NOT cover
+# the Dutch copies at /nl/downloads/. Every locale needs its own line here, and
+# a locale added to LOCALES in scripts/build.py needs one adding. Without it the
+# Dutch PDFs quietly fall back to the default HTML policy, and the fault looks
+# like a stale CV rather than a missing header.
 /downloads/*
+  Cache-Control: public, max-age=300, stale-while-revalidate=3600
+
+/nl/downloads/*
   Cache-Control: public, max-age=300, stale-while-revalidate=3600
 
 # The print sheets exist as the source the PDF renderer prints from, and as a
@@ -92,5 +102,27 @@
 # too; this header is the belt to that braces, for crawlers that fetch the URL
 # anyway (a Disallowed URL is never fetched, so a well-behaved crawler never
 # sees this: the two controls cover different crawlers, not the same one).
+#
+# Same prefix-matching point as above: /nl/print/ needs its own rule, and it
+# matters more here, because the failure is silent and public. An unlisted
+# locale's print sheets would be indexable duplicates of its own pages.
 /print/*
   X-Robots-Tag: noindex, nofollow
+
+/nl/print/*
+  X-Robots-Tag: noindex, nofollow
+
+# CONTENT-LANGUAGE: only the prefixed locales can get one from this file.
+#
+# /nl/* is every Dutch URL and nothing else, so it can be labelled here. English
+# cannot: it lives at the root with no prefix of its own, so the only pattern
+# that covers it is /*, and rules are additive. A /* rule setting en-GB would
+# also apply to /nl/*, and those responses would go out as two values meaning
+# "this document is in both languages", which is worse than saying nothing.
+# Enumerating the English pages instead (/cv/*, /experience/* ...) would just
+# duplicate the PAGES list in scripts/build.py somewhere it cannot be kept in
+# sync. So English carries its language in <html lang> and in the hreflang set
+# only, which is what search engines read anyway; this header is a small extra
+# for the Dutch pages, not the mechanism.
+/nl/*
+  Content-Language: nl-NL

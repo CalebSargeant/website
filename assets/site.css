@@ -659,6 +659,131 @@ body.menu-open .nav-toggle > span:nth-child(3) { transform: translateY(-6px) rot
 [data-theme-state="light"] .icon-moon { display: block; }
 
 
+/* ── 4b. Language switcher and suggestion banner ─────────────────────────── */
+
+/* The switcher is server-rendered, one real <a> per locale, and works with JS
+   off. site.js only adds data-short, aria-current and a memory of the choice.
+   Styled as a segmented control because a language is a state you are in, not
+   an action you take. */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 2px;
+  margin: 0;
+  padding: 2px;
+  list-style: none;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-chip);
+  background: color-mix(in srgb, var(--ink-2) 60%, transparent);
+}
+
+/* Rendered as a <ul> or as bare anchors; either way the anchors are the row. */
+.lang-switch li { display: flex; margin: 0; }
+
+.lang-switch a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: calc(var(--radius-chip) - 2px);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--fg-mute);
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.lang-switch a:hover { color: var(--fg); background: var(--sig-wash); }
+
+/* The template may set aria-current="page"; site.js sets "true" when it did
+   not. Matching the bare attribute accepts both. */
+.lang-switch a[aria-current] {
+  color: var(--sig-ink);
+  background: var(--sig-wash);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sig) 30%, transparent);
+}
+
+/* Injected by site.js, never server-rendered: with JS off there is no banner
+   and the switcher is the whole feature. It arrives after first paint because
+   the script is deferred, so it opens from zero height rather than appearing
+   at full size, which reads as arriving rather than as a layout glitch. */
+.lang-banner {
+  position: relative;
+  z-index: 90;                    /* below the sticky nav, above page content */
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  background: var(--ink-2);
+  border-bottom: 1px solid var(--line);
+  transition: max-height 320ms var(--ease-out), opacity 200ms linear;
+}
+
+/* Generous enough for the sentence to wrap to three lines on a phone. */
+.lang-banner.is-in { max-height: 9rem; opacity: 1; }
+
+.lang-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-block: 9px;
+}
+
+.lang-banner-text {
+  margin: 0;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--fg-dim);
+}
+
+.lang-banner-go {
+  flex: none;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--sig-ink);
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.lang-banner-go::after { content: "→"; }
+.lang-banner-go:hover { color: var(--sig); background: var(--sig-wash); }
+
+.lang-banner-x {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-chip);
+  background: transparent;
+  color: var(--fg-mute);
+  font: inherit;
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.lang-banner-x:hover { color: var(--fg); background: var(--sig-wash); }
+
+
 /* ── 5. Buttons ──────────────────────────────────────────────────────────── */
 
 .btn {
@@ -2343,6 +2468,11 @@ dialog.cmdk:not([open]) { display: none; }
   .nav-inner { position: relative; }
   .nav-actions { margin-left: auto; }
   .nav-enhanced .nav-links { margin-left: 0; }
+
+  /* Brand + theme toggle + download + switcher is the tightest the bar ever
+     gets, and this is the width where it stops fitting. Native names stay. */
+  .lang-switch { gap: 0; }
+  .lang-switch a { padding-inline: 7px; }
 }
 
 @media (max-width: 760px) {
@@ -2362,6 +2492,15 @@ dialog.cmdk:not([open]) { display: none; }
 
   .foot-inner { flex-direction: column; align-items: flex-start; }
   .foot-links { margin-left: 0; }
+}
+
+/* The switcher costs the bar about what the Download CV button does, and the
+   two together run off the right edge somewhere around 575px, before the 560
+   rules below have a chance to help. The download also sits in the hero, the
+   footer, the palette and the CV toolbar; the switcher sits nowhere else, so
+   the download is the one that goes, and only on a page that has a switcher. */
+@media (max-width: 640px) {
+  .nav-actions:has(.lang-switch) .btn-sig { display: none; }
 }
 
 @media (max-width: 560px) {
@@ -2391,6 +2530,35 @@ dialog.cmdk:not([open]) { display: none; }
   .cmdk-hint { display: none; }
 
   .to-top { right: 14px; bottom: 14px; }
+
+  /* "Nederlands" next to "English" is wider than a phone bar can spare, so the
+     switcher falls back to the two-letter code in data-short (the template's,
+     or the one site.js derives from hreflang). The label is pushed out of a
+     clipped box rather than hidden, so it is still read out and still copied;
+     only anchors that actually have a code collapse, so a template that never
+     supplies one keeps its full names instead of going blank. */
+  .lang-switch a[data-short] {
+    display: block;
+    width: 2.6rem;
+    padding-inline: 0;
+    overflow: hidden;
+    text-indent: 120%;
+  }
+
+  .lang-switch a[data-short]::after {
+    content: attr(data-short);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-indent: 0;
+  }
+
+  .lang-banner-inner { flex-wrap: wrap; gap: 8px 10px; }
+  .lang-banner-text { flex: 1 1 100%; order: 1; }
+  .lang-banner-go { order: 2; margin-left: 0; }
+  .lang-banner-x { order: 3; margin-left: auto; }
 }
 
 
@@ -2437,6 +2605,12 @@ dialog.cmdk:not([open]) { display: none; }
   /* The caret would otherwise sit at whichever half of the blink it froze on. */
   [data-typewriter].is-typing::after,
   .term-caret::after { opacity: 1; animation: none !important; }
+
+  /* No slide. site.js adds .is-in on the same tick under reduced motion, so the
+     banner is simply there; max-height goes to none in case the copy wraps
+     further than the animated ceiling allows. */
+  .lang-banner { transition: none !important; }
+  .lang-banner.is-in { max-height: none; }
 }
 
 
@@ -2461,6 +2635,8 @@ dialog.cmdk:not([open]) { display: none; }
   .skip-link,
   .filter-row,
   .term,
+  .lang-switch,
+  .lang-banner,
   canvas,
   #hero-net {
     display: none !important;
