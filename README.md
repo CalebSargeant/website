@@ -55,7 +55,7 @@ off the site is still fully readable and navigable.
 │   └── template-context.md      what build.py hands templates, and base.html's blocks
 ├── Makefile                     install / build / pdf / serve / clean
 ├── requirements.txt             jinja2, pyyaml, playwright
-├── wrangler.toml                the assets-only Worker and the www custom domain
+├── wrangler.toml                the assets-only Worker and its apex + www routes
 ├── _headers                     CSP, HSTS, cache policy
 ├── robots.txt · llms.txt · .well-known/security.txt   crawl, AEO and disclosure surface
 ├── .github/workflows/deploy.yml production deploys and PR previews
@@ -180,12 +180,31 @@ The site is **www-canonical**. Every `<link rel="canonical">`, every `og:url`,
 every `sitemap.xml` entry and `SITE["base_url"]` in `scripts/build.py` all say
 `https://www.calebsargeant.com`.
 
-- `www.calebsargeant.com` is the Worker's custom domain. `wrangler deploy`
-  attaches it and provisions its DNS record and certificate, so it must not be
-  managed anywhere else.
-- `calebsargeant.com` (the bare apex) 301s to `www` through a Cloudflare redirect
-  rule on the zone, not through this Worker. Cloudflare's `_redirects` file
-  matches on path only and cannot redirect a hostname.
+- Both `www.calebsargeant.com` and the bare apex `calebsargeant.com` are bound to
+  the Worker with **plain Workers routes**, not with `custom_domain = true`.
+- A route attaches to a hostname that already has a proxied DNS record and
+  intercepts the request before it reaches the origin. Both hostnames already had
+  proxied records pointing at the old Google Sites, so the Worker simply takes
+  over and that origin is never asked. No DNS record is created, changed or
+  deleted by a deploy, and there is no cutover window.
+- Both hostnames therefore **serve** the site rather than one redirecting to the
+  other. A Worker with no entrypoint cannot issue a redirect, and Cloudflare's
+  `_redirects` matches on path only, never on hostname. Duplicate content is
+  handled the way it is meant to be: everything canonical says `www`, so search
+  engines consolidate there. To make the apex a real 301, add a Redirect Rule on
+  the zone (Rules, then Redirect Rules); that needs `Zone: Rulesets Edit`, which
+  the deploy token deliberately does not carry.
+
+> **Why not `custom_domain = true`?** It was tried first and cannot work here.
+> Cloudflare refuses to attach a Worker custom domain to a hostname that already
+> owns a DNS record, and `override_existing_dns_record` is
+> [not exposed by the CLI or config](https://github.com/cloudflare/workers-sdk/issues/9878).
+> The deploy uploaded every asset and then failed with the API error body
+> swallowed, which took a read-only probe in the deploy workflow to diagnose: the
+> token was correctly scoped all along, the record was the whole problem. Deleting
+> the record would also have worked, at the cost of taking the old site down for
+> the gap between the delete and the next successful deploy. Routes have no such
+> gap, so they win.
 
 > **A conflicting DNS record blocks the custom domain.** Cloudflare refuses to
 > attach a Worker custom domain to a hostname that already has its own A or CNAME
@@ -226,7 +245,7 @@ Cloudflare maintains the template, so it tracks what Wrangler actually needs:
 | User | User Memberships, Read |
 
 Scope it to this account, and to the `calebsargeant.com` zone for the zone
-permission. `Workers Routes: Edit` is what lets a deploy attach the custom domain.
+permission. `Workers Routes: Edit` is what lets a deploy attach a route.
 Despite appearances there is **no `DNS: Edit` in the template**, because the
 Workers custom-domain API creates its DNS record itself rather than going through
 the DNS API. Adding `DNS: Edit` is not required.

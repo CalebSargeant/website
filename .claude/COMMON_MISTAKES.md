@@ -43,9 +43,15 @@ the two causes apart, which is why the workflow has an `Explain the deploy failu
 step that re-runs with `WRANGLER_LOG=debug`.
 - The hostname already has its own DNS record. Cloudflare will not attach a Worker
   custom domain over one, and `override_existing_dns_record` is not exposed by the CLI.
-  Delete the record in the dashboard, then re-run. This is the case when the hostname
-  is still serving whatever it served before, as www.calebsargeant.com did for the
-  Google Sites version.
+  This is the case when the hostname is still serving whatever it served before, as
+  www.calebsargeant.com did for the Google Sites version.
+  **Deleting the record is not the only fix, and usually not the best one.** A plain
+  Workers route binds to a hostname that already has a proxied record and intercepts
+  the request before it reaches the origin, so the Worker serves and the old origin is
+  never asked. That needs only `Workers Routes: Edit`, which the deploy token already
+  has, and it has no cutover window. `wrangler.toml` here uses routes for exactly this
+  reason. Reach for deleting the record only if you actually want the custom-domain
+  API's cert and DNS provisioning.
 - The API token lacks **Zone -> Workers Routes: Edit** for that zone. This, not
   `DNS: Edit`, is the permission that attaches a custom domain, and a token scoped to
   the account but to no zone (or to the wrong one) fails here and nowhere else.
