@@ -36,15 +36,40 @@ directory = "./dist"
 # the site.
 not_found_handling = "404-page"
 
-# Custom domain. Wrangler provisions the DNS record and the certificate as part
-# of `wrangler deploy`, so this hostname must not also be managed elsewhere.
+# Hostnames: plain Workers routes, NOT `custom_domain = true`.
 #
-# www, not the apex: the site is www-canonical. Every <link rel="canonical">,
-# every og:url, every sitemap.xml entry and the base_url in scripts/build.py all
-# point at https://www.calebsargeant.com. Serving the canonical host from
-# anywhere else would mean 301ing every canonical URL somewhere other than where
-# it says it lives. The apex -> www redirect is a Cloudflare redirect rule on the
-# zone, not this Worker.
+# The custom-domain API is the modern default and was the first thing tried. It
+# cannot be used here: Cloudflare refuses to attach a Worker custom domain to a
+# hostname that already owns a DNS record, and www.calebsargeant.com has had one
+# since the Google Sites era. The deploy uploaded every asset and then failed on
+#
+#     A request to the Cloudflare API (.../domains/records) failed.
+#
+# with the API's error body swallowed by Wrangler. A read-only probe in the
+# deploy workflow proved the token is correctly scoped (it can list this zone's
+# Workers routes), so the record was the only cause.
+#
+# A route binds to a hostname that ALREADY has a proxied record, which is exactly
+# the situation, and intercepts the request before it reaches the origin. So the
+# Worker serves the site and the old Google Sites origin is simply never asked.
+# Nothing about DNS changes, which also means there is no cutover window where
+# the site is down between deleting a record and Wrangler recreating it.
+#
+# Both hostnames are served rather than redirected, because a Worker with no
+# entrypoint cannot issue a redirect and `_redirects` matches on path only, never
+# on hostname. Duplicate content is handled the way it is meant to be: every
+# <link rel="canonical">, every og:url, every hreflang and every sitemap entry
+# names https://www.calebsargeant.com, so search engines consolidate on www.
+#
+# To make the apex a real 301 instead, add a Cloudflare Redirect Rule on the zone
+# (Rules -> Redirect Rules, apex -> www, 301). That needs Zone: Rulesets Edit,
+# which the deploy token deliberately does not carry.
+#
+# The `/*` suffix is required: a route pattern without a path matches nothing.
 [[routes]]
-pattern = "www.calebsargeant.com"
-custom_domain = true
+pattern = "www.calebsargeant.com/*"
+zone_name = "calebsargeant.com"
+
+[[routes]]
+pattern = "calebsargeant.com/*"
+zone_name = "calebsargeant.com"
