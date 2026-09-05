@@ -8,7 +8,7 @@
 
 name: Caleb Sargeant
 # Shown under the name everywhere. Keep it short enough for one line on A4.
-headline: Network, Security & DevOps Engineer
+headline: Platform, Network & Security Engineer
 # The one-line positioning used in <title>, OG cards and the CV header.
 tagline: Platform, cloud, network and security engineering since 2012.
 location: Eindhoven, Netherlands
@@ -50,10 +50,11 @@ cover_letter:
       maintainable systems, and I approach every challenge with a mindset geared
       towards clarity, consistency and improvement.
     - >-
-      My experience spans DevOps, network security, cloud and hybrid
-      infrastructure, as well as systems automation, scripting and open-source
-      tooling. I have operated in diverse environments, from bare-metal servers
-      to virtualised platforms and cloud-native architectures, delivering
+      My experience spans platform engineering, network security, cloud and
+      hybrid infrastructure, as well as systems automation, scripting and
+      open-source tooling. I have operated in diverse environments, from
+      bare-metal servers to virtualised platforms and cloud-native
+      architectures, delivering
       solutions that are secure, scalable and maintainable. I am comfortable
       taking ownership of complex technical problems, whether that involves
       optimising CI/CD pipelines, designing infrastructure as code, or securing

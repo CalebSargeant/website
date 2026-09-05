@@ -61,7 +61,7 @@ DEFAULT_LOCALE = "en"
 # sitemap.xml: used for the noindex print sheets.
 PAGES = [
     {"id": "home", "template": "home.html", "out": "index.html", "path": "/",
-     "nav": "Home", "title": "Caleb Sargeant · Network, Security & DevOps Engineer",
+     "nav": "Home", "title": "Caleb Sargeant · Platform, Network & Security Engineer",
      "description": "Platform, cloud, network and security engineer in Eindhoven, "
                     "Netherlands. Kubernetes, Terraform, Azure and AWS, and the "
                     "networks underneath them. CV generated straight from this site."},
