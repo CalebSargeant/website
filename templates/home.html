@@ -105,6 +105,12 @@
       <div class="term-bar">
         <span class="term-dots" aria-hidden="true"></span>
         <span class="term-title mono">caleb@eindhoven: ~</span>
+        {# Reports this terminal's own state, nothing invented: site.js pulses
+           --lit once per character typed and adds .is-linked when the last line
+           lands. Decorative to a screen reader, which has the text itself. #}
+        <span class="term-link mono" aria-hidden="true">
+          <i class="term-led"></i>ACT
+        </span>
       </div>
       <div class="term-body">
         <p class="term-line">
