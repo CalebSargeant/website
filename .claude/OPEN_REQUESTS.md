@@ -32,11 +32,16 @@ is merged and confirmed, not when the PR is opened.
       is currently formatted one way for everyone.
 
 ## Waiting on Caleb
-- [ ] **Delete the `www.calebsargeant.com` DNS record** in Cloudflare, then re-run
-      the deploy. Confirmed by the probe in PR #4 to be the only thing blocking
-      the site going live; the token is correctly scoped. This is the cutover:
-      the Google Sites version goes off `www` at that moment.
-- [ ] Add an apex -> www redirect rule afterwards; the apex still serves Google Sites.
+- [x] ~~Delete the `www` DNS record~~ NOT NEEDED. Solved instead by binding both
+      hostnames with plain Workers routes (PR #10), which attach over the existing
+      proxied records and intercept before the origin. No DNS change, no cutover
+      window, and it needs only the Workers Routes: Edit the deploy token already
+      had. The site is LIVE on www.calebsargeant.com and calebsargeant.com.
+- [ ] Optional: an apex -> www 301. Both hostnames currently serve the site and
+      every canonical names www, so search engines consolidate correctly as-is.
+      A real 301 needs a zone Redirect Rule and `Zone: Rulesets Edit`, which the
+      deploy token deliberately does not carry. Say the word and I will add it
+      once a token with that scope exists.
 - [ ] **Rotate the Cloudflare token** in the 1Password item "Cloudflare MagmaMoose
       GitHub Actions Worker Deploy". Its value was printed into a session
       transcript on 2026-09-04. Move it to a concealed field, not the note.
