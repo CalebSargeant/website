@@ -4,6 +4,12 @@
 # AI assistants alike) is the entire point of it, so the default is Allow and
 # the AI stance is permissive.
 #
+# The site is published in full in every language it supports: English at the
+# root, Dutch under /nl/. They are translations of one another, not competing
+# pages, and each one says so with hreflang in its <head> and in the sitemap.
+# Nothing here needs to prefer one over the other: blocking a translation is how
+# you lose the language a reader actually searched in.
+#
 # Content-Signal (contentsignals.org) states how automated systems may use this
 # content:
 #   search=yes    let search and AI search index and link to these pages.
@@ -13,7 +19,7 @@
 #                 a CV that gets recommended.
 #
 # There is a machine-readable summary of the whole site, with links to the pages
-# and the three PDFs, at https://www.calebsargeant.com/llms.txt (see llmstxt.org).
+# and the PDFs, at https://www.calebsargeant.com/llms.txt (see llmstxt.org).
 User-agent: *
 Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
@@ -21,6 +27,14 @@ Allow: /
 # /print/ is the same content as /cv/ and /experience/ with the design stripped
 # out: it exists only as the source the PDF renderer prints from. Indexing it
 # would put duplicate, uglier copies of every page in the results.
+#
+# Disallow is a prefix match, so /print/ does not cover the translations: every
+# locale's print sheets need their own line, and a locale added to LOCALES in
+# scripts/build.py needs one adding here.
 Disallow: /print/
+Disallow: /nl/print/
 
+# One sitemap for the whole site. It lists every page in every locale, each
+# entry naming the others as hreflang alternates, so there is nothing per
+# language to point at from here.
 Sitemap: https://www.calebsargeant.com/sitemap.xml

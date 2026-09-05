@@ -37,6 +37,24 @@ SITE = {
     "repo": "https://github.com/CalebSargeant/website",
 }
 
+# Every locale is a complete static copy of the site, generated here. There is
+# deliberately no runtime language detection: the Worker is assets-only, and
+# redirecting on Accept-Language would show a crawler (which sends none) exactly
+# one language while trapping readers in one they did not pick. Instead every
+# language has a real URL, they point at each other with hreflang, and the reader
+# chooses with the nav switcher. site.js offers a dismissible suggestion when the
+# browser's language differs from the page's.
+#
+# `prefix` is the URL prefix AND the dist/ subdirectory. The default locale has
+# none, so English stays at / and existing links never move.
+LOCALES = [
+    {"code": "en", "prefix": "",    "html_lang": "en-GB", "native": "English",
+     "og": "en_GB"},
+    {"code": "nl", "prefix": "/nl", "html_lang": "nl-NL", "native": "Nederlands",
+     "og": "nl_NL"},
+]
+DEFAULT_LOCALE = "en"
+
 # Every page: template, output path, and the nav/SEO metadata that goes with it.
 # `nav` is the label in the header; omit it for a page that should not appear
 # there (the print sheets, 404). `sitemap: False` keeps a page out of
@@ -80,14 +98,103 @@ PAGES = [
 
 # What each print sheet becomes. Consumed by scripts/render_pdf.py, which imports
 # this list rather than keeping its own copy.
-PDFS = [
-    {"page": "/print/cv/", "out": "downloads/Caleb_Sargeant_CV.pdf"},
-    {"page": "/print/jds/", "out": "downloads/Caleb_Sargeant_JDs_and_Duties.pdf"},
-    {"page": "/print/cover/", "out": "downloads/Caleb_Sargeant_Cover_Letter.pdf"},
+# One set per locale. `page` and `out` are relative to the locale's prefix, so
+# English prints /print/cv/ to downloads/, Dutch prints /nl/print/cv/ to
+# nl/downloads/, and neither can drift from the other because both come from the
+# same data through the same template.
+PDF_DOCS = [
+    {"page": "print/cv/", "out": "downloads/Caleb_Sargeant_CV.pdf", "max_pages": 2},
+    {"page": "print/jds/", "out": "downloads/Caleb_Sargeant_JDs_and_Duties.pdf"},
+    {"page": "print/cover/", "out": "downloads/Caleb_Sargeant_Cover_Letter.pdf",
+     "max_pages": 1},
 ]
+
+
+def pdf_jobs() -> list[dict]:
+    """Flatten PDF_DOCS across LOCALES into the list render_pdf.py iterates."""
+    jobs = []
+    for loc in LOCALES:
+        prefix = loc["prefix"]
+        for doc in PDF_DOCS:
+            jobs.append({
+                "page": f"{prefix}/{doc['page']}",
+                "out": f"{prefix.lstrip('/') + '/' if prefix else ''}{doc['out']}",
+                "locale": loc["code"],
+                "max_pages": doc.get("max_pages"),
+            })
+    return jobs
+
+
+# Kept as a module-level name because scripts/render_pdf.py imports it.
+PDFS = pdf_jobs()
 
 MONTHS = ["", "January", "February", "March", "April", "May", "June",
           "July", "August", "September", "October", "November", "December"]
+
+# Per-locale date vocabulary, read from data/i18n/<code>.yml under these ui keys.
+# Falling back to the English constants above means a new locale renders readable
+# dates from its first build, before anyone has translated a month name.
+DATE_KEYS = ("date.months", "date.months_short", "date.present",
+             "date.year_unit", "date.month_unit")
+
+
+# ── translation ─────────────────────────────────────────────────────────────
+#
+# English is the source. `data/i18n/<code>.yml` is an OVERLAY: it carries only
+# what differs, and anything it omits falls back to English rather than
+# rendering blank. That is deliberate. Adding a role to data/experience.yml
+# without translating it yet gives a Dutch page with one English role, which is
+# a visible prompt to finish the job; a hard failure would instead mean nobody
+# can ship a content change until every language is done.
+#
+# Overlay shape:
+#   ui:        flat dotted keys for interface strings, e.g. nav.experience
+#   pages:     per page id -> {title, description, nav}
+#   profile:   any key from data/profile.yml, same nesting
+#   roles:     keyed BY ROLE ID, not by list position, so reordering the English
+#              data can never silently re-point a translation at another job
+#   skills:    group name -> translated group name
+#
+# `make build` prints how much of each locale is still falling back.
+
+
+def load_i18n(code: str) -> dict:
+    path = DATA / "i18n" / f"{code}.yml"
+    if not path.exists():
+        return {}
+    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def deep_merge(base, overlay):
+    """Overlay wins, recursively, and only where it actually has a value.
+
+    A None or an empty string in the overlay is treated as "not translated yet"
+    rather than as an instruction to blank the English out, because that is what
+    a half-finished translation file looks like.
+    """
+    if not isinstance(overlay, dict) or not isinstance(base, dict):
+        return overlay if overlay not in (None, "", []) else base
+    out = dict(base)
+    for key, value in overlay.items():
+        out[key] = deep_merge(base.get(key), value) if key in base else value
+    return out
+
+
+def make_translator(overlay: dict, code: str, misses: set):
+    """Return t(key, **fmt) for interface strings, English on a miss."""
+    ui = overlay.get("ui", {}) or {}
+    english = load_i18n(DEFAULT_LOCALE).get("ui", {}) or {}
+
+    def t(key: str, **fmt) -> str:
+        value = ui.get(key, english.get(key))
+        if value is None:
+            # A key no locale defines is an authoring bug, not a translation gap.
+            raise KeyError(f"no ui string for {key!r} (add it to data/i18n/en.yml)")
+        if code != DEFAULT_LOCALE and key not in ui:
+            misses.add(f"ui.{key}")
+        return value.format(**fmt) if fmt else value
+
+    return t
 
 
 # ── data helpers ────────────────────────────────────────────────────────────
@@ -121,15 +228,21 @@ def has_month(value) -> bool:
     return bool(re.match(r"^\d{4}-\d{1,2}", str(value).strip()))
 
 
-def month_label(value, short: bool = False) -> str:
+def month_label(value, short: bool = False, words=None) -> str:
+    """`words` carries the locale's month names and "Present"; English if absent."""
+    words = words or {}
     ym = parse_ym(value)
     if ym is None:
-        return "Present"
+        return words.get("present", "Present")
     year, month = ym
     if not has_month(value):
         return str(year)
-    name = MONTHS[month]
-    return f"{name[:3] if short else name} {year}"
+    names = words.get("months_short") if short else words.get("months")
+    if names:
+        name = names[month - 1]
+    else:
+        name = MONTHS[month][:3] if short else MONTHS[month]
+    return f"{name} {year}"
 
 
 def months_between(start, end, today: dt.date) -> int:
@@ -138,14 +251,17 @@ def months_between(start, end, today: dt.date) -> int:
     return max(0, (b[0] - a[0]) * 12 + (b[1] - a[1]))
 
 
-def duration_label(start, end, today: dt.date) -> str:
+def duration_label(start, end, today: dt.date, words=None) -> str:
+    words = words or {}
+    yr = words.get("year_unit", "yr")
+    mo = words.get("month_unit", "mo")
     n = months_between(start, end, today)
     years, months = divmod(n, 12)
     if years and months:
-        return f"{years} yr {months} mo"
+        return f"{years} {yr} {months} {mo}"
     if years:
-        return f"{years} yr"
-    return f"{max(months, 1)} mo"
+        return f"{years} {yr}"
+    return f"{max(months, 1)} {mo}"
 
 
 def sort_key(role: dict):
@@ -155,9 +271,53 @@ def sort_key(role: dict):
     return (start[0], start[1], 1 if parse_ym(role.get("end")) is None else 0)
 
 
+def localise_page(page: dict, overlay: dict, prefix: str) -> dict:
+    """A copy of a PAGES entry with its prose translated and its path prefixed.
+
+    The English title, description and nav label stay in PAGES where they are
+    readable in context; the overlay supplies the rest, keyed by page id.
+    """
+    tr = (overlay.get("pages", {}) or {}).get(page["id"], {}) or {}
+    out = dict(page)
+    for field in ("title", "description", "nav"):
+        if tr.get(field):
+            out[field] = tr[field]
+    out["path"] = prefix + page["path"]
+    out["href"] = out["path"]
+    return out
+
+
+def alternates_for(page: dict) -> list[dict]:
+    """Every locale's URL for one page, for hreflang and the nav switcher.
+
+    x-default points at the default locale: it is what a crawler with no
+    language preference should be sent to, and it is the reason this site does
+    not need to redirect on Accept-Language to be indexed correctly.
+    """
+    items = [
+        {"code": loc["code"], "native": loc["native"], "html_lang": loc["html_lang"],
+         "url": SITE["base_url"] + loc["prefix"] + page["path"],
+         "path": loc["prefix"] + page["path"]}
+        for loc in LOCALES
+    ]
+    return items
+
+
 # ── the render context ──────────────────────────────────────────────────────
 
-def build_context() -> dict:
+def build_context(locale: dict | None = None) -> dict:
+    locale = locale or LOCALES[0]
+    code = locale["code"]
+    prefix = locale["prefix"]
+    overlay = load_i18n(code)
+    misses: set[str] = set()
+    t = make_translator(overlay, code, misses)
+
+    # Resolved once per locale: every date and duration on the page goes
+    # through it, so a new language needs no code change here.
+    ui_map = overlay.get("ui", {}) or {}
+    words = {k.split(".", 1)[1]: ui_map[k] for k in DATE_KEYS if ui_map.get(k)}
+
     today = dt.date.today()
     profile = load("profile")
     experience = load("experience")
@@ -165,15 +325,33 @@ def build_context() -> dict:
     courses = load("courses")
     skills = load("skills")
 
+    profile = deep_merge(profile, overlay.get("profile", {}) or {})
+
+    # Roles are overlaid by id, so reordering the English data cannot re-point a
+    # translation at a different job.
+    role_overlay = overlay.get("roles", {}) or {}
+    experience["roles"] = [
+        deep_merge(r, role_overlay.get(r["id"], {}) or {}) for r in experience["roles"]
+    ]
+    if code != DEFAULT_LOCALE:
+        for r in experience["roles"]:
+            if r["id"] not in role_overlay:
+                misses.add(f"roles.{r['id']}")
+
+    skill_overlay = overlay.get("skills", {}) or {}
+    skills["groups"] = [
+        dict(g, name=skill_overlay.get(g["name"], g["name"])) for g in skills["groups"]
+    ]
+
     roles = sorted(experience["roles"], key=sort_key, reverse=True)
     by_id = {r["id"]: r for r in roles}
     for role in roles:
         role["is_current"] = parse_ym(role.get("end")) is None
-        role["start_label"] = month_label(role["start"])
-        role["end_label"] = month_label(role.get("end"))
-        role["start_short"] = month_label(role["start"], short=True)
-        role["end_short"] = month_label(role.get("end"), short=True)
-        role["duration"] = duration_label(role["start"], role.get("end"), today)
+        role["start_label"] = month_label(role["start"], words=words)
+        role["end_label"] = month_label(role.get("end"), words=words)
+        role["start_short"] = month_label(role["start"], short=True, words=words)
+        role["end_short"] = month_label(role.get("end"), short=True, words=words)
+        role["duration"] = duration_label(role["start"], role.get("end"), today, words)
         role["start_year"] = parse_ym(role["start"])[0]
         role.setdefault("focus", [])
         role.setdefault("highlights", [])
@@ -207,9 +385,9 @@ def build_context() -> dict:
                  key=lambda e: parse_ym(e["completed"]), reverse=True)
     crs = sorted(courses["courses"], key=lambda c: parse_ym(c["date"]), reverse=True)
     for course in crs:
-        course["date_label"] = month_label(course["date"])
+        course["date_label"] = month_label(course["date"], words=words)
     for item in edu:
-        item["completed_label"] = month_label(item["completed"])
+        item["completed_label"] = month_label(item["completed"], words=words)
 
     cv_skills = [s for g in skills["groups"] for s in g["skills"] if s.get("cv")]
 
@@ -224,13 +402,20 @@ def build_context() -> dict:
         "courses": crs,
         "featured_courses": [c for c in crs if c.get("featured")],
         "skill_groups": skills["groups"],
-        "soft_skills": skills.get("soft_skills", []),
+        "soft_skills": overlay.get("soft_skills") or skills.get("soft_skills", []),
         "cv_skills": cv_skills,
         "focus_areas": ["platform", "cloud", "network", "security"],
-        "nav": [p for p in PAGES if p.get("nav")],
-        "pdfs": {"cv": "/downloads/Caleb_Sargeant_CV.pdf",
-                 "jds": "/downloads/Caleb_Sargeant_JDs_and_Duties.pdf",
-                 "cover": "/downloads/Caleb_Sargeant_Cover_Letter.pdf"},
+        "nav": [localise_page(p, overlay, prefix) for p in PAGES if p.get("nav")],
+        "locale": locale,
+        "locales": LOCALES,
+        "default_locale": DEFAULT_LOCALE,
+        "t": t,
+        "url": lambda path: (prefix + path) if path.startswith("/") else path,
+        "pdfs": {"cv": f"{prefix}/downloads/Caleb_Sargeant_CV.pdf",
+                 "jds": f"{prefix}/downloads/Caleb_Sargeant_JDs_and_Duties.pdf",
+                 "cover": f"{prefix}/downloads/Caleb_Sargeant_Cover_Letter.pdf"},
+        "month_filter": lambda v, short=False: month_label(v, short, words),
+        "_misses": misses,
         "today": today,
         "build_date": today.isoformat(),
         "career_start_year": career_start[0],
@@ -240,7 +425,8 @@ def build_context() -> dict:
 
 # ── rendering ───────────────────────────────────────────────────────────────
 
-def render(context: dict) -> None:
+def render() -> dict:
+    """Render every page in every locale. Returns the per-locale miss report."""
     env = Environment(
         loader=FileSystemLoader(ROOT / "templates"),
         autoescape=True,
@@ -248,14 +434,28 @@ def render(context: dict) -> None:
         trim_blocks=True,
         lstrip_blocks=True,
     )
-    env.filters["month"] = month_label
 
-    for page in PAGES:
-        target = OUT / page["out"]
-        target.parent.mkdir(parents=True, exist_ok=True)
-        html = env.get_template(page["template"]).render(page=page, **context)
-        target.write_text(html, encoding="utf-8")
-        print(f"  rendered {page['out']}")
+    report = {}
+    for locale in LOCALES:
+        context = build_context(locale)
+        prefix = locale["prefix"].lstrip("/")
+        count = 0
+        for page in PAGES:
+            localised = localise_page(page, load_i18n(locale["code"]), locale["prefix"])
+            out = f"{prefix}/{page['out']}" if prefix else page["out"]
+            target = OUT / out
+            target.parent.mkdir(parents=True, exist_ok=True)
+            env.filters["month"] = context["month_filter"]
+            html = env.get_template(page["template"]).render(
+                page=localised,
+                alternates=alternates_for(page),
+                **{k: v for k, v in context.items() if k != "_misses"},
+            )
+            target.write_text(html, encoding="utf-8")
+            count += 1
+        report[locale["code"]] = sorted(context["_misses"])
+        print(f"  {locale['code']}: {count} pages -> {prefix or '/'}")
+    return report
 
 
 def copy_static() -> None:
@@ -271,17 +471,34 @@ def copy_static() -> None:
         shutil.copytree(wellknown, OUT / ".well-known")
 
 
-def write_sitemap(context: dict) -> None:
-    today = context["build_date"]
-    urls = "\n".join(
-        f"  <url><loc>{SITE['base_url']}{p['path']}</loc>"
-        f"<lastmod>{today}</lastmod></url>"
-        for p in PAGES if p.get("sitemap", True)
-    )
+def write_sitemap(today: str) -> None:
+    """One <url> per locale per page, each listing every locale as an alternate.
+
+    Listing the alternates inside every entry (rather than only on the English
+    one) is what tells a crawler these are translations of each other rather
+    than near-duplicate pages competing with one another.
+    """
+    blocks = []
+    for page in PAGES:
+        if not page.get("sitemap", True):
+            continue
+        alts = alternates_for(page)
+        links = "".join(
+            f'\n    <xhtml:link rel="alternate" hreflang="{a["html_lang"]}" href="{a["url"]}"/>'
+            for a in alts
+        )
+        default = SITE["base_url"] + page["path"]
+        links += f'\n    <xhtml:link rel="alternate" hreflang="x-default" href="{default}"/>'
+        for alt in alts:
+            blocks.append(
+                f'  <url>\n    <loc>{alt["url"]}</loc>'
+                f'\n    <lastmod>{today}</lastmod>{links}\n  </url>'
+            )
     (OUT / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        f"{urls}\n</urlset>\n", encoding="utf-8")
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
+        '        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+        + "\n".join(blocks) + "\n</urlset>\n", encoding="utf-8")
 
 
 def serve(port: int = 8788) -> None:
@@ -303,13 +520,20 @@ def main() -> int:
     shutil.rmtree(OUT, ignore_errors=True)
     OUT.mkdir(parents=True)
 
-    context = build_context()
-    render(context)
+    report = render()
     copy_static()
-    write_sitemap(context)
+    write_sitemap(dt.date.today().isoformat())
 
     count = sum(1 for p in OUT.rglob("*") if p.is_file())
-    print(f"Built {count} files into dist/")
+    print(f"Built {count} files into dist/ across {len(LOCALES)} locales")
+
+    # Untranslated content is a fallback to English, not a failure, so it has to
+    # be visible here or it is invisible everywhere.
+    for code, misses in report.items():
+        if not misses:
+            continue
+        print(f"  {code}: {len(misses)} untranslated "
+              f"({', '.join(misses[:6])}{'...' if len(misses) > 6 else ''})")
 
     if args.pdf:
         print("Rendering PDFs...")

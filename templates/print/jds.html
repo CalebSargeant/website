@@ -14,7 +14,7 @@
   reliable way to get a running header out of a paged HTML document. It carries
   no data, hence role="presentation".
 #}
-<html lang="en-GB">
+<html lang="{{ locale.html_lang }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -43,7 +43,7 @@
   <tr><td>
 
   <header class="jd-title">
-    <p class="kicker">Job descriptions &amp; duties</p>
+    <p class="kicker">{{ t('print.jds_kicker') }}</p>
     <h1>{{ profile.name }}</h1>
     <p class="jd-sub">{{ profile.headline }}</p>
     <p class="jd-meta">
@@ -51,11 +51,7 @@
       {{ profile.contact.phone }} ·
       {{ profile.links.website | replace('https://', '') }}
     </p>
-    <p class="jd-intro">
-      The full record of what each role actually involved, grouped by area of
-      work. The CV is the two-page summary of this document. Both are generated
-      from the same source, so nothing here contradicts anything there.
-    </p>
+    <p class="jd-intro">{{ t('print.jds_intro') }}</p>
 
     <div class="jd-facts">
       {% for stat in profile.stats %}
@@ -68,7 +64,7 @@
   </header>
 
   <section>
-    <h2 class="sec-head">Contents</h2>
+    <h2 class="sec-head">{{ t('print.contents') }}</h2>
     <ol class="jd-toc">
       {% for role in duty_roles %}
       <li>
@@ -103,11 +99,7 @@
     {% endif %}
 
     {% if role.get('duties_shared_with') %}
-    <p class="jd-note">
-      The same position as the other {{ role.duties_shared_with }} entry, worked
-      from a different location. The duty list is identical and is repeated here
-      in full so this section stands on its own.
-    </p>
+    <p class="jd-note">{{ t('print.jds_same_position', company=role.duties_shared_with) }}</p>
     {% endif %}
 
     {# `group['items']` and not `group.items`: Jinja resolves an attribute
@@ -127,7 +119,7 @@
   {% endfor %}
 
   <p class="jd-end">
-    End of record · {{ duty_roles | length }} roles documented ·
+    {{ t('print.jds_end', count=duty_roles | length) }} ·
     {{ profile.name }} · {{ profile.links.website | replace('https://', '') }}
   </p>
 

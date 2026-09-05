@@ -890,6 +890,180 @@
     });
   }
 
+  /* ── 14. language: switcher memory, and a suggestion banner ────────── */
+  /* Every locale is a complete static copy (English at /, Dutch at /nl/) and
+   * the Worker never redirects on Accept-Language, so this is the only place
+   * the reader's browser language is looked at at all. It offers; it never
+   * moves anyone. The switcher links are real links and work without any of
+   * this, and the banner is injected, so with JS off there is nothing to see.
+   */
+
+  var LANG_CHOICE = 'cs-lang';
+  var LANG_DISMISSED = 'cs-lang-dismissed';
+
+  /* The banner speaks the language it is offering, not the one on the page, so
+   * its copy cannot come from t() in the template. The switcher link is asked
+   * for it first (data-suggest / data-dismiss-label); this is the fallback so
+   * a locale added to build.py still gets a sentence. One line each, and the
+   * native name alone if a language turns up that is not listed here. */
+  var LANG_COPY = {
+    en: { offer: 'This page is also available in English.', close: 'Dismiss' },
+    nl: { offer: 'Deze pagina is ook in het Nederlands beschikbaar.', close: 'Sluiten' },
+    de: { offer: 'Diese Seite ist auch auf Deutsch verfügbar.', close: 'Schließen' },
+    fr: { offer: 'Cette page est aussi disponible en français.', close: 'Fermer' },
+    es: { offer: 'Esta página también está disponible en español.', close: 'Cerrar' },
+    pt: { offer: 'Esta página também está disponível em português.', close: 'Fechar' },
+    it: { offer: 'Questa pagina è disponibile anche in italiano.', close: 'Chiudi' },
+    af: { offer: 'Hierdie bladsy is ook in Afrikaans beskikbaar.', close: 'Maak toe' }
+  };
+
+  // "nl-BE" and "nl" are the same offer as far as this site is concerned.
+  function langPrimary(tag) {
+    return String(tag || '').toLowerCase().split('-')[0].replace(/\s/g, '');
+  }
+
+  function langWrite(key, value) {
+    try { window.localStorage.setItem(key, value); } catch (e) { /* private mode */ }
+  }
+
+  function langRead(key) {
+    try { return window.localStorage.getItem(key); } catch (e) { return null; }
+  }
+
+  /* Read the available locales out of the switcher the template rendered,
+   * rather than keeping a list here: adding a locale to LOCALES in build.py
+   * must not need a JS change. */
+  function langOptions() {
+    var out = [];
+    each($$('.lang-switch a[href]'), function (a) {
+      var tag = a.getAttribute('hreflang') || a.getAttribute('lang') ||
+                a.getAttribute('data-lang') || '';
+      var code = langPrimary(tag);
+      if (!code) return;
+      out.push({
+        code: code,
+        tag: tag,
+        href: a.getAttribute('href'),
+        native: (a.getAttribute('data-native') || a.textContent || '').trim() || code.toUpperCase(),
+        offer: a.getAttribute('data-suggest') || '',
+        close: a.getAttribute('data-dismiss-label') || '',
+        el: a
+      });
+    });
+    return out;
+  }
+
+  function initLangSwitch() {
+    var options = langOptions();
+    if (!options.length) return;
+    var here = langPrimary(root.getAttribute('lang'));
+
+    each(options, function (opt) {
+      // The narrow-viewport collapse in the CSS reads data-short. Filling it in
+      // here means that rule does not depend on the template remembering it.
+      if (!opt.el.getAttribute('data-short')) {
+        opt.el.setAttribute('data-short', opt.code.toUpperCase());
+      }
+      if (opt.code === here && !opt.el.hasAttribute('aria-current')) {
+        opt.el.setAttribute('aria-current', 'true');
+      }
+      // No preventDefault: the link navigates itself, this only remembers that
+      // the reader has now chosen, so the banner stops asking.
+      on(opt.el, 'click', function () { langWrite(LANG_CHOICE, opt.code); });
+    });
+  }
+
+  function initLangBanner() {
+    var nav = siteNav || $('.site-nav');
+    if (!nav || !nav.parentNode) return;
+
+    // No navigator.languages is a crawler, a locked-down webview or something
+    // old: nothing that should be shown an offer it cannot have asked for.
+    if (!navigator.languages || !navigator.languages.length) return;
+    // Dismissed once, or already chose a language: do not ask again.
+    if (langRead(LANG_DISMISSED) || langRead(LANG_CHOICE)) return;
+
+    var options = langOptions();
+    if (options.length < 2) return;
+    var here = langPrimary(root.getAttribute('lang'));
+
+    var byCode = {};
+    each(options, function (opt) { if (!byCode[opt.code]) byCode[opt.code] = opt; });
+
+    // First preference this site can actually serve wins. Walking the list in
+    // order is what makes "already on the language they wanted most" a no-op
+    // rather than an offer of their second choice.
+    var want = null;
+    for (var i = 0; i < navigator.languages.length; i++) {
+      var code = langPrimary(navigator.languages[i]);
+      if (byCode[code]) { want = byCode[code]; break; }
+    }
+    if (!want || want.code === here || !want.href) return;
+
+    var copy = LANG_COPY[want.code] || {};
+    var offerText = want.offer || copy.offer || want.native;
+    var closeText = want.close || copy.close || 'Close';
+
+    var banner = document.createElement('div');
+    banner.className = 'lang-banner';
+    banner.setAttribute('role', 'region');
+    // The whole bar is in the offered language, so say so: a screen reader
+    // reading Dutch with an English voice is worse than no offer at all.
+    banner.setAttribute('lang', want.tag || want.code);
+    banner.setAttribute('aria-label', want.native);
+
+    var inner = document.createElement('div');
+    inner.className = 'lang-banner-inner wrap';
+
+    var text = document.createElement('p');
+    text.className = 'lang-banner-text';
+    text.textContent = offerText;
+
+    var go = document.createElement('a');
+    go.className = 'lang-banner-go';
+    go.setAttribute('href', want.href);
+    if (want.tag) go.setAttribute('hreflang', want.tag);
+    go.textContent = want.native;
+
+    var dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.className = 'lang-banner-x';
+    dismiss.setAttribute('aria-label', closeText);
+    dismiss.setAttribute('title', closeText);
+    dismiss.innerHTML = '<span aria-hidden="true">×</span>';
+
+    inner.appendChild(text);
+    inner.appendChild(go);
+    inner.appendChild(dismiss);
+    banner.appendChild(inner);
+    nav.parentNode.insertBefore(banner, nav.nextSibling);
+
+    on(go, 'click', function () { langWrite(LANG_CHOICE, want.code); });
+
+    on(dismiss, 'click', function () {
+      langWrite(LANG_DISMISSED, '1');
+      banner.classList.remove('is-in');
+      // Focus is about to be inside a removed element, so hand it to the
+      // permanent way of doing the same thing.
+      var back = $('.lang-switch a[aria-current]') || $('.lang-switch a') || $('.brand');
+      if (back && back.focus) back.focus();
+      function remove() { if (banner.parentNode) banner.parentNode.removeChild(banner); }
+      if (REDUCE) remove(); else window.setTimeout(remove, 340);
+    });
+
+    // Two frames: the collapsed state has to be painted before the class that
+    // opens it lands, or there is no transition to see. It arrives late by
+    // definition (this file is deferred); sliding is what keeps that from
+    // reading as a layout glitch.
+    if (REDUCE) {
+      banner.classList.add('is-in');
+    } else {
+      window.requestAnimationFrame(function () {
+        window.requestAnimationFrame(function () { banner.classList.add('is-in'); });
+      });
+    }
+  }
+
   /* ── boot ──────────────────────────────────────────────────────────── */
 
   function boot() {
@@ -906,6 +1080,8 @@
     safe('filters', initFilters);
     safe('year', initYear);
     safe('copy', initCopy);
+    safe('language switch', initLangSwitch);
+    safe('language banner', initLangBanner);
 
     on(window, 'scroll', requestScrollTick, true);
     on(window, 'resize', requestScrollTick, true);

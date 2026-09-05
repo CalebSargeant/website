@@ -31,8 +31,9 @@
 {{ {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  "name": profile.name ~ ", engineering roles",
+  "name": t('experience.ld_name', name=profile.name),
   "url": site.base_url ~ page.path,
+  "inLanguage": locale.html_lang,
   "itemListOrder": "https://schema.org/ItemListOrderDescending",
   "numberOfItems": roles | length,
   "itemListElement": ld_items,
@@ -45,35 +46,33 @@
   <div class="wrap">
 
     <header class="section-head reveal" style="--d:0">
-      <p class="kicker">Career history</p>
-      <h1>Experience</h1>
+      <p class="kicker">{{ t('experience.kicker') }}</p>
+      <h1>{{ t('experience.title') }}</h1>
       <p class="lead">
-        {{ years_experience }} years in IT across {{ roles | length }} engineering roles, from an
-        MSP helpdesk in Cape Town to platform engineering in the Netherlands.
+        {{ t('experience.lead', years=years_experience, roles=roles | length) }}
       </p>
-      <p>
-        Open a role for its full duty list. Those lists are what the
-        <a href="{{ pdfs.jds }}">JDs &amp; Duties PDF</a> is generated from, so the document
-        and this page cannot drift apart.
-      </p>
+      {# See base.html: the anchor goes in as an argument so a translation can
+         move it, and the sentence is escaped before the substitution. #}
+      {% set jds_link %}<a href="{{ pdfs.jds }}">{{ t('download.jds_link') }}</a>{% endset %}
+      <p>{{ (t('experience.duties_note') | e).format(link=jds_link) }}</p>
     </header>
 
     <div class="cta-row reveal" style="--d:1">
-      <a class="btn btn-ghost" href="{{ pdfs.jds }}">JDs &amp; Duties PDF</a>
-      <a class="btn btn-quiet" href="{{ pdfs.cv }}">CV PDF</a>
+      <a class="btn btn-ghost" href="{{ pdfs.jds }}">{{ t('download.jds_link') }}</a>
+      <a class="btn btn-quiet" href="{{ pdfs.cv }}">{{ t('download.cv_link') }}</a>
     </div>
 
     {# The filter root wraps the buttons *and* the items, so site.js can filter by
        flipping one attribute here rather than touching every item. #}
     <div data-filter-root data-active-filter="all">
 
-      <div class="filter-row reveal" style="--d:2" role="group" aria-label="Filter roles by focus area">
+      <div class="filter-row reveal" style="--d:2" role="group" aria-label="{{ t('experience.filter_aria') }}">
         {# aria-pressed is the only selected-state hook: site.js keeps it in sync
            and .filter-btn[aria-pressed="true"] carries the styling. A hard-coded
            .is-active here would never be cleared, so two buttons would read as
            selected the moment anyone picks a focus area. #}
         <button type="button" class="filter-btn" data-filter="all" aria-pressed="true">
-          All <span class="filter-count mono">{{ roles | length }}</span>
+          {{ t('filter.all') }} <span class="filter-count mono">{{ roles | length }}</span>
         </button>
         {% for area in focus_areas %}
         {% set counter = namespace(n=0) %}
@@ -81,12 +80,12 @@
         {% if area in role.focus %}{% set counter.n = counter.n + 1 %}{% endif %}
         {% endfor %}
         <button type="button" class="filter-btn" data-filter="{{ area }}" aria-pressed="false">
-          {{ area | capitalize }} <span class="filter-count mono">{{ counter.n }}</span>
+          {{ t('focus.' ~ area) }} <span class="filter-count mono">{{ counter.n }}</span>
         </button>
         {% endfor %}
       </div>
 
-      <h2 class="sr-only">Roles, newest first</h2>
+      <h2 class="sr-only">{{ t('experience.roles_heading') }}</h2>
 
       <div class="timeline">
         {# 1000 user units tall and preserveAspectRatio="none" so it stretches to
@@ -113,7 +112,7 @@
             <p class="tl-when">
               <span class="tl-range">
                 <time datetime="{{ role.start }}">{{ role.start_label }}</time>
-                <span aria-hidden="true">–</span><span class="sr-only">to</span>
+                <span aria-hidden="true">–</span><span class="sr-only">{{ t('common.to') }}</span>
                 {% if role.is_current %}
                 <span>{{ role.end_label }}</span>
                 {% else %}
@@ -154,10 +153,10 @@
             {% set duty_count.n = duty_count.n + group["items"] | length %}
             {% endfor %}
             <details class="tl-duties">
-              <summary>Full duties ({{ duty_count.n }})</summary>
+              <summary>{{ t('experience.full_duties', count=duty_count.n) }}</summary>
               {% if role.get('duties_shared_with') %}
               <p class="duty-note mono">
-                Same duties as the other {{ role.get('duties_shared_with') }} entry.
+                {{ t('experience.same_duties', company=role.get('duties_shared_with')) }}
               </p>
               {% endif %}
               {% for group in role.duties %}
