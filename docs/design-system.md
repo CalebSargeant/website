@@ -91,8 +91,9 @@ Fonts come from Google Fonts (`Space Grotesk` 400/500/600/700, `JetBrains Mono`
 and toggles `.menu-open`.
 
 **Buttons**, `.btn` base; variants `.btn-sig` (gradient fill), `.btn-ghost`
-(hairline), `.btn-quiet` (text only). `.btn[data-magnetic]` gets pointer-follow
-from `site.js`.
+(hairline), `.btn-quiet` (text only). Buttons lift 2px on hover;
+`.btn[data-magnetic]` additionally leans up to 6px toward a fine pointer within
+40px of it, written to `translate` by `site.js` so it composes with the lift.
 
 **Kicker / chips**, `.kicker` (mono, uppercase, tracked), `.chip` (small mono
 pill), `.chip-row`, `.pill-live` (green dot + label).
@@ -145,17 +146,23 @@ never blank.
 | Hero network | rAF loop | `hero-net.js` on `#hero-net`; pauses when off-screen or tab hidden |
 | Typewriter | on load | `[data-typewriter]` types its own `data-typewriter` value |
 | Count-up | reveal | `[data-count-to]`, 1100ms ease-out |
+| Magnetic button | pointer move | ≤6px toward the pointer, fine pointer only |
 | Spine draw | scroll | `#spine-path` `stroke-dashoffset` mapped to timeline scroll progress |
 | Skill fill | reveal | width transitions to `level/5*100%` |
-| Cursor glow | pointer move | fine pointer only; rAF-throttled |
-| Magnetic button | pointer move | translate ≤6px toward pointer |
 | Scroll rail | scroll | `.scroll-progress` width = read percentage |
 | Theme swap | click | `View Transition API` when available, else instant |
+
+**No ambient cursor spotlight.** Pointer feedback is allowed only where it is
+*local*: attached to the control or region the pointer is actually over, silent
+everywhere else. Magnetic buttons and the hero canvas's lean qualify; a light
+that follows the cursor around the page does not, and has been removed four
+times now. See `.claude/decisions/2026-09-05-no-cursor-spotlight.md`.
 
 `hero-net.js` contract: canvas `#hero-net`, sized to its parent with DPR
 scaling, nodes drawn in `--sig`, packets in `--sig-2`, edges at 10% alpha. It
 must cap at ~34 nodes, stop on `visibilitychange`, and no-op entirely under
-reduced motion after painting one static frame.
+reduced motion after painting one static frame. Nodes within ~160px of a fine
+pointer lean toward it and brighten.
 
 ---
 

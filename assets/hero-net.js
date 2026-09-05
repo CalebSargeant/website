@@ -6,6 +6,11 @@
  * to its parent with DPR scaling, nodes in --sig, packets in --sig-2, edges
  * near 10% alpha, at most 34 nodes, stops on visibilitychange, and under
  * prefers-reduced-motion paints one static frame and never starts the loop.
+ *
+ * Nodes near the cursor lean toward it and brighten, and the edges around it
+ * gain a little alpha. That is direct feedback on the part of the graph you are
+ * over, not a light that follows you around the page; see
+ * .claude/decisions/2026-09-05-no-cursor-spotlight.md for where the line is.
  */
 (function () {
   'use strict';
@@ -70,6 +75,7 @@
       canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
       canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      rect = canvas.getBoundingClientRect();
       // Rescale rather than regenerate: on mobile the URL bar collapsing fires a
       // resize, and rebuilding the graph there would visibly reshuffle it.
       if (built && ow > 0 && oh > 0) {
@@ -78,7 +84,6 @@
           n.x *= sx; n.hx *= sx; n.y *= sy; n.hy *= sy;
         }
       }
-      rect = canvas.getBoundingClientRect();
       return true;
     }
 

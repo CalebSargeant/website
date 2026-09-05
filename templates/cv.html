@@ -87,14 +87,15 @@
         <button type="button" class="filter-btn" data-filter="{{ area }}" aria-pressed="false">{{ area | capitalize }}</button>
 {% endfor %}
       </div>
-      <p class="cv-filter-note">Filter the roles to a focus area. The PDF always contains everything.</p>
     </div>
 
     <div class="cv-actions">
-      <a class="btn btn-sig" href="{{ pdfs.cv }}" download data-magnetic>{{ icon("download") }} Download PDF</a>
+      <a class="btn btn-sig" data-magnetic href="{{ pdfs.cv }}" download>{{ icon("download") }} Download PDF</a>
       <a class="btn btn-ghost" href="/print/cv/">{{ icon("printer") }} Print view</a>
       <p class="mono cv-stamp">Generated from data/ on {{ build_date }}</p>
     </div>
+
+    <p class="cv-filter-note">Filter the roles to a focus area. The PDF always contains everything.</p>
 
   </div>
 </div>
@@ -105,6 +106,9 @@
 
       {# ── header ───────────────────────────────────────────────────────── #}
       <header class="cv-head reveal" style="--d:0">
+        <img class="cv-portrait" src="/assets/img/caleb.jpg" alt="Caleb Sargeant"
+             width="168" height="168" decoding="async">
+        <div class="cv-head-text">
         <h1 class="cv-name">{{ profile.name }}</h1>
         <p class="cv-headline">{{ profile.headline }}</p>
         <ul class="cv-contact mono">
@@ -116,6 +120,7 @@
           <li>{{ icon("linkedin") }} <a href="{{ profile.links.linkedin }}" rel="me">{{ short_url(profile.links.linkedin) }}</a></li>
         </ul>
         <p class="cv-status mono">{{ profile.nationality_note }}</p>
+        </div>
       </header>
 
       {# ── profile ──────────────────────────────────────────────────────── #}

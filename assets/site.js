@@ -749,33 +749,11 @@
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   }
 
-  /* ── 10. cursor glow ───────────────────────────────────────────────── */
+  /* ── 10. magnetic buttons ──────────────────────────────────────────── */
 
-  function initCursorGlow() {
-    if (!FINE_POINTER || REDUCE) return;   // never on touch, never against a stated preference
-
-    var glow = document.createElement('div');
-    glow.className = 'cursor-glow';
-    glow.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(glow);
-
-    var x = 0, y = 0, queued = false;
-    on(document, 'mousemove', function (e) {
-      x = e.clientX; y = e.clientY;
-      if (queued) return;
-      queued = true;
-      window.requestAnimationFrame(function () {
-        queued = false;
-        glow.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
-        glow.style.opacity = '1';
-      });
-    }, true);
-
-    on(document, 'mouseleave', function () { glow.style.opacity = '0'; }, true);
-  }
-
-  /* ── 11. magnetic buttons ──────────────────────────────────────────── */
-
+  /* Direct feedback on the control under the pointer, which is the opposite of
+     the ambient spotlight this file used to carry: it only ever moves the thing
+     you are already reaching for, and only within 40px of it. */
   function initMagnetic() {
     if (!FINE_POINTER || REDUCE) return;
 
@@ -813,16 +791,14 @@
           dx = clamp((mx - cx) / (r.width / 2 + 40), -1, 1) * 6;
           dy = clamp((my - cy) / (r.height / 2 + 40), -1, 1) * 6;
         }
-        // `translate` rather than `transform`, so a CSS hover lift or scale on
-        // the same element keeps working instead of being overwritten.
+        // `translate` rather than `transform`, so the CSS hover lift on the same
+        // element keeps working instead of being overwritten.
         item.el.style.translate = dx.toFixed(2) + 'px ' + dy.toFixed(2) + 'px';
-        item.el.style.setProperty('--mx', dx.toFixed(2) + 'px');
-        item.el.style.setProperty('--my', dy.toFixed(2) + 'px');
       }
     }
   }
 
-  /* ── 12. filters (skill matrix, CV focus) ──────────────────────────── */
+  /* ── 11. filters (skill matrix, CV focus) ──────────────────────────── */
 
   function initFilters() {
     var buttons = $$('[data-filter]');
@@ -864,7 +840,7 @@
     });
   }
 
-  /* ── 13/14. year stamp and copy buttons ────────────────────────────── */
+  /* ── 12/13. year stamp and copy buttons ────────────────────────────── */
 
   function initYear() {
     var year = String(new Date().getFullYear());
@@ -895,7 +871,6 @@
     safe('spine', initSpine);
     safe('theme', initTheme);
     safe('cmdk', initCmdk);
-    safe('cursor glow', initCursorGlow);
     safe('magnetic', initMagnetic);
     safe('filters', initFilters);
     safe('year', initYear);

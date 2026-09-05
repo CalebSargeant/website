@@ -79,9 +79,13 @@
   <canvas id="hero-net" aria-hidden="true"></canvas>
 
   <div class="wrap hero-inner">
-    {% if profile.availability.show %}
-    <p class="hero-badge pill-live reveal">{{ profile.availability.text }}</p>
-    {% endif %}
+    <div class="hero-intro reveal">
+      <img class="hero-portrait" src="/assets/img/caleb-320.jpg" alt="Caleb Sargeant"
+           width="96" height="96" decoding="async" fetchpriority="high">
+      {% if profile.availability.show %}
+      <p class="hero-badge pill-live">{{ profile.availability.text }}</p>
+      {% endif %}
+    </div>
 
     <h1 class="reveal" style="--d: 1">Networks, platforms and the <span class="grad-text">glue between them.</span></h1>
 
