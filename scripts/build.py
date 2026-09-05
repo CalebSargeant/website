@@ -61,7 +61,7 @@ DEFAULT_LOCALE = "en"
 # sitemap.xml: used for the noindex print sheets.
 PAGES = [
     {"id": "home", "template": "home.html", "out": "index.html", "path": "/",
-     "nav": "Home", "title": "Caleb Sargeant · Platform, Network & Security Engineer",
+     "nav": "Home", "title": "{name} · {headline}",
      "description": "Platform, cloud, network and security engineer in Eindhoven, "
                     "Netherlands. Kubernetes, Terraform, Azure and AWS, and the "
                     "networks underneath them. CV generated straight from this site."},
@@ -271,17 +271,29 @@ def sort_key(role: dict):
     return (start[0], start[1], 1 if parse_ym(role.get("end")) is None else 0)
 
 
-def localise_page(page: dict, overlay: dict, prefix: str) -> dict:
+def localise_page(page: dict, overlay: dict, prefix: str,
+                  subs: dict | None = None) -> dict:
     """A copy of a PAGES entry with its prose translated and its path prefixed.
 
     The English title, description and nav label stay in PAGES where they are
     readable in context; the overlay supplies the rest, keyed by page id.
+
+    `{headline}` and `{name}` in any of those three fields are substituted from
+    data/profile.yml. That is what stops a page title from becoming a second
+    copy of the headline: change profile.yml and every title that names it
+    follows, in every locale. A plain replace rather than str.format, because a
+    title is free text and a stray brace in it should not raise.
     """
     tr = (overlay.get("pages", {}) or {}).get(page["id"], {}) or {}
     out = dict(page)
     for field in ("title", "description", "nav"):
         if tr.get(field):
             out[field] = tr[field]
+        value = out.get(field)
+        if isinstance(value, str) and subs:
+            for key, replacement in subs.items():
+                value = value.replace("{" + key + "}", replacement)
+            out[field] = value
     out["path"] = prefix + page["path"]
     out["href"] = out["path"]
     return out
@@ -342,6 +354,9 @@ def build_context(locale: dict | None = None) -> dict:
     skills["groups"] = [
         dict(g, name=skill_overlay.get(g["name"], g["name"])) for g in skills["groups"]
     ]
+
+    # What a page title may name rather than copy. See localise_page.
+    page_subs = {"headline": profile["headline"], "name": profile["name"]}
 
     roles = sorted(experience["roles"], key=sort_key, reverse=True)
     by_id = {r["id"]: r for r in roles}
@@ -405,7 +420,7 @@ def build_context(locale: dict | None = None) -> dict:
         "soft_skills": overlay.get("soft_skills") or skills.get("soft_skills", []),
         "cv_skills": cv_skills,
         "focus_areas": ["platform", "cloud", "network", "security"],
-        "nav": [localise_page(p, overlay, prefix) for p in PAGES if p.get("nav")],
+        "nav": [localise_page(p, overlay, prefix, page_subs) for p in PAGES if p.get("nav")],
         "locale": locale,
         "locales": LOCALES,
         "default_locale": DEFAULT_LOCALE,
@@ -414,6 +429,7 @@ def build_context(locale: dict | None = None) -> dict:
         "pdfs": {"cv": f"{prefix}/downloads/Caleb_Sargeant_CV.pdf",
                  "jds": f"{prefix}/downloads/Caleb_Sargeant_JDs_and_Duties.pdf",
                  "cover": f"{prefix}/downloads/Caleb_Sargeant_Cover_Letter.pdf"},
+        "page_subs": page_subs,
         "month_filter": lambda v, short=False: month_label(v, short, words),
         "_misses": misses,
         "today": today,
@@ -439,9 +455,11 @@ def render() -> dict:
     for locale in LOCALES:
         context = build_context(locale)
         prefix = locale["prefix"].lstrip("/")
+        subs = context["page_subs"]
         count = 0
         for page in PAGES:
-            localised = localise_page(page, load_i18n(locale["code"]), locale["prefix"])
+            localised = localise_page(page, load_i18n(locale["code"]),
+                                      locale["prefix"], subs)
             out = f"{prefix}/{page['out']}" if prefix else page["out"]
             target = OUT / out
             target.parent.mkdir(parents=True, exist_ok=True)

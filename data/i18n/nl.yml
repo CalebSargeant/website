@@ -240,7 +240,7 @@ ui:
   date.month_unit: mnd
 pages:
   home:
-    title: Caleb Sargeant · Platform, Network & Security Engineer
+    title: '{name} · {headline}'
     description: Platform-, cloud-, netwerk- en security-engineer in Eindhoven. Kubernetes, Terraform,
       Azure en AWS, en de netwerken eronder. CV uit dezelfde data.
     nav: Home
@@ -277,7 +277,6 @@ pages:
     description: ''
 profile:
   location: Eindhoven, Nederland
-  headline: Platform, Network & Security Engineer
   tagline: Platform, cloud, netwerk en security engineering sinds 2012.
   summary: Ik werk sinds 2012 in de IT, gespecialiseerd in platform engineering, automatisering, infrastructure
     as code, netwerken en security. Ik heb van alles beheerd, van bare-metal serverruimtes tot gevirtualiseerde
