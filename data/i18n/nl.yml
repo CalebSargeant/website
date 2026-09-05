@@ -246,8 +246,8 @@ pages:
     nav: Home
   experience:
     title: Ervaring · Caleb Sargeant
-    description: Twaalf engineeringrollen sinds 2012, van MSP-helpdesk tot platform engineering, met per
-      rol de volledige takenlijst.
+    description: '{roles} engineeringrollen sinds 2012, van MSP-helpdesk tot platform engineering,
+      met per rol de volledige takenlijst.'
     nav: Ervaring
   education:
     title: Opleiding & cursussen · Caleb Sargeant
@@ -330,6 +330,81 @@ roles:
     - Cloud- en Kubernetes platform engineering voor workloads in de overheidssector.
     - Infrastructure as code en CI/CD voor applicatieteams.
     - Migratie en modernisering van legacy applicatieplatformen.
+  magma-moose-co-founder:
+    type: Founder
+    location: Op afstand · Nederland
+    summary: 'Mede-oprichter van een development studio rond platform-, cloud-, netwerk- en security engineering,
+      met eigen developer tooling. Ik doe de engineering: de gedeelde infrastructuur waar alles op draait, en de
+      meeste producten die daarbovenop staan.'
+    highlights:
+    - 'De infrastructure as code van de studio gebouwd: Terraform en Terragrunt over Cloudflare, Kubernetes, Oracle
+      Cloud, AWS en GCP, inclusief Zero Trust-toegang en IPsec/BGP-tunnels naar de OCI DRG.'
+    - Diatreme uitgebracht, een GitHub Action en Cloudflare Worker voor release-orkestratie die vier semantic-versioning
+      tools samenbrengt en Docker build, scan, SBOM naar Dependency-Track en promotie naar de registry op digest
+      doet.
+    - Chargate en Brimyr uitgebracht, die een pull request tegenhouden op nieuwe findings en op de dekking van de
+      regels die het echt wijzigt, in plaats van op een cijfer over de hele repository.
+    - 'Dün Mir gebouwd, een platform voor fleet assurance: agents op routers sturen heartbeats naar een control
+      plane dat een dead-man sweep draait en alerts stuurt, met een gelicentieerde operatorconsole die in-process
+      op een bevroren agent-API is samengesteld.'
+    - 'De security posture van de studio beheerd: DefectDojo als centrale plek voor findings, Dependency-Track als
+      bestemming voor SBOM''s, en een geplande job die tussen die twee synchroniseert en issues opent voor nieuwe
+      high-severity findings.'
+    - Caldrith gebouwd, een multi-tenant GitHub App die organisatie- en repository-instellingen gelijktrekt met
+      configuration as code, en daarmee gedeelde security- en release-workflows in elke repository uitgerold.
+    duties:
+    - group: Bedrijf en richting
+      items:
+      - De studio mede opgericht en de technische richting bepaald, inclusief wat open source gaat en wat gelicentieerd
+        blijft.
+      - Eigenaar van de productroadmap voor release tooling, security gating, fleet assurance en developer experience.
+      - De publieke positionering, de productdocumentatie en de website van de studio geschreven en onderhouden.
+    - group: Gedeelde infrastructuur
+      items:
+      - De infrastructure as code omgeving in Terraform en Terragrunt ontworpen en onderhouden, over Cloudflare,
+        Kubernetes, Oracle Cloud, AWS en GCP.
+      - Cloudflare Zero Trust beheerd voor interne toegang, inclusief tunnels, access applications, identity providers
+        en device posture.
+      - De OCI-edge beheerd, waaronder MikroTik CHR-routers, FortiGate IPsec-tunnels met BGP en DRG-peering.
+      - DNS, certificaten en de Workers beheerd die voor de publieke sites staan.
+      - Het Kubernetes-platform beheerd met FluxCD, inclusief de applicaties waar de studio van afhankelijk is.
+    - group: Release- en supply-chain tooling
+      items:
+      - Diatreme gebouwd en onderhouden voor python-semantic-release, semantic-release, GitVersion en release-please.
+      - Docker build en scan geïmplementeerd met CycloneDX-SBOM's die naar Dependency-Track gaan, en promotie van
+        images op digest via GHCR met geverifieerde provenance.
+      - Publiceren naar npm, Maven, Gradle, RubyGems, NuGet, pip en S3 ondersteund, en het geheel compatibel gehouden
+        met GitHub Enterprise.
+    - group: Security engineering
+      items:
+      - Chargate gebouwd, dat een pull request tegenhoudt op nieuwe code-quality- en security-findings in plaats
+        van op het totaal van de repository.
+      - Brimyr gebouwd, dat toetst op patch coverage in de stijl van diff-cover, met automatische detectie van het
+        ecosysteem.
+      - DefectDojo en Dependency-Track beheerd als de plek waar de findings en SBOM's van de studio binnenkomen,
+        met een geplande sync die GitHub-issues opent voor nieuwe high-severity findings.
+      - Draventis gebouwd voor geplande DAST op uitgerolde omgevingen met OWASP ZAP en Nuclei, met herimport in
+        DefectDojo. Vroege fase, nog niet in productie.
+      - Ponvara gebouwd om GHAS-alerts en Dependency-Track-findings in DefectDojo in te lezen. Vroege fase, nog
+        niet in productie.
+    - group: Fleet assurance (Dün Mir)
+      items:
+      - 'Het control plane ontworpen: agents op elke router sturen heartbeats en jobrapportages, en het plane draait
+        een dead-man sweep en levert alerts af.'
+      - Het wire contract van de agent bevroren en van versies voorzien gehouden, zodat de gelicentieerde console
+        de kern van het control plane in-process samenstelt in plaats van die te proxyen.
+      - De operatorconsole gebouwd in React en Vite op een FastAPI-backend, met eigen authenticatie en multi-tenancy
+        die via de extension points van de kern worden ingebracht.
+      - Het uitgerold en beheerd op het Kubernetes-platform van de studio.
+    - group: Developerplatform en manier van werken
+      items:
+      - Caldrith gebouwd, een self-hostable multi-tenant GitHub App die organisatie- en repository-instellingen
+        gelijktrekt met configuration as code.
+      - Daarmee gedeelde security- en release-workflowtemplates uitgerold naar elke repository in de organisatie.
+      - Een gedeelde Homebrew-tap onderhouden met automatische nachtelijke updates, en een gedeelde set AI-agent
+        skills die in de hele tooling wordt gebruikt.
+      - Ondertekende commits, actions vastgepind op SHA, branch protection en een gedocumenteerd reviewproces afgedwongen
+        over de hele omgeving.
   tengen-devops-engineer:
     type: Contract
     location: Op afstand · Zuid-Afrika

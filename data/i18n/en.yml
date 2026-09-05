@@ -260,8 +260,8 @@ pages:
     nav: Home
   experience:
     title: Experience · Caleb Sargeant
-    description: Twelve engineering roles since 2012, from MSP helpdesk to platform engineering, with
-      the full duty list for each.
+    description: '{roles} engineering roles since 2012, from MSP helpdesk to platform engineering,
+      with the full duty list for each.'
     nav: Experience
   education:
     title: Education & courses · Caleb Sargeant

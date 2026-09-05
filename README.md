@@ -139,6 +139,13 @@ If a sheet goes over its page budget the run prints a warning and carries on. Th
 is the signal that an edit in `data/` has outgrown the layout, usually too many
 `highlights` on the CV.
 
+A page count alone does not catch everything, because a `.sheet` is a fixed-height
+box that clips: content that outgrows it slides under the page footer rather than
+starting a new page, and the PDF still reports the same number of pages. So each
+sheet is also measured in the browser before it is printed, and a sheet whose last
+line runs into its own footer gets the same warning. Adding the thirteenth role to
+`data/experience.yml` did exactly that to the CV's first sheet.
+
 **The PDFs are never committed.** `dist/` is gitignored and CI rebuilds everything
 on every deploy, so a downloaded CV cannot silently disagree with `data/`. That is
 the one failure this repo exists to make impossible.

@@ -174,6 +174,14 @@ exactly 210×297mm with its own 14mm padding. No dark tokens, no animations, no
 JS. Page-break rules: `.cv-role { break-inside: avoid }`,
 `.duty-group { break-inside: avoid-page }`.
 
+A `.sheet` clips, it does not reflow. Content that outgrows one slides under the
+absolutely positioned `.sheet-foot` and off the paper without changing the PDF's
+page count, so `scripts/render_pdf.py` measures every sheet's last line against
+its footer before printing and warns when they collide. The CV's first sheet is
+the tight one: it carries one `.cv-jobs` row per role in `data/experience.yml`
+and has roughly 2mm of slack at thirteen roles, so a fourteenth needs a layout
+decision, not just another row.
+
 Three documents, all rendered from the same data:
 
 | Output | Template | Notes |
