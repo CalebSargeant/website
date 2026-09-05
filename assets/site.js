@@ -362,6 +362,8 @@
 
     if (REDUCE) {
       each(els, function (el) { el.textContent = el.getAttribute('data-typewriter'); });
+      // No traffic to report, but the port is still up.
+      each($$('.term-link'), function (el) { el.classList.add('is-linked'); });
       return;
     }
 
@@ -379,20 +381,48 @@
     });
 
     each(groups, function (group) {
-      whenVisible(group.root, function () { typeChain(group.items, 0); });
+      var term = closest(group.root, '.term');
+      var link = term ? term.querySelector('.term-link') : null;
+      whenVisible(group.root, function () {
+        typeChain(group.items, 0, function () {
+          // Traffic done: the port stays up, so the lamp goes steady rather than
+          // dark. Inline --lit is cleared so the .is-linked rule can win.
+          var led = term ? term.querySelector('.term-led') : null;
+          if (led) led.style.removeProperty('--lit');
+          if (link) link.classList.add('is-linked');
+        });
+      });
     });
     each(singles, function (el) {
       whenVisible(el, function () { typeChain([el], 0); });
     });
   }
 
-  function typeChain(items, index) {
-    if (index >= items.length) return;
-    typeInto(items[index], function () { typeChain(items, index + 1); });
+  function typeChain(items, index, done) {
+    if (index >= items.length) { if (done) done(); return; }
+    typeInto(items[index], function () { typeChain(items, index + 1, done); });
+  }
+
+  // The activity lamp in this line's terminal chrome, if it has one.
+  function ledFor(el) {
+    var term = closest(el, '.term');
+    return term ? term.querySelector('.term-led') : null;
+  }
+
+  // One pulse per character. Set lit, then drop it on the next frame and let the
+  // CSS transition decay it, so sustained typing holds the lamp near-on with
+  // small dips instead of strobing it.
+  function pulse(led) {
+    if (!led) return;
+    led.style.setProperty('--lit', '1');
+    window.requestAnimationFrame(function () {
+      led.style.setProperty('--lit', '0');
+    });
   }
 
   function typeInto(el, done) {
     var text = el.getAttribute('data-typewriter') || '';
+    var led = ledFor(el);
     var i = 0;
     // Cleared here, not at boot: until this line's turn comes the server-rendered
     // text stays on the page, so a group whose observer never fires loses nothing.
@@ -401,6 +431,7 @@
     (function step() {
       i++;
       el.textContent = text.slice(0, i);
+      pulse(led);
       if (i >= text.length) {
         el.classList.remove('is-typing');
         el.classList.add('typed');
