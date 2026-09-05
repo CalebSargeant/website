@@ -1,6 +1,6 @@
 # Caleb Sargeant
 
-> Network, security and DevOps engineer in Eindhoven, Netherlands. Working in IT
+> Platform, network and security engineer in Eindhoven, Netherlands. Working in IT
 > since 2012 across platform engineering, automation, infrastructure as code,
 > networking and security, from bare-metal server rooms to cloud-native platforms.
 
