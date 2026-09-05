@@ -37,6 +37,66 @@ roles:
       - Migration and modernisation of legacy application platforms.
     duties: []
 
+  - id: magma-moose-co-founder
+    company: Magma Moose
+    title: Co-Founder
+    location: Remote · Netherlands
+    start: 2023-03
+    end: present
+    type: Founder
+    focus: [platform, cloud, security, network]
+    summary: >-
+      Co-founded a development studio built around platform, cloud, network and
+      security engineering, and its own developer tooling. I run the
+      engineering: the shared infrastructure everything sits on, and most of the
+      products on top of it.
+    stack: [Terraform, Terragrunt, Kubernetes, FluxCD, Cloudflare, GitHub Actions, Python,
+            FastAPI, React, Docker, DefectDojo, Dependency-Track, OCI, MikroTik, FortiGate]
+    highlights:
+      - "Built the studio's infrastructure as code: Terraform and Terragrunt across Cloudflare, Kubernetes, Oracle Cloud, AWS and GCP, including Zero Trust access and IPsec/BGP tunnels into the OCI DRG."
+      - Shipped Diatreme, a release-orchestration GitHub Action and Cloudflare Worker that unifies four semantic-versioning tools and does Docker build, scan, SBOM to Dependency-Track and registry promotion by digest.
+      - Shipped Chargate and Brimyr, which gate a pull request on net-new findings and on the coverage of the lines it actually changed rather than on a whole-repo number.
+      - "Built Dün Mir, a fleet-assurance platform: agents on routers push heartbeats to a control plane that runs a dead-man sweep and alerts, with a licensed operator console composed in-process against a frozen agent API."
+      - "Run the studio's security posture: DefectDojo as the finding hub, Dependency-Track as the SBOM sink, and a scheduled job that syncs between them and opens issues for new high-severity findings."
+      - Built Caldrith, a multi-tenant GitHub App that reconciles organisation and repository settings from configuration as code, and uses it to provision shared security and release workflows into every repository.
+    duties:
+      - group: Company and direction
+        items:
+          - Co-founded the studio and set its technical direction, including what to open-source and what to keep licensed.
+          - Own the product roadmap across release tooling, security gating, fleet assurance and developer experience.
+          - Write and maintain the public positioning, the product documentation and the studio website.
+      - group: Shared infrastructure
+        items:
+          - Design and maintain the infrastructure as code estate in Terraform and Terragrunt across Cloudflare, Kubernetes, Oracle Cloud, AWS and GCP.
+          - Run Cloudflare Zero Trust for internal access, including tunnels, access applications, identity providers and device posture.
+          - Operate the OCI edge, including MikroTik CHR routers, FortiGate IPsec tunnels with BGP, and DRG peering.
+          - Manage DNS, certificates and the Workers estate fronting the public sites.
+          - Run the Kubernetes platform with FluxCD, including the apps the studio depends on.
+      - group: Release and supply-chain tooling
+        items:
+          - Build and maintain Diatreme across python-semantic-release, semantic-release, GitVersion and release-please.
+          - Implement Docker build and scan with CycloneDX SBOM generation published to Dependency-Track, and provenance-verified image promotion by digest through GHCR.
+          - Support publishing to npm, Maven, Gradle, RubyGems, NuGet, pip and S3, and keep it GitHub Enterprise compatible.
+      - group: Security engineering
+        items:
+          - Build Chargate, which gates a pull request on net-new code-quality and security findings rather than on the repository total.
+          - Build Brimyr, which gates on patch coverage, diff-cover style, with the ecosystem auto-detected.
+          - Run DefectDojo and Dependency-Track as the studio's finding and SBOM sinks, with a scheduled sync that opens GitHub issues for new high-severity findings.
+          - Build Draventis for scheduled DAST against deployed environments with OWASP ZAP and Nuclei, reimported into DefectDojo. Early phase, not yet in production.
+          - Build Ponvara to read GHAS alerts and Dependency-Track findings into DefectDojo. Early phase, not yet in production.
+      - group: Fleet assurance (Dün Mir)
+        items:
+          - "Design the control plane: agents on each router push heartbeats and job reports, and the plane runs a dead-man sweep and delivers alerts."
+          - Keep the agent wire contract frozen and versioned, so the licensed console composes the control-plane core in-process rather than proxying it.
+          - Build the operator console in React and Vite against a FastAPI backend, with first-party auth and multi-tenancy injected through the core's extension points.
+          - Deploy and run it on the studio's Kubernetes platform.
+      - group: Developer platform and ways of working
+        items:
+          - Build Caldrith, a self-hostable multi-tenant GitHub App that reconciles organisation and repository settings from configuration as code.
+          - Use it to provision shared security and release workflow templates into every repository in the organisation.
+          - Maintain a shared Homebrew tap with automated nightly updates, and a shared set of AI agent skills used across the tooling.
+          - Enforce signed commits, SHA-pinned actions, branch protection and a documented review process across the estate.
+
   - id: tengen-devops-engineer
     company: tengen
     title: DevOps Engineer
@@ -140,9 +200,9 @@ roles:
       hundreds of .NET services ship through.
     stack: [Azure, AKS, Terraform, Ansible, GitHub Actions, TeamCity, Helm, FluxCD, RabbitMQ, Prometheus, Grafana, Entra ID]
     highlights:
-      - Designed, built and ran Azure infrastructure as code with Terraform: AKS clusters, ACR, VNets, NSGs and identity integrations.
+      - "Designed, built and ran Azure infrastructure as code with Terraform: AKS clusters, ACR, VNets, NSGs and identity integrations."
       - Led the migration of legacy Linux VMs to microservices on AKS.
-      - Built the internal developer platform: reusable DRY infrastructure modules that bootstrap a new team's environments and repos.
+      - "Built the internal developer platform: reusable DRY infrastructure modules that bootstrap a new team's environments and repos."
       - Rolled out observability (Prometheus, Grafana, Blackbox Exporter) across dev, test, acceptance and production.
       - Integrated Microsoft Entra ID with Kubernetes RBAC, and audited IP whitelisting, SSO and certificate management.
       - Stood in as Scrum Master for the platform team, running retrospectives and turning actions into prioritised engineering work.
@@ -158,7 +218,7 @@ roles:
       - group: CI/CD and developer tooling
         items:
           - Build, improve and debug GitHub Actions workflows and TeamCity pipelines for .NET and containerised applications.
-          - Standardise and document GitHub configuration practices: org secrets, repo management, fork setups and onboarding new developers.
+          - "Standardise and document GitHub configuration practices: org secrets, repo management, fork setups and onboarding new developers."
           - Investigate and enable cost-efficient GitHub Actions usage and storage options (logs, caching, runner disk space).
           - Set up and manage self-hosted GitHub runners, including Windows-based runners with Bash scripting capabilities.
           - Enable Azure authentication during test workflows and optimise .NET restore issues in pipelines.
@@ -212,7 +272,7 @@ roles:
     duties:
       - group: Infrastructure as code
         items:
-          - Write Terraform code for different environments: AWS WAF, Cisco FTD GWLB and transit gateway, OWASP Dependency-Track, DefectDojo, SonarQube.
+          - "Write Terraform code for different environments: AWS WAF, Cisco FTD GWLB and transit gateway, OWASP Dependency-Track, DefectDojo, SonarQube."
           - Cisco FTD NGFW install and configure as a POC in AWS with a Geneve tunnel GWLB, using Terraform.
           - Rotate S3 access keys in AWS.
       - group: Application security toolchain
@@ -231,12 +291,12 @@ roles:
           - Weekly investigation and reporting of security industry trends for Information Security Council meetings.
       - group: Identity, access & zero trust
         items:
-          - Duo Network Gateway POC as a ZTNA solution: install and configure, get HTTPS connections working, configure DNG with SSO and protect applications behind it.
+          - "Duo Network Gateway POC as a ZTNA solution: install and configure, get HTTPS connections working, configure DNG with SSO and protect applications behind it."
           - ZScaler POC as a ZTNA solution.
           - Cisco Umbrella SIG trial and POC.
           - SAML configurations with various applications using JumpCloud.
           - Integrate Duo with Datadog.
-          - 1Password: administer access and policies.
+          - "1Password: administer access and policies."
           - Audit the use of Apple Developer Consoles.
       - group: Governance
         items:
@@ -261,7 +321,7 @@ roles:
       - Installed and ran Prometheus, Alertmanager and Grafana via Docker and Ansible, with granular alerting into Slack.
       - Wrote the automation that starts and stops cloud instances overnight to cut spend.
       - Configured MikroTik route failover for fibre outages, with notification, and ran a zero-trust IPTables policy via Ansible.
-      - Built the backup estate: Veeam on Hyper-V, scripted FTP and cloud backups, and Hyper-V replication.
+      - "Built the backup estate: Veeam on Hyper-V, scripted FTP and cloud backups, and Hyper-V replication."
     duties:
       - group: Deployments & Git
         items:
@@ -378,7 +438,7 @@ roles:
     stack: [Cisco ASA, FirePOWER, Azure, AWS, OpenStack, Zabbix, Azure Sentinel, FreeRADIUS, Duo, BGP, OSPF]
     highlights:
       - Implemented MFA for remote-access VPN and network device management access (Duo, Google Authenticator).
-      - Implemented Microsoft PKI: a standalone root and enterprise subordinate CA environment.
+      - "Implemented Microsoft PKI: a standalone root and enterprise subordinate CA environment."
       - Migrated virtualised and physical servers to Azure, and migrated Windows NPS to cloud-based FreeRADIUS.
       - Built VPN tunnels between ASA, Azure and AWS, and scripted the DR procedure with Azure.
       - Implemented network L2 and L3 redundancy and failover, and Syslog into Azure Sentinel.
@@ -491,7 +551,7 @@ roles:
     duties:
       - group: Engineering
         items:
-          - First-line support calls: configuring and troubleshooting site-to-site VPNs, configuring and maintaining ACLs, configuring and maintaining firewalls (Cisco ASA, FortiGate, Juniper).
+          - "First-line support calls: configuring and troubleshooting site-to-site VPNs, configuring and maintaining ACLs, configuring and maintaining firewalls (Cisco ASA, FortiGate, Juniper)."
           - Creating and modifying routes; maintenance and changes to interfaces; NAT.
           - Troubleshooting connectivity with captures, packet-tracers and Wireshark.
           - Installing and configuring Cisco ASAs and FortiGates; firewall upgrades.
@@ -529,7 +589,7 @@ roles:
           - Log, assign, monitor and report on incidents and requests from users, and redirect unresolved problems to the relevant section.
           - Provide an end-to-end customer interface to understand and drive customer requests to closure.
           - Provide 1st, 2nd and 3rd line customer support (telephonic, remote and onsite) for all customers.
-          - Added focus on VIP support: frequent communication, follow-up, proactive checks and speedy turnaround times.
+          - "Added focus on VIP support: frequent communication, follow-up, proactive checks and speedy turnaround times."
           - Responsible for advanced fault finding, repair and configuration on all workstations, laptops, desktops and mobile devices.
           - Provide hardware troubleshooting on IT infrastructure, like servers, switches, desktop telephones (Cisco), projectors and VC end points.
           - Provide mobile device support (BlackBerry, Apple, Android, Nokia).
@@ -540,7 +600,7 @@ roles:
           - Administer and maintain Active Directory, Group Policy, print server, DNS server and DHCP server.
           - Maintaining the IT asset register and assisting with IT-related procurement.
           - Administrative support to IT Operations, such as managing backup drives to the disaster-recovery site.
-          - Engage with third-party vendors to ensure site requirements are carried out: building cabling, boardrooms and meeting rooms, printer and hardware call logging.
+          - "Engage with third-party vendors to ensure site requirements are carried out: building cabling, boardrooms and meeting rooms, printer and hardware call logging."
           - Ensure ISO requirements are met and policies and procedures are adhered to.
 
   - id: mmi-desktop-support-engineer
@@ -628,11 +688,11 @@ roles:
           - Scheduled visits and callouts when the helpdesk could not solve the problem.
           - Maintenance of workstations and servers; setup new computers; install printers; setup fax.
           - Solve network issues; setup switches, routers and cabling; cover for assigned technicians.
-          - Three months as an in-house technician at a Mindspring client: server installs, Kaseya and ManageEngine evaluation, SQL Server audit, Hyper-V installs and replication, Windows Deployment Services.
+          - "Three months as an in-house technician at a Mindspring client: server installs, Kaseya and ManageEngine evaluation, SQL Server audit, Hyper-V installs and replication, Windows Deployment Services."
       - group: Development experience
         items:
           - Learned to program in PHP, HTML, CSS, VBS, batch and Bash during quiet office hours, and developed test programs in those languages.
           - Developed an application that auto-logs into servers and services using KeePass and PHP.
           - Upload created websites via FTP/cPanel; edit websites using Joomla/WordPress.
           - Created scripts to make my work easier.
-          - Websites created: kaytrad.co.za and saasie.co.za.
+          - "Websites created: kaytrad.co.za and saasie.co.za."

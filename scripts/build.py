@@ -67,7 +67,7 @@ PAGES = [
                     "networks underneath them. CV generated straight from this site."},
     {"id": "experience", "template": "experience.html", "out": "experience/index.html",
      "path": "/experience/", "nav": "Experience", "title": "Experience · Caleb Sargeant",
-     "description": "Twelve engineering roles since 2012, from MSP helpdesk to "
+     "description": "{roles} engineering roles since 2012, from MSP helpdesk to "
                     "platform engineering, with the full duty list for each."},
     {"id": "education", "template": "education.html", "out": "education/index.html",
      "path": "/education/", "nav": "Education", "title": "Education & courses · Caleb Sargeant",
@@ -278,11 +278,13 @@ def localise_page(page: dict, overlay: dict, prefix: str,
     The English title, description and nav label stay in PAGES where they are
     readable in context; the overlay supplies the rest, keyed by page id.
 
-    `{headline}` and `{name}` in any of those three fields are substituted from
-    data/profile.yml. That is what stops a page title from becoming a second
-    copy of the headline: change profile.yml and every title that names it
-    follows, in every locale. A plain replace rather than str.format, because a
-    title is free text and a stray brace in it should not raise.
+    `{headline}`, `{name}` and `{roles}` in any of those three fields are
+    substituted from the data. That is what stops a page title from becoming a
+    second copy of the headline, and a page description from carrying a role
+    count that has to be remembered: change the data and every title or
+    description that names it follows, in every locale. A plain replace rather
+    than str.format, because a title is free text and a stray brace in it should
+    not raise.
     """
     tr = (overlay.get("pages", {}) or {}).get(page["id"], {}) or {}
     out = dict(page)
@@ -316,6 +318,47 @@ def alternates_for(page: dict) -> list[dict]:
 
 
 # ── the render context ──────────────────────────────────────────────────────
+
+def check_prose(experience: dict, code: str = DEFAULT_LOCALE) -> None:
+    """Fail the build if a bullet is not a string.
+
+    YAML reads `- Some label: some text` as a one-key MAPPING, not as the
+    sentence it looks like. That is easy to introduce (any edit that puts a
+    colon-space into an unquoted scalar does it) and impossible to see in the
+    source, and what reaches the page is a rendered Python dict:
+
+        {'1Password': 'administer access and policies.'}
+
+    That shipped to the live CV once. It fails the build now instead. The fix is
+    always to quote the whole scalar: `- "Some label: some text"`.
+
+    Called once per locale, on the roles AFTER the overlay has been merged in,
+    so a translated bullet in data/i18n/<code>.yml is checked too. `code` is
+    only used to name the file that has to be fixed: on the default locale the
+    fault is in data/experience.yml, on any other it is in either that file or
+    the overlay that replaced the entry.
+    """
+    problems = []
+    for role in experience["roles"]:
+        for item in role.get("highlights", []) or []:
+            if not isinstance(item, str):
+                problems.append(f"{role['id']}: highlight is {type(item).__name__}, "
+                                f"not str -> {item}")
+        for group in role.get("duties", []) or []:
+            if not isinstance(group.get("group"), str):
+                problems.append(f"{role['id']}: duty group name is not a string")
+            for item in group.get("items", []) or []:
+                if not isinstance(item, str):
+                    problems.append(f"{role['id']}: duty item is "
+                                    f"{type(item).__name__}, not str -> {item}")
+    if problems:
+        where = ("data/experience.yml" if code == DEFAULT_LOCALE
+                 else f"data/experience.yml or data/i18n/{code}.yml")
+        raise SystemExit(
+            f"error: [{code}] {where} has entries YAML parsed as mappings.\n"
+            "Quote the whole scalar, e.g. - \"Label: text\".\n  "
+            + "\n  ".join(problems))
+
 
 def build_context(locale: dict | None = None) -> dict:
     locale = locale or LOCALES[0]
@@ -355,8 +398,14 @@ def build_context(locale: dict | None = None) -> dict:
         dict(g, name=skill_overlay.get(g["name"], g["name"])) for g in skills["groups"]
     ]
 
-    # What a page title may name rather than copy. See localise_page.
-    page_subs = {"headline": profile["headline"], "name": profile["name"]}
+    # What a page title or description may name rather than copy. `roles` is
+    # counted here for the same reason the "Engineering roles" stat is: a meta
+    # description that spells the number out goes stale the moment a role is
+    # added, and nothing fails when it does. See localise_page.
+    page_subs = {"headline": profile["headline"], "name": profile["name"],
+                 "roles": str(len(experience["roles"]))}
+
+    check_prose(experience, code)
 
     roles = sorted(experience["roles"], key=sort_key, reverse=True)
     by_id = {r["id"]: r for r in roles}
@@ -393,6 +442,11 @@ def build_context(locale: dict | None = None) -> dict:
         if "since" in entry:
             entry["value"] = (years_experience if entry["since"] == career_start[0]
                               else today.year - entry["since"])
+        # `count: roles` beats a hand-typed number for the same reason every
+        # duration is computed: adding a role to data/experience.yml must not
+        # require remembering to bump a counter somewhere else.
+        if entry.get("count") == "roles":
+            entry["value"] = len(experience["roles"])
         stats.append(entry)
     profile["stats"] = stats
 

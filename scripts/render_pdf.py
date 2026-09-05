@@ -49,6 +49,34 @@ except ImportError as exc:  # pyyaml / jinja2 missing -> build.py will not impor
 # exists" is not a useful check on its own.
 MIN_BYTES = 5_000
 
+# A `.sheet` is a fixed-height box that clips (see assets/print.css), so content
+# that outgrows it does not lengthen the PDF: it slides under the page footer and
+# then off the paper, and the page count stays exactly where it was. Adding the
+# thirteenth role to data/experience.yml did precisely that to the CV's first
+# sheet in both locales. This measures each sheet in the browser before the page
+# is printed, so the next role that does it says so.
+SHEET_FIT_JS = """() => [...document.querySelectorAll('.sheet')].map((sheet, i) => {
+  const box = sheet.getBoundingClientRect();
+  const pad = parseFloat(getComputedStyle(sheet).paddingBottom);
+  const foot = sheet.querySelector('.sheet-foot');
+  let lowest = 0, what = '';
+  for (const el of sheet.querySelectorAll('*')) {
+    if (el.children.length || (foot && foot.contains(el))) continue;
+    const r = el.getBoundingClientRect();
+    if (r.height > 0 && r.bottom > lowest) {
+      lowest = r.bottom;
+      what = (el.innerText || '').trim().slice(0, 60);
+    }
+  }
+  return {
+    sheet: i + 1,
+    // Positive is headroom, negative means the content has run into the footer.
+    clearance: Math.round((foot ? foot.getBoundingClientRect().top
+                                : box.bottom - pad) - lowest),
+    lowest: what,
+  };
+})"""
+
 
 def by_locale(jobs: list[dict]) -> dict[str, list[dict]]:
     """Group PDFS by locale code, keeping build.py's locale order."""
@@ -121,7 +149,7 @@ def render_all(base_url: str) -> tuple[int, dict[str, int]]:
     """Print every entry in PDFS. Returns (warning count, per-locale totals)."""
     from playwright.sync_api import sync_playwright
 
-    warnings = 0
+    errors = warnings = 0
     written: dict[str, int] = {}
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
@@ -139,6 +167,23 @@ def render_all(base_url: str) -> tuple[int, dict[str, int]]:
                 # before the browser has swapped them in. Without this wait the
                 # first sheet reliably prints in the fallback font.
                 page.evaluate("() => document.fonts.ready.then(() => document.fonts.status)")
+
+                # Measured before printing, because the PDF cannot show it: a
+                # clipped sheet prints as a full page with the bottom line
+                # missing under the footer.
+                for fit in page.evaluate(SHEET_FIT_JS):
+                    if fit["clearance"] < 0:
+                        # An ERROR, not a warning. A page-count overrun is a
+                        # judgement call about length; this is text printed on
+                        # top of other text, which is a broken document. It also
+                        # cannot be seen in the page count, which is exactly how
+                        # it nearly shipped.
+                        errors += 1
+                        print(f"  ERROR:   [{locale}] {spec['page']} sheet "
+                              f"{fit['sheet']} overruns its page footer by "
+                              f"{-fit['clearance']}px, last line "
+                              f"{fit['lowest']!r}. Trim the data, the "
+                              f"translation or the layout.", file=sys.stderr)
 
                 # prefer_css_page_size honours `@page { size: A4 }` in print.css;
                 # zero margins because the .sheet element owns its own padding.
@@ -162,7 +207,7 @@ def render_all(base_url: str) -> tuple[int, dict[str, int]]:
                           f"translation or the layout.", file=sys.stderr)
 
         browser.close()
-    return warnings, written
+    return errors, warnings, written
 
 
 def check() -> int:
@@ -223,7 +268,7 @@ def main() -> int:
 
     with serve(OUT) as base_url:
         try:
-            warnings, written = render_all(base_url)
+            errors, warnings, written = render_all(base_url)
         except Exception as exc:
             # Almost always the browser binary rather than the package: a deploy
             # that quietly ships no CV is worse than one that fails here.
@@ -235,6 +280,11 @@ def main() -> int:
                        for code, count in written.items())
     print(f"Wrote {sum(written.values())} PDFs ({totals})"
           + (f" with {warnings} warning(s)" if warnings else ""))
+    if errors:
+        print(f"error: {errors} sheet(s) overran their page footer, so the PDF "
+              f"has text printed over text. Fix the layout or trim the content; "
+              f"the page count cannot catch this.", file=sys.stderr)
+        return 1
     return 0
 
 

@@ -245,7 +245,7 @@ h1, h2, h3 { break-after: avoid; margin: 0; }
   color: var(--ink-2);
 }
 
-.cv-block { margin-top: 4.2mm; }
+.cv-block { margin-top: 3.2mm; }
 
 .cv-summary { font-size: 8.6pt; line-height: 1.38; }
 
@@ -317,7 +317,7 @@ h1, h2, h3 { break-after: avoid; margin: 0; }
 
 .cv-skills li {
   break-inside: avoid;
-  margin-bottom: 1mm;
+  margin-bottom: 0.7mm;
   padding-left: 3mm;
   position: relative;
 }
@@ -340,7 +340,12 @@ h1, h2, h3 { break-after: avoid; margin: 0; }
   color: var(--ink-2);
 }
 
-/* ── experience table ── */
+/* ── experience table ──────────────────────────────────────────────────────
+   One row per role, and the table grows every time a role is added to
+   data/experience.yml while the sheet's height does not. The row padding is
+   therefore sized for the current thirteen rows with room to spare, not for
+   the tightest fit: at 1.05mm the thirteenth row printed underneath the page
+   footer. scripts/render_pdf.py warns if a sheet ever overruns again. */
 
 .cv-jobs {
   width: 100%;
@@ -348,7 +353,7 @@ h1, h2, h3 { break-after: avoid; margin: 0; }
 }
 
 .cv-jobs td {
-  padding: 1.05mm 0;
+  padding: 0.65mm 0;
   border-bottom: 0.25mm solid var(--rule-2);
   vertical-align: top;
 }
@@ -387,7 +392,6 @@ h1, h2, h3 { break-after: avoid; margin: 0; }
 
 .cv-where {
   display: block;
-  margin-top: 0.25mm;
   font-size: 6.5pt;
   line-height: 1.25;
   color: var(--ink-2);
@@ -439,7 +443,7 @@ h1, h2, h3 { break-after: avoid; margin: 0; }
 }
 
 .cv-role {
-  margin-bottom: 6.4mm;
+  margin-bottom: 5.4mm;
   /* Multicol balances columns, and a role block split down the middle reads
      as two different jobs. Keep each one whole. */
   break-inside: avoid;
@@ -465,7 +469,7 @@ h1, h2, h3 { break-after: avoid; margin: 0; }
 
 .cv-role li {
   position: relative;
-  margin-bottom: 1.9mm;
+  margin-bottom: 1.4mm;
   padding-left: 3.4mm;
   font-size: 8.7pt;
   line-height: 1.42;
