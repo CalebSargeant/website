@@ -50,6 +50,13 @@ step that re-runs with `WRANGLER_LOG=debug`.
   `DNS: Edit`, is the permission that attaches a custom domain, and a token scoped to
   the account but to no zone (or to the wrong one) fails here and nowhere else.
 
+**`/user/tokens/verify` returning 401 does not mean the token is bad**
+It only works for user-owned API tokens. An account-owned token, which is what the
+Workers deploy token is, returns `1000 Invalid API Token` there while working perfectly
+everywhere else. Chasing that 401 cost a diagnostic cycle the first time. To judge a
+deploy token, call something it is actually scoped for: `GET /zones?name=<zone>` and
+`GET /zones/<id>/workers/routes`, which is what the workflow's probe does.
+
 **Dependabot PRs cannot read repo secrets**
 They run against GitHub's separate `dependabot` secrets context, so any job needing
 `CLOUDFLARE_API_TOKEN` fails on every dependency bump. Guarding on
