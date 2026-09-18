@@ -9,14 +9,14 @@
 # Templating. StrictUndefined in scripts/build.py turns a typo in a template into
 # a failed build rather than a silently empty page, so the version floor is only
 # about known fixes, not features.
-jinja2>=3.1.4
+jinja2>=3.1.6
 
 # Reads data/*.yml, the single source of truth for every page and every PDF.
 # 6.0.1 is the floor because it is the first release that builds cleanly against
 # modern Cython, which is what you hit on a fresh machine.
-pyyaml>=6.0.1
+pyyaml>=6.0.3
 
 # Headless Chromium, used twice: scripts/render_pdf.py prints the three print
 # sheets to PDF, and scripts/render_images.py generates the OG card and the
 # raster favicons. Needs `playwright install chromium` as a separate step.
-playwright>=1.47.0
+playwright>=1.62.0
