@@ -210,6 +210,11 @@ ui:
   print.label.docs: Docs
   print.label.duties: Taken
   og.lead: '{headline} in {location}. {years} jaar in IT, {roles} engineeringrollen.'
+  md.header: Markdownversie van {url}, gegenereerd uit dezelfde data als de pagina.
+  md.highlights: Hoofdpunten
+  md.duties: Taken
+  md.stack: Stack
+  md.focus: Focus
   date.months:
   - januari
   - februari

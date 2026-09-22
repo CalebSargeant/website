@@ -29,6 +29,10 @@ links:
   # calebsargeant.github.io/docs/ now 301s here. If it moves again, change this
   # one line and `site_url` in CalebSargeant/docs together.
   docs: https://docs.calebsargeant.com/
+  # The public, read-only MCP server that searches this site and the docs.
+  # Named in llms.txt so an assistant can find it. Its corpus from this repo is
+  # written by scripts/build.py and put in R2 by the production deploy.
+  mcp: https://mcp.calebsargeant.com/
   github: https://github.com/CalebSargeant
   linkedin: https://www.linkedin.com/in/calebsargeant/
   credly: https://www.credly.com/users/calebsargeant/badges

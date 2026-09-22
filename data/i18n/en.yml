@@ -224,6 +224,12 @@ ui:
   print.label.docs: Docs
   print.label.duties: Duties
   og.lead: '{headline} in {location}. {years} years in IT, {roles} engineering roles.'
+  # The markdown twins (templates/md/). {url} arrives already wrapped as <url>.
+  md.header: Markdown copy of {url}, generated from the same data as the page.
+  md.highlights: Highlights
+  md.duties: Duties
+  md.stack: Stack
+  md.focus: Focus
   date.months:
   - January
   - February

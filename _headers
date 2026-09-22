@@ -7,8 +7,9 @@
 # Cache-Control rules would both contribute, and which one a browser honours is
 # not something worth finding out in production.
 #
-# scripts/build.py copies this file into dist/ verbatim. It applies to static
-# asset responses only.
+# scripts/build.py copies this file into dist/ and then appends one generated
+# rule per markdown twin (see the end of this file). It applies to static asset
+# responses only.
 
 /*
   # Two years, subdomains included. `preload` is deliberately left off: the
@@ -126,3 +127,26 @@
 # for the Dutch pages, not the mechanism.
 /nl/*
   Content-Language: nl-NL
+
+# CHARSET ON TEXT. The asset server sends text/plain and text/markdown with no
+# charset parameter, and a client that then assumes Latin-1 turns every "·"
+# and "ë" in llms.txt or a Dutch twin into mojibake. scripts/build.py writes
+# everything as UTF-8, so say so. A rule in this file replaces the header the
+# asset server would have sent rather than adding a second one.
+#
+# /*.txt covers llms.txt, llms-full.txt, robots.txt and security.txt. RFC 9116
+# asks for exactly this Content-Type on the last one, so it gains from the rule
+# rather than merely tolerating it.
+/*.md
+  Content-Type: text/markdown; charset=utf-8
+
+/*.txt
+  Content-Type: text/plain; charset=utf-8
+
+# CANONICAL LINKS FOR THE MARKDOWN TWINS are not written here. build.py appends
+# them to dist/_headers (write_headers), one per page per locale, each a
+#     Link: <https://calebsargeant.com/experience/>; rel="canonical"
+# on its twin, so search engines index the page and not its plain copy. They
+# are generated because the set is PAGES x LOCALES; a list kept by hand here
+# would fall behind the first time a page was added. The build prints the total
+# rule count and fails if it passes Cloudflare's 100.

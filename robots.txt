@@ -18,8 +18,16 @@
 #                 a second thought, but a CV that a model already knows about is
 #                 a CV that gets recommended.
 #
-# There is a machine-readable summary of the whole site, with links to the pages
-# and the PDFs, at https://calebsargeant.com/llms.txt (see llmstxt.org).
+# For assistants there are plainer ways in than the HTML, all generated from
+# the same data as the pages by scripts/build.py:
+#   /llms.txt           a markdown map of the site and the PDFs (llmstxt.org)
+#   /llms-full.txt      the whole CV in one markdown file
+#   <page>/index.md     every page as clean markdown, e.g. /experience/index.md
+#                       and /nl/experience/index.md. Each is served with a
+#                       Link rel="canonical" back to its page, so search engines
+#                       index the page, not the copy.
+# and an MCP server, https://mcp.calebsargeant.com/ (public, read-only, no
+# authentication), that searches this site and the docs.
 User-agent: *
 Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /

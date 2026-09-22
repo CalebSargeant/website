@@ -4,6 +4,10 @@
 # data/, which is the one failure this repo is built to make impossible.
 dist/
 
+# The MCP search corpus (index/website.json), written by scripts/build.py next
+# to dist/ and put in R2 by the production deploy. Output, like dist/.
+.docs-index/
+
 # Wrangler's local state and cache directory.
 .wrangler/
 

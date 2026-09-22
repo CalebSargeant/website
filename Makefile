@@ -19,11 +19,11 @@ PYTHON := $(shell [ -x $(VENV)/bin/python ] && echo $(VENV)/bin/python || echo p
 
 help:
 	@echo "make install  create .venv, install the Python deps and Playwright's Chromium"
-	@echo "make build    render the site into dist/"
+	@echo "make build    render the site into dist/ and the MCP corpus into .docs-index/"
 	@echo "make pdf      render the site and the three PDFs"
 	@echo "make images   regenerate the OG card and the favicons (committed assets)"
 	@echo "make serve    render everything, then serve dist/ on http://127.0.0.1:8788/"
-	@echo "make clean    delete dist/"
+	@echo "make clean    delete dist/ and .docs-index/"
 	@echo ""
 	@echo "using: $(PYTHON)"
 
@@ -40,7 +40,7 @@ serve:
 	$(PYTHON) scripts/build.py --pdf --serve
 
 clean:
-	rm -rf dist
+	rm -rf dist .docs-index
 
 venv:
 	python3 -m venv $(VENV)
