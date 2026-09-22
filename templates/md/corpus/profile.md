@@ -28,6 +28,14 @@
 - {{ role.title }}, {{ role.company }} ({{ role.type }}, {{ role.location }}), since {{ role.start_label }}. {{ role.summary }} In full: `{{ role_docs[role.id] }}`.
 {% endfor %}
 
+## Key skills
+
+The skills the CV leads with (`cv: true` in data/skills.yml); `skills.md` has every skill with its level.
+
+{% for skill in cv_skills %}
+- {{ skill.name }}
+{% endfor %}
+
 ## Numbers
 
 {{ md.stats() }}
