@@ -82,9 +82,11 @@ DEFAULT_LOCALE = "en"
 PAGES = [
     {"id": "home", "template": "home.html", "out": "index.html", "path": "/",
      "nav": "Home", "title": "{name} · {headline}",
+     # Under the ~155 characters a search result shows before it cuts a
+     # description off; the sentence about the CV build was the part lost.
      "description": "Platform, cloud, network and security engineer in Eindhoven, "
                     "Netherlands. Kubernetes, Terraform, Azure and AWS, and the "
-                    "networks underneath them. CV generated straight from this site."},
+                    "networks underneath them."},
     {"id": "experience", "template": "experience.html", "out": "experience/index.html",
      "path": "/experience/", "nav": "Experience", "title": "Experience · Caleb Sargeant",
      "description": "{roles} engineering roles since 2012, from MSP helpdesk to "
