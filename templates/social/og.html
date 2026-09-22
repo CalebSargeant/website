@@ -87,7 +87,9 @@
     </div>
   </div>
 
-  <div class="foot"><span class="dot"></span> www.calebsargeant.com</div>
+  {# The host from SITE, so the card cannot advertise an address the site has
+     moved off, as it did while it still said www. #}
+  <div class="foot"><span class="dot"></span> {{ site.base_url | replace('https://', '') }}</div>
   <div class="rule"></div>
 </body>
 </html>

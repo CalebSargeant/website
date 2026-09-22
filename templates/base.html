@@ -24,6 +24,14 @@
 {% endif %}
 {% endfor %}
 
+{# The same page as plain markdown, for assistants (llmstxt.org). build.py sets
+   page.markdown only on pages in the sitemap, so a print sheet or the 404
+   never advertises a file that does not exist. The twin's own response names
+   this page as canonical, so the two do not compete in search. #}
+{% if page.get('markdown') %}
+<link rel="alternate" type="text/markdown" href="{{ site.base_url }}{{ page.markdown }}">
+{% endif %}
+
 {# Print sheets are public so "view in browser" works, but they duplicate the
    real pages, so they stay out of the index. Same for 404: it is a real URL
    that returns a body, and an indexed error page is worse than none. Both are

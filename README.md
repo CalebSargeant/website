@@ -11,6 +11,8 @@ That is the whole design. Everything else here is plumbing.
 data/*.yml  ->  scripts/build.py (Jinja2)  ->  dist/  ->  Cloudflare Worker static assets
                                             \
                                              ->  three print sheets  ->  Chromium  ->  PDFs
+                                            \
+                                             ->  .docs-index/  ->  R2  ->  the MCP server
 ```
 
 No node build, no framework, no bundler. Plain HTML, one stylesheet for the site,
@@ -38,7 +40,13 @@ off the site is still fully readable and navigable.
 │   ├── print/cv.html            A4 sheet, printed to Caleb_Sargeant_CV.pdf
 │   ├── print/jds.html           A4 sheet, printed to Caleb_Sargeant_JDs_and_Duties.pdf
 │   ├── print/cover.html         A4 sheet, printed to Caleb_Sargeant_Cover_Letter.pdf
-│   └── social/og.html           the 1200x630 Open Graph card, rendered by render_images.py
+│   ├── social/og.html           the 1200x630 Open Graph card, rendered by render_images.py
+│   └── md/                      markdown, rendered with autoescape off (see "For assistants")
+│       ├── _macros.md           how a role, a credential or a skill reads as markdown
+│       ├── home.md, cv.md ...   one twin per page in the sitemap, same names as the pages
+│       ├── llms*.txt            /llms.txt and /llms-full.txt
+│       └── corpus/              the MCP corpus documents
+
 ├── assets/
 │   ├── site.css                 every token and component for the site
 │   ├── site.js                  reveals, nav, command palette, theme, counters
@@ -56,19 +64,21 @@ off the site is still fully readable and navigable.
 ├── Makefile                     install / build / pdf / serve / clean
 ├── requirements.txt             jinja2, pyyaml, playwright
 ├── wrangler.toml                the assets-only Worker and its apex + www routes
-├── _headers                     CSP, HSTS, cache policy
-├── robots.txt · llms.txt · .well-known/security.txt   crawl, AEO and disclosure surface
-├── .github/workflows/deploy.yml production deploys and PR previews
-└── dist/                        generated. Deleted and rewritten on every build. Not committed.
+├── _headers                     CSP, HSTS, cache policy, charset on text
+├── robots.txt · .well-known/security.txt   crawl and disclosure surface
+├── .github/workflows/deploy.yml production deploys, the corpus publish, PR previews
+├── dist/                        generated. Deleted and rewritten on every build. Not committed.
+└── .docs-index/                 generated: the MCP corpus, index/website.json. Not committed.
 ```
 
-`sitemap.xml` is not in the tree because `build.py` writes it, stamped with the
-build date, so it can never sit stale or in the future.
+`sitemap.xml`, `llms.txt` and `llms-full.txt` are not in the tree because
+`build.py` writes them from `data/`, so they can never sit stale.
 
 ## Change something
 
 Every row below is a single-file edit. Nothing else needs touching: the site, all
-three PDFs, the sitemap and `llms.txt` follow from it on the next build.
+three PDFs, the sitemap, the markdown twins, `llms.txt`, `llms-full.txt` and the
+MCP corpus follow from it on the next build.
 
 | I want to | Edit | Notes |
 | --- | --- | --- |
@@ -81,8 +91,10 @@ three PDFs, the sitemap and `llms.txt` follow from it on the next build.
 | Change the summary, headline, contact details or the counters | `data/profile.yml` | The counters take either a fixed `value:` or a `since:` year, which is computed at build time so nobody has to bump a number. |
 | Change the cover letter | `data/profile.yml` | The `cover_letter:` block: salutation, paragraphs, sign-off. |
 | Hide the "available" banner | `data/profile.yml` | `availability.show: false`. |
-| Change where an off-site link points | `data/profile.yml` | The `links:` block. Each one is read wherever it appears, so `docs:` moves the nav entry, the footer, the contact page and both PDFs together. |
-| Add a page | `scripts/build.py` and `templates/` | Append an entry to `PAGES` (it drives the nav, the sitemap and the SEO metadata), then add the template it names. |
+| Change where an off-site link points | `data/profile.yml` | The `links:` block. Each one is read wherever it appears, so `docs:` moves the nav entry, the footer, the contact page, both PDFs and `llms.txt` together. `website:` must equal `SITE["base_url"]` in `build.py`; the build fails if they differ. |
+| Add a page | `scripts/build.py` and `templates/` | Append an entry to `PAGES` (it drives the nav, the sitemap and the SEO metadata), then add the template it names. A page in the sitemap also needs `templates/md/<name>.md`, its markdown twin. |
+| Change how the markdown copies read | `templates/md/` | `_macros.md` is shared by the twins, `llms-full.txt` and the corpus, so a role changes everywhere at once. Labels come from `t()`, so a new one goes in both `data/i18n/*.yml`. |
+| Add a document to the MCP corpus | `scripts/build.py` and `templates/md/corpus/` | A row in `CORPUS`, and the template it names, opening with `# Title`. Keep paths stable: agents keep them. |
 | Add a fourth PDF | `scripts/build.py` and `templates/print/` | Add the sheet to `PAGES` with `print: True`, then add it to `PDFS`. `render_pdf.py` imports that list rather than keeping its own copy. |
 | Change a colour, a spacing step or an animation | `assets/site.css` | Read `docs/design-system.md` first. It is the contract the CSS, the JS and the templates all share. |
 
@@ -169,7 +181,7 @@ Deploys are automatic. Push to `main` and the site is live in about a minute.
 
 | Trigger | What happens |
 | --- | --- |
-| Push to `main` | build + PDFs, then `wrangler deploy`, live on www.calebsargeant.com |
+| Push to `main` | build + PDFs, then `wrangler deploy`, live on calebsargeant.com, then the MCP corpus into R2 |
 | Pull request | build + PDFs, then `wrangler versions upload`, an aliased preview URL posted on the PR |
 | Manual re-run on `main` | Re-publishes production (use it for rollbacks) |
 
@@ -184,24 +196,31 @@ entrypoint would silently strip the CSP from anything that entrypoint handled.
 
 ### Hostnames
 
-The site is **www-canonical**. Every `<link rel="canonical">`, every `og:url`,
-every `sitemap.xml` entry and `SITE["base_url"]` in `scripts/build.py` all say
-`https://www.calebsargeant.com`.
+The site is **apex-canonical**. `SITE["base_url"]` in `scripts/build.py` is
+`https://calebsargeant.com`, and every `<link rel="canonical">`, `og:url`,
+hreflang, `sitemap.xml` entry, JSON-LD URL, the `Sitemap:` line in `robots.txt`
+and `Canonical:` in `security.txt` say the same. `links.website` in
+`data/profile.yml` is the same fact again, and the build fails if the two differ.
 
-- Both `www.calebsargeant.com` and the bare apex `calebsargeant.com` are bound to
-  the Worker with **plain Workers routes**, not with `custom_domain = true`.
+- `https://www.calebsargeant.com/*` is **301'd to the apex**, path preserved, by
+  a Redirect Rule on the zone. The rule is configured in Cloudflare, not in this
+  repo: a Worker with no entrypoint cannot issue a redirect, `_redirects` matches
+  on path only, never on hostname, and managing zone rules needs
+  `Zone: Rulesets Edit`, which the deploy token deliberately does not carry.
+- The apex is served by this Worker: a **plain Workers route** in
+  `wrangler.toml`, and a Worker custom domain attached outside it.
 - A route attaches to a hostname that already has a proxied DNS record and
-  intercepts the request before it reaches the origin. Both hostnames already had
-  proxied records pointing at the old Google Sites, so the Worker simply takes
-  over and that origin is never asked. No DNS record is created, changed or
-  deleted by a deploy, and there is no cutover window.
-- Both hostnames therefore **serve** the site rather than one redirecting to the
-  other. A Worker with no entrypoint cannot issue a redirect, and Cloudflare's
-  `_redirects` matches on path only, never on hostname. Duplicate content is
-  handled the way it is meant to be: everything canonical says `www`, so search
-  engines consolidate there. To make the apex a real 301, add a Redirect Rule on
-  the zone (Rules, then Redirect Rules); that needs `Zone: Rulesets Edit`, which
-  the deploy token deliberately does not carry.
+  intercepts the request before it reaches the origin. Both hostnames had
+  proxied records pointing at the old Google Sites, so the Worker took over and
+  that origin is never asked. No DNS record is created, changed or deleted by a
+  deploy, and there is no cutover window.
+- The **www route stays** in `wrangler.toml`. The Redirect Rule answers before
+  it, so it serves nothing today, but if the rule is ever removed www serves the
+  site (still canonical on the apex) instead of whatever its old record points at.
+- Canonicals used to name www. Once the redirect existed, that meant every page
+  declared a canonical URL that only ever answers with a 301, which search
+  engines treat as a hint to second-guess. Keep `base_url` on the host that
+  actually returns 200.
 
 > **Why not `custom_domain = true`?** It was tried first and cannot work here.
 > Cloudflare refuses to attach a Worker custom domain to a hostname that already
@@ -258,10 +277,13 @@ Despite appearances there is **no `DNS: Edit` in the template**, because the
 Workers custom-domain API creates its DNS record itself rather than going through
 the DNS API. Adding `DNS: Edit` is not required.
 
-This site only really exercises Workers Scripts, Workers Routes and Account
-Settings; it has no KV, R2 or tail usage. Trimming the template is possible but
-means revisiting it whenever Wrangler starts calling something new, which is
-exactly the maintenance the template exists to absorb.
+This site exercises Workers Scripts, Workers Routes and Account Settings for the
+deploy, and **Workers R2 Storage: Edit** for the corpus publish, which writes one
+object to the `calebsargeant-docs-index` bucket (see "For assistants"). It has no
+KV or tail usage. Trimming the template is possible but means revisiting it
+whenever Wrangler starts calling something new, which is exactly the
+maintenance the template exists to absorb. Trim R2 away and the deploy still
+succeeds while the publish step fails.
 
 ### The first PR preview needs the Worker to exist
 
@@ -275,14 +297,44 @@ previews with it. If previews ever stop producing a URL, check that line first.
 
 - `robots.txt` carries Content Signals ([contentsignals.org](https://contentsignals.org/))
   and disallows `/print/`, so the noindex print sheets stay out of results while
-  the PDFs they produce remain linkable.
-- `llms.txt` ([llmstxt.org](https://llmstxt.org/)) is a markdown map of the site,
-  so an assistant can answer from a primary source instead of scraping HTML.
+  the PDFs they produce remain linkable. Its comments point assistants at the
+  files below.
 - `sitemap.xml` is generated by `build.py` from `PAGES`, minus anything marked
   `sitemap: False`, with `lastmod` stamped to the build date.
 - `.well-known/security.txt` ([RFC 9116](https://www.rfc-editor.org/rfc/rfc9116))
   is the disclosure contact. Its `Expires` is hand-set, so bump it when it gets
   close; nothing stamps it for you.
+
+### For assistants
+
+Four outputs, all written by `build.py` from `data/` through `templates/md/`,
+which renders with autoescaping off (so "&" stays "&") and shares one set of
+macros, `_macros.md`. None of it is hand-written, so none of it can drift from
+the pages. There used to be a hand-written `llms.txt`; it had already drifted.
+
+| Output | What it is |
+| --- | --- |
+| `/llms.txt` | The [llmstxt.org](https://llmstxt.org/) map: summary, current roles (the `end: present` ones), every page's markdown twin with its meta description, the PDFs, the docs site and the MCP server, contact. English, root only. |
+| `/llms-full.txt` | The whole CV in one markdown file: profile, every role with highlights, stack and full duties, education, courses, skills, contact. English. |
+| `<page>index.md` | A twin of every page in the sitemap, in every locale (`/experience/index.md`, `/nl/experience/index.md`), from `templates/md/<page>.md` with the same context as the HTML, so a Dutch twin comes out of the Dutch catalogue. Each page links its twin with `<link rel="alternate" type="text/markdown">`; each twin is served with `Link: <page>; rel="canonical"`, rules `build.py` appends to `dist/_headers`, so search engines index the page and not the copy. |
+| `.docs-index/index/website.json` | The search corpus for the MCP server at `https://mcp.calebsargeant.com/`: `profile.md` (read first), `experience.md`, one `experience/<role id>.md` per role, `education.md`, `courses.md`, `skills.md` and `contact.md`, each with the canonical URL it came from. English, not served by the site. |
+
+The corpus follows the MCP server's schema 1 (`repo`, `site_url`, `generated`,
+`commit`, and per document `path`, `title`, `headings`, `snippet`, `url`,
+`text`, `bytes`). An unchanged build writes identical bytes: keys are sorted,
+`generated` is the build date at day precision and `commit` is `GITHUB_SHA` or
+`HEAD`. A corpus URL whose anchor is missing from the built page fails the build.
+
+The production deploy job then puts it into R2 with `wrangler r2 object put
+calebsargeant-docs-index/index/website.json ... --remote`, after the deploy and
+never from a PR preview, because the bucket is shared with the docs site's
+`index/docs.json` and read by production agents. `--remote` matters: without it
+Wrangler 4 writes to a local simulation and exits 0. The token needs
+`Workers R2 Storage: Edit`.
+
+`_headers` adds `charset=utf-8` to `.md` and `.txt`. Production serves them as
+bare `text/markdown` and `text/plain`, and `wrangler dev` adds the charset on
+its own, so a missing charset never shows up locally.
 
 ## Design
 

@@ -1,0 +1,74 @@
+{#
+  /llms-full.txt: the whole CV as one markdown file, for an assistant that
+  wants everything in one fetch rather than following llms.txt's links. Built
+  from the same macros as the twins and the corpus, so a role reads the same
+  in all three. English only.
+#}
+{% import "md/_macros.md" as md with context %}
+# {{ profile.name }}
+
+> {{ profile.headline }} in {{ profile.location }}. {{ profile.tagline }}
+
+The whole CV in one file, generated from the same data as {{ md.abs('/') }} on every deploy, so it says exactly what the pages and the PDFs say. The short map is {{ md.abs('/llms.txt') }}.
+
+## Profile
+
+{{ profile.summary }}
+
+- Headline: {{ profile.headline }}
+- Location: {{ profile.location }}
+- Work authorisation: {{ profile.nationality_note }}
+{% if profile.availability.show %}
+- Availability: {{ profile.availability.text }}
+{% endif %}
+- Interests: {{ profile.interests | join(', ') }}
+{{ md.stats() }}
+## {{ t('experience.title') }}
+
+{{ roles | length }} roles since {{ career_start_year }}, newest first, {{ current_roles | length }} of them current.
+
+{% for role in roles %}
+### {{ role.title }}, {{ role.company }}
+
+{{ md.role_facts(role) }}
+{{ role.summary }}
+
+{{ md.role_detail(role, 4) }}
+{% endfor %}
+## {{ t('cv.section.education') }}
+
+{% if in_progress %}
+### {{ t('education.in_progress') }}
+
+{% for topic in in_progress %}
+- {{ topic }}
+{% endfor %}
+
+{% endif %}
+{% for item in education %}
+{{ md.education_entry(item, 3) }}
+{% endfor %}
+## {{ t('education.training_title') }}
+
+{% for course in courses %}
+{{ md.course_line(course) }}
+{% endfor %}
+
+## {{ t('skills.kicker') }}
+
+{{ t('skills.lead') }}
+
+{% for group in skill_groups %}
+{{ md.skill_group(group, 3) }}
+{% endfor %}
+### Soft skills
+
+{% for item in soft_skills %}
+- {{ item }}
+{% endfor %}
+
+## {{ t('contact.kicker') }}
+
+{{ md.contact_direct() }}
+{{ md.profile_links() }}
+{{ md.documents() }}

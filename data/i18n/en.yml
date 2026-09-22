@@ -224,6 +224,12 @@ ui:
   print.label.docs: Docs
   print.label.duties: Duties
   og.lead: '{headline} in {location}. {years} years in IT, {roles} engineering roles.'
+  # The markdown twins (templates/md/). {url} arrives already wrapped as <url>.
+  md.header: Markdown copy of {url}, generated from the same data as the page.
+  md.highlights: Highlights
+  md.duties: Duties
+  md.stack: Stack
+  md.focus: Focus
   date.months:
   - January
   - February
@@ -257,7 +263,7 @@ pages:
   home:
     title: '{name} · {headline}'
     description: Platform, cloud, network and security engineer in Eindhoven, Netherlands. Kubernetes,
-      Terraform, Azure and AWS, and the networks underneath them. CV generated straight from this site.
+      Terraform, Azure and AWS, and the networks underneath them.
     nav: Home
   experience:
     title: Experience · Caleb Sargeant

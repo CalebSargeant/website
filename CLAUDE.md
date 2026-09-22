@@ -1,6 +1,6 @@
 # calebsargeant.com
 
-Caleb's personal site and CV (www.calebsargeant.com). `data/*.yml` is the single source of truth; `scripts/build.py` renders it with Jinja2 into `dist/`, which ships as Cloudflare Workers static assets. The same data renders three A4 print sheets that Playwright prints to the CV, JDs & Duties and cover-letter PDFs. No framework, no bundler: one site stylesheet, one print stylesheet, progressive-enhancement JS only.
+Caleb's personal site and CV (calebsargeant.com). `data/*.yml` is the single source of truth; `scripts/build.py` renders it with Jinja2 into `dist/`, which ships as Cloudflare Workers static assets. The same data renders three A4 print sheets that Playwright prints to the CV, JDs & Duties and cover-letter PDFs. No framework, no bundler: one site stylesheet, one print stylesheet, progressive-enhancement JS only.
 
 **This file (`CLAUDE.md`) is canonical.** `AGENTS.md` mirrors it for other agents. Edit both together.
 
@@ -12,7 +12,7 @@ Caleb's personal site and CV (www.calebsargeant.com). `data/*.yml` is the single
 - `docs/design-system.md`: tokens, the exact class names / ids / data-attributes shared by `assets/site.css`, `assets/site.js`, `assets/hero-net.js` and `templates/`, the animation catalogue, the print rules, and the accessibility floor in section 6. A name there is the name everywhere; changing it in one place breaks the other two.
 - `docs/template-context.md`: every variable `build.py` hands a template, the enriched role fields, and the `base.html` block contract.
 
-**Content is never edited in a template or in `dist/`.** A fact about Caleb lives in `data/profile.yml`, `experience.yml`, `education.yml`, `courses.yml` or `skills.yml` and nowhere else. `dist/` is deleted on every build. The README's "Change something" table maps a task to the one file it touches.
+**Content is never edited in a template or in `dist/`.** A fact about Caleb lives in `data/profile.yml`, `experience.yml`, `education.yml`, `courses.yml` or `skills.yml` and nowhere else. `dist/` is deleted on every build. The same goes for `llms.txt`, `llms-full.txt`, each page's `index.md` twin and the MCP corpus in `.docs-index/`: `build.py` renders them from `data/` through `templates/md/`. The README's "Change something" table maps a task to the one file it touches.
 
 Voice: plain, senior engineer, understated. British spelling. No em-dashes in copy (comma, full stop or brackets). No marketing words.
 

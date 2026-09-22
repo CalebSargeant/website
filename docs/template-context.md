@@ -8,8 +8,14 @@ not listed here fails the build rather than rendering an empty string.
 
 | Name | Shape |
 | --- | --- |
-| `site` | `{base_url, name, repo}` |
-| `page` | the current entry from `PAGES`: `{id, template, out, path, title, description}`, plus optional `nav`, `print`, `sitemap` |
+| `site` | `{base_url, name, repo}`. `base_url` is the apex, `https://calebsargeant.com`, with no trailing slash |
+| `page` | the current entry from `PAGES`, localised: `{id, template, out, path, href, title, description}`, plus optional `nav`, `print`, `sitemap`, and `markdown` (the twin's path, e.g. `/nl/experience/index.md`) on pages in the sitemap only. `path` already carries the locale prefix |
+| `alternates` | this page in every locale: `[{code, native, html_lang, url, path}]`, for hreflang and the switcher |
+| `locale` | the locale being rendered: `{code, prefix, html_lang, native, og}` |
+| `locales`, `default_locale` | every locale record, and the default's code (`"en"`) |
+| `t` | `t('key', **fmt)`: an interface string from `data/i18n/<code>.yml`, English on a miss, a failed build for a key English does not define |
+| `url` | `url('/cv/')` → the path with the locale prefix (`/nl/cv/`); anything not starting with `/` is returned unchanged |
+| `page_subs` | what `{name}`, `{headline}` and `{roles}` in a page title or description are replaced with |
 | `nav` | list of page dicts that have a `nav` label: build the header from this |
 | `profile` | all of `data/profile.yml`, with `profile.stats[].value` already computed |
 | `roles` | all roles, newest first, each enriched (see below) |
@@ -54,5 +60,31 @@ command-palette markup and the script tags. Child templates override blocks:
 ```
 
 `base.html` derives `<title>` and `<meta name="description">` from `page`, so a
-child never sets them. Print templates do **not** extend `base.html`: they are
-standalone documents that link only `assets/print.css`.
+child never sets them. It also emits `<link rel="alternate" type="text/markdown">`
+when `page.markdown` is set. Print templates do **not** extend `base.html`: they
+are standalone documents that link only `assets/print.css`.
+
+## Markdown templates (`templates/md/`)
+
+Everything under `templates/md/` is rendered by a second environment with
+**autoescape off** (`make_env(markdown=True)`), then `tidy_markdown` collapses
+blank-line runs. Same `StrictUndefined`, same `trim_blocks`, so a `{% if %}` at
+the end of a line eats that line's newline: write line-end conditions as
+`{{ x if y else '' }}`. Never render these with the HTML environment, and never
+serve them as HTML.
+
+| Template | Output | Context |
+| --- | --- | --- |
+| `md/<page>.md` (`home`, `experience`, `education`, `cv`, `contact`) | `<page.path>index.md` in every locale | exactly what the HTML page gets, `page` and `alternates` included |
+| `md/llms.txt`, `md/llms-full.txt` | `dist/llms.txt`, `dist/llms-full.txt` | the English globals, plus `md_pages`: every localised page that has a twin |
+| `md/corpus/*.md` | the documents in `.docs-index/index/website.json` | the English globals, plus `role` (the enriched role for `corpus/role.md`, else `None`), `role_docs` (`{role id: corpus path}`) and `corpus_paths` (the other documents' paths) |
+
+A page in the sitemap must have a twin template of the same name, or the build
+fails with `TemplateNotFound`. Every corpus document must open with `# Title`:
+that line becomes the document's `title`.
+
+`md/_macros.md` is imported `with context`: `abs`, `link`, `h`, `role_line`,
+`role_detail`, `role_facts`, `education_entry`, `education_line`,
+`course_line`, `skill_group`, `stats`, `contact_direct`, `profile_links`,
+`documents`. Every label in them goes through `t()`, except `role_facts`, which
+only the English-only files use.

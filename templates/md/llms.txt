@@ -1,0 +1,59 @@
+{#
+  /llms.txt (llmstxt.org): an H1, a blockquote summary, a little context, then
+  H2 sections of links. English and root only; the Dutch site is one line
+  under Optional.
+
+  Nothing in it is typed that data/ already says. The current roles are the
+  `end: present` ones, the page list is every page with a markdown twin, and
+  each page's description is its own meta description. The page links go to
+  the twins, because the reason to fetch this file is to read the site without
+  its HTML; each page's own URL rides alongside for citing.
+#}
+{% import "md/_macros.md" as md with context %}
+# {{ profile.name }}
+
+> {{ profile.headline }} in {{ profile.location }}. {{ profile.tagline }}
+
+This is {{ profile.name }}'s CV site. Every page and document on it is generated from one set of YAML files on each deploy, so none of them can disagree with another. Each page has a markdown copy at its own URL plus `index.md`, and `llms-full.txt` is the whole CV in one file.
+
+{{ profile.nationality_note }}.{{ ' ' ~ profile.availability.text if profile.availability.show else '' }}
+
+## Current roles
+
+{% for role in current_roles %}
+- {{ md.link(role.title ~ ', ' ~ role.company, md.abs('/experience/#' ~ role.id)) }}: {{ role.type }}, {{ role.location }}, since {{ role.start_label }}. {{ role.summary }}
+{% endfor %}
+
+## Pages
+
+{% for p in md_pages %}
+- {{ md.link(p.nav, md.abs(p.markdown)) }}: {{ p.description }} Markdown copy of <{{ md.abs(p.path) }}>.
+{% endfor %}
+
+## Documents
+
+- {{ md.link('llms-full.txt', md.abs('/llms-full.txt')) }}: The whole CV as one markdown file: every role with its highlights and full duty list, then education, courses, skills and contact.
+{{ md.documents() }}
+## Docs and agents
+
+- {{ md.link('Docs', profile.links.docs) }}: Notes and runbooks, written as they are worked out.
+- {{ md.link('Docs llms.txt', profile.links.docs ~ 'llms.txt') }}: The docs site's own map for assistants.
+- {{ md.link('MCP server', profile.links.mcp) }}: Public, read-only MCP endpoint over Streamable HTTP, no authentication. It searches this site and the docs.
+
+## Contact and profiles
+
+- {{ md.link('Email', 'mailto:' ~ profile.contact.email) }}: {{ profile.contact.email }}
+- {{ md.link('Phone', 'tel:' ~ profile.contact.phone_href) }}: {{ profile.contact.phone }}
+- {{ md.link(t('cta.book_call'), profile.links.booking) }}
+- {{ md.link('GitHub', profile.links.github) }}
+- {{ md.link('LinkedIn', profile.links.linkedin) }}
+- {{ md.link('Credly', profile.links.credly) }}: verifiable certification badges
+- {{ md.link('Udemy', profile.links.udemy) }}: course history
+
+## Optional
+
+{% for loc in locales if loc.code != default_locale %}
+- {{ md.link(loc.native, md.abs(loc.prefix ~ '/')) }}: The same site translated ({{ loc.html_lang }}), with markdown copies at the same paths under {{ loc.prefix }}/.
+{% endfor %}
+- {{ md.link('Sitemap', md.abs('/sitemap.xml')) }}: Every page in every language.
+- {{ md.link('Source', site.repo) }}: The data files and the build that produce everything above.
