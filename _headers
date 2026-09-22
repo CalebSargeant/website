@@ -1,4 +1,4 @@
-# Response headers for www.calebsargeant.com.
+# Response headers for calebsargeant.com.
 # https://developers.cloudflare.com/workers/static-assets/headers/
 #
 # Limits: 100 rules, 2,000 characters per line. Rules are ADDITIVE: a request

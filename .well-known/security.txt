@@ -1,5 +1,6 @@
 # Vulnerability disclosure for calebsargeant.com, RFC 9116.
-# https://www.calebsargeant.com/.well-known/security.txt
+# https://calebsargeant.com/.well-known/security.txt (www 301s here, and RFC
+# 9116 wants Canonical to name the URL the file is actually served from).
 #
 # Unlike the magmamoose.com copy of this file, `Expires` here is NOT refreshed by
 # the build: scripts/build.py copies .well-known/ byte-for-byte and is not mine
@@ -14,4 +15,4 @@
 Contact: mailto:contact@calebsargeant.com
 Expires: 2027-09-01T00:00:00.000Z
 Preferred-Languages: en
-Canonical: https://www.calebsargeant.com/.well-known/security.txt
+Canonical: https://calebsargeant.com/.well-known/security.txt

@@ -1,4 +1,4 @@
-# Cloudflare Worker serving www.calebsargeant.com.
+# Cloudflare Worker serving calebsargeant.com.
 #
 # An ASSETS-ONLY Worker: there is deliberately no `main` entrypoint. Cloudflare
 # makes `main` optional when a Worker only serves static assets, and that is what
@@ -16,7 +16,7 @@
 name = "calebsargeant-website"
 compatibility_date = "2026-07-24"
 
-# The site is canonical on www.calebsargeant.com only. Without this the exact
+# The site is canonical on calebsargeant.com only. Without this the exact
 # same pages are also live on
 # calebsargeant-website.<subdomain>.workers.dev, which is duplicate content that
 # search engines will happily index and then rank against the real thing.
@@ -55,15 +55,23 @@ not_found_handling = "404-page"
 # Nothing about DNS changes, which also means there is no cutover window where
 # the site is down between deleting a record and Wrangler recreating it.
 #
-# Both hostnames are served rather than redirected, because a Worker with no
-# entrypoint cannot issue a redirect and `_redirects` matches on path only, never
-# on hostname. Duplicate content is handled the way it is meant to be: every
-# <link rel="canonical">, every og:url, every hreflang and every sitemap entry
-# names https://www.calebsargeant.com, so search engines consolidate on www.
+# CANONICAL IS THE APEX, https://calebsargeant.com. The apex is served by this
+# Worker (the route below; it is also attached as a Worker custom domain, which
+# is not configured in this file). www.calebsargeant.com is 301'd to the apex,
+# path preserved, by a Redirect Rule on the zone, so a www request is answered
+# before it ever reaches this Worker. The redirect has to live in the zone: a
+# Worker with no entrypoint cannot issue one, and `_redirects` matches on path
+# only, never on hostname. Managing that rule needs Zone: Rulesets Edit, which
+# the deploy token deliberately does not carry, so it is not deployed from here.
 #
-# To make the apex a real 301 instead, add a Cloudflare Redirect Rule on the zone
-# (Rules -> Redirect Rules, apex -> www, 301). That needs Zone: Rulesets Edit,
-# which the deploy token deliberately does not carry.
+# Every <link rel="canonical">, og:url, hreflang, sitemap entry and JSON-LD URL
+# is built from SITE["base_url"] in scripts/build.py and names the apex.
+# Naming www would point every canonical at a redirect.
+#
+# The www route stays even though the Redirect Rule means it serves nothing.
+# It is harmless, and if the rule is ever removed, www falls back to serving
+# the site (whose canonicals still name the apex) instead of whatever the
+# hostname's old record points at.
 #
 # The `/*` suffix is required: a route pattern without a path matches nothing.
 [[routes]]

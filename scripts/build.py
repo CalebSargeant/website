@@ -32,7 +32,12 @@ DATA = ROOT / "data"
 OUT = ROOT / "dist"
 
 SITE = {
-    "base_url": "https://www.calebsargeant.com",
+    # The apex is canonical. www.calebsargeant.com is 301'd here by a Redirect
+    # Rule on the zone (see wrangler.toml), and every canonical, hreflang,
+    # sitemap entry and JSON-LD id is built from this value. Pointing them at
+    # www would name a URL that only ever answers with a redirect, which search
+    # engines treat as a canonical to second-guess rather than to trust.
+    "base_url": "https://calebsargeant.com",
     "name": "Caleb Sargeant",
     "repo": "https://github.com/CalebSargeant/website",
 }
@@ -381,6 +386,15 @@ def build_context(locale: dict | None = None) -> dict:
     skills = load("skills")
 
     profile = deep_merge(profile, overlay.get("profile", {}) or {})
+
+    # links.website is the address the CV, the letter and the JSON-LD print;
+    # SITE["base_url"] is the one every canonical names. The same fact in two
+    # places, so the build refuses to let them disagree.
+    if profile["links"]["website"].rstrip("/") != SITE["base_url"]:
+        raise SystemExit(
+            f"error: data/profile.yml links.website ({profile['links']['website']}) "
+            f"is not SITE['base_url'] ({SITE['base_url']}) in scripts/build.py. "
+            "Change both together.")
 
     # Roles are overlaid by id, so reordering the English data cannot re-point a
     # translation at a different job.

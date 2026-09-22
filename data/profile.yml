@@ -21,7 +21,10 @@ contact:
   phone_href: "+31682016886"
 
 links:
-  website: https://www.calebsargeant.com
+  # The canonical address, and the same value as SITE["base_url"] in
+  # scripts/build.py: the build fails if the two disagree. The apex, not www:
+  # www.calebsargeant.com is 301'd here by a Redirect Rule on the zone.
+  website: https://calebsargeant.com
   # The docs site moved off Read the Docs to MkDocs on GitHub Pages.
   # docs.calebsargeant.com still resolves but serves a certificate that does
   # not cover it, so every link to it fails; point at the address that works.

@@ -1,11 +1,11 @@
-# Deploy www.calebsargeant.com to Cloudflare Workers (static assets).
+# Deploy calebsargeant.com to Cloudflare Workers (static assets).
 #
 # Workers, not Pages: Cloudflare's current guidance is to start new projects on
 # Workers static assets, and that is where the ongoing investment goes. The
 # Worker is assets-only, no entrypoint, no code in the request path, so asset
 # requests are served free from the edge. See wrangler.toml.
 #
-# push to main             -> `wrangler deploy`, live on www.calebsargeant.com
+# push to main             -> `wrangler deploy`, live on calebsargeant.com
 # pull_request             -> `wrangler versions upload`, an aliased preview URL
 #                             that takes NO production traffic, posted as a PR comment
 # workflow_dispatch (main) -> manual re-publish of production, for rollbacks
@@ -45,7 +45,7 @@ jobs:
   production:
     name: Deploy production
     # workflow_dispatch is restricted to main so a manual run from a topic branch
-    # cannot quietly publish that branch to www.calebsargeant.com.
+    # cannot quietly publish that branch to calebsargeant.com.
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     # GitHub-hosted, deliberately: `playwright install --with-deps` installs
     # Chromium's shared libraries with apt, which needs a real Ubuntu image with
