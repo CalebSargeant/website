@@ -175,6 +175,13 @@
       {% for item in nav %}
       <a class="navlink{{ ' active' if item.id == page.id else '' }}" href="{{ item.path }}"{% if item.id == page.id %} aria-current="page"{% endif %}>{{ item.nav }}</a>
       {% endfor %}
+
+      {# The one nav entry that leaves this site, so it is not a PAGES row: there
+         is no page here to render and nothing for `active` to match. Neither half
+         is hard-coded even so, the href being a fact in profile.yml and the label
+         interface copy in the catalogue. `target="_blank"` is how the footer and
+         the contact page already treat this same link. #}
+      <a class="navlink" href="{{ profile.links.docs }}" rel="noopener" target="_blank">{{ t('nav.docs') }}</a>
     </nav>
 
     <div class="nav-actions">

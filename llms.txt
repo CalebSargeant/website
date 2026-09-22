@@ -34,7 +34,7 @@ disagree with each other.
 
 - Email: contact@calebsargeant.com
 - Website: https://www.calebsargeant.com
-- Documentation: https://docs.calebsargeant.com
+- Documentation: https://calebsargeant.github.io/docs/
 - GitHub: https://github.com/CalebSargeant
 - LinkedIn: https://www.linkedin.com/in/calebsargeant/
 - Book a slot: https://cal.com/calebsargeant/personal

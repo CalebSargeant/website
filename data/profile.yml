@@ -22,7 +22,12 @@ contact:
 
 links:
   website: https://www.calebsargeant.com
-  docs: https://docs.calebsargeant.com
+  # The docs site moved off Read the Docs to MkDocs on GitHub Pages.
+  # docs.calebsargeant.com still resolves but serves a certificate that does
+  # not cover it, so every link to it fails; point at the address that works.
+  # If that custom domain is attached to Pages later, change this one line and
+  # `site_url` in CalebSargeant/docs together.
+  docs: https://calebsargeant.github.io/docs/
   github: https://github.com/CalebSargeant
   linkedin: https://www.linkedin.com/in/calebsargeant/
   credly: https://www.credly.com/users/calebsargeant/badges
