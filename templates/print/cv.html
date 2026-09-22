@@ -98,7 +98,7 @@
           <li class="side-line">{{ profile.contact.email }}</li>
           <li class="side-line">{{ profile.contact.phone }}</li>
           <li class="side-line">{{ profile.links.website | replace('https://', '') }}</li>
-          <li class="side-line">{{ profile.links.docs | replace('https://', '') }}</li>
+          <li class="side-line">{{ profile.links.docs | replace('https://', '') | trim('/') }}</li>
           <li class="side-line">{{ profile.links.github | replace('https://', '') }}</li>
           <li class="side-line">{{ profile.links.linkedin | replace('https://', '') | replace('www.', '') }}</li>
         </ul>

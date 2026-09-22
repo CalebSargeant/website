@@ -29,7 +29,7 @@
 
     <p class="cover-contact">
       <span><b>{{ t('print.label.web') }}</b><span>{{ profile.links.website | replace('https://', '') }}</span></span>
-      <span><b>{{ t('print.label.docs') }}</b><span>{{ profile.links.docs | replace('https://', '') }}</span></span>
+      <span><b>{{ t('print.label.docs') }}</b><span>{{ profile.links.docs | replace('https://', '') | trim('/') }}</span></span>
       <span><b>GitHub</b><span>{{ profile.links.github | replace('https://', '') }}</span></span>
       <span><b>{{ t('contact.email') }}</b><span>{{ profile.contact.email }}</span></span>
       <span><b>{{ t('contact.phone') }}</b><span>{{ profile.contact.phone }}</span></span>
