@@ -5,7 +5,8 @@
 # Worker is assets-only, no entrypoint, no code in the request path, so asset
 # requests are served free from the edge. See wrangler.toml.
 #
-# push to main             -> `wrangler deploy`, live on calebsargeant.com
+# push to main             -> `wrangler deploy`, live on calebsargeant.com, then
+#                             the MCP search corpus is put in R2
 # pull_request             -> `wrangler versions upload`, an aliased preview URL
 #                             that takes NO production traffic, posted as a PR comment
 # workflow_dispatch (main) -> manual re-publish of production, for rollbacks
@@ -19,7 +20,9 @@
 #
 # Required secrets: CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID. Mint the
 # token from Cloudflare's "Edit Cloudflare Workers" template rather than a
-# hand-picked permission list.
+# hand-picked permission list. Besides what the deploy uses, the production
+# job's corpus publish needs Account -> Workers R2 Storage: Edit. The template
+# includes it; a token trimmed by hand may not, and then only that step fails.
 #
 # Actions are pinned by commit SHA; the trailing `# vX.Y.Z` comment is the tag
 # the SHA resolves to. Keep both in sync (Dependabot updates them together).
@@ -153,6 +156,31 @@ jobs:
           right record itself. That deletion is the cutover: whatever www serves today
           goes down at that moment and comes back when this workflow next succeeds.
           NOTE
+
+      # The MCP server at mcp.calebsargeant.com answers from one JSON corpus per
+      # source repo in the calebsargeant-docs-index bucket; this is this repo's.
+      # build.py wrote it to .docs-index/ in the build step above, from the same
+      # data as the pages that were just deployed.
+      #
+      # `--remote` is load-bearing. Wrangler 4 runs r2 commands against a local
+      # simulation by default, where this put "succeeds", exits 0, and changes
+      # nothing any agent will ever read.
+      #
+      # After the deploy, and skipped when it fails (steps run only while the
+      # job is green), so the index never cites pages that did not ship. Not
+      # continue-on-error either: a green run that left every agent answering
+      # from a stale corpus is worse than a red one somebody looks at.
+      #
+      # Production only, never the preview job: the bucket is shared, and a pull
+      # request must not overwrite what production agents read. Needs
+      # Workers R2 Storage: Edit on the token (see the header).
+      - name: Publish the MCP corpus
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.114.0"
+          command: r2 object put calebsargeant-docs-index/index/website.json --file .docs-index/index/website.json --content-type application/json --remote
 
   preview:
     name: Deploy preview
