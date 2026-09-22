@@ -86,7 +86,9 @@ Fonts come from Google Fonts (`Space Grotesk` 400/500/600/700, `JetBrains Mono`
 ## 3. Components (exact class names)
 
 **Nav**, `.site-nav` (sticky) → `.nav-inner` → `.brand`, `.nav-links`,
-`.navlink` (`.active` for current page), `.nav-actions`. JS adds `.solid` past
+`.navlink` (`.active` for current page), `.nav-actions`. The last `.navlink` is
+the external docs link and never takes `.active`: it leaves the site, so no page
+id can match it. JS adds `.solid` past
 24px of scroll, injects `.nav-toggle` and sets `.nav-enhanced` on `.site-nav`,
 and toggles `.menu-open`.
 

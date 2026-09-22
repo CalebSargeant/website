@@ -10,6 +10,7 @@
 ui:
   nav.primary: Hoofdnavigatie
   nav.brand_aria: '{name}, homepage'
+  nav.docs: Docs
   nav.language: Taal
   nav.download_cv: CV downloaden
   common.skip_to_content: Naar de inhoud

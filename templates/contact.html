@@ -96,7 +96,7 @@
         {% set linkedin_link %}<a href="{{ profile.links.linkedin }}" rel="me noopener" target="_blank">LinkedIn</a>{% endset %}
         {% set credly_link %}<a href="{{ profile.links.credly }}" rel="me noopener" target="_blank">Credly</a>{% endset %}
         {% set udemy_link %}<a href="{{ profile.links.udemy }}" rel="me noopener" target="_blank">Udemy</a>{% endset %}
-        {% set docs_link %}<a href="{{ profile.links.docs }}" rel="noopener" target="_blank">docs.calebsargeant.com</a>{% endset %}
+        {% set docs_link %}<a href="{{ profile.links.docs }}" rel="noopener" target="_blank">{{ profile.links.docs | replace('https://', '') }}</a>{% endset %}
         <ul>
           <li>{{ (t('contact.link.github') | e).format(link=github_link) }}</li>
           <li>{{ (t('contact.link.linkedin') | e).format(link=linkedin_link) }}</li>

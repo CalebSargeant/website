@@ -81,6 +81,7 @@ three PDFs, the sitemap and `llms.txt` follow from it on the next build.
 | Change the summary, headline, contact details or the counters | `data/profile.yml` | The counters take either a fixed `value:` or a `since:` year, which is computed at build time so nobody has to bump a number. |
 | Change the cover letter | `data/profile.yml` | The `cover_letter:` block: salutation, paragraphs, sign-off. |
 | Hide the "available" banner | `data/profile.yml` | `availability.show: false`. |
+| Change where an off-site link points | `data/profile.yml` | The `links:` block. Each one is read wherever it appears, so `docs:` moves the nav entry, the footer, the contact page and both PDFs together. |
 | Add a page | `scripts/build.py` and `templates/` | Append an entry to `PAGES` (it drives the nav, the sitemap and the SEO metadata), then add the template it names. |
 | Add a fourth PDF | `scripts/build.py` and `templates/print/` | Add the sheet to `PAGES` with `print: True`, then add it to `PDFS`. `render_pdf.py` imports that list rather than keeping its own copy. |
 | Change a colour, a spacing step or an animation | `assets/site.css` | Read `docs/design-system.md` first. It is the contract the CSS, the JS and the templates all share. |

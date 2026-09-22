@@ -27,6 +27,7 @@
 ui:
   nav.primary: Primary
   nav.brand_aria: '{name}, home page'
+  nav.docs: Docs
   nav.language: Language
   nav.download_cv: Download CV
   common.skip_to_content: Skip to content
