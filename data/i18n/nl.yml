@@ -248,7 +248,7 @@ pages:
   home:
     title: '{name} · {headline}'
     description: Platform-, cloud-, netwerk- en security-engineer in Eindhoven. Kubernetes, Terraform,
-      Azure en AWS, en de netwerken eronder. CV uit dezelfde data.
+      Azure en AWS, en de netwerken eronder.
     nav: Home
   experience:
     title: Ervaring · Caleb Sargeant
@@ -316,7 +316,10 @@ profile:
     since: 2012
     suffix: +
   - label: Engineering-rollen
-    value: 12
+    # Counted from data/experience.yml, like the English list. This overlay
+    # replaces the whole stats list, so a typed number here would fall behind
+    # the English one the moment a role is added (it had: 12 against 13).
+    count: roles
   - label: Landen waar ik werkte
     value: 2
   - label: Certificeringen
