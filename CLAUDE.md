@@ -9,10 +9,10 @@ Caleb's personal site and CV (calebsargeant.com). `data/*.yml` is the single sou
 @.claude/COMMON_MISTAKES.md
 
 **Two documents are contracts, not notes. Read the relevant one before touching CSS, JS or a template:**
-- `docs/design-system.md`: tokens, the exact class names / ids / data-attributes shared by `assets/site.css`, `assets/site.js`, `assets/hero-net.js` and `templates/`, the animation catalogue, the print rules, and the accessibility floor in section 6. A name there is the name everywhere; changing it in one place breaks the other two.
+- `docs/design-system.md`: tokens, the exact class names / ids / data-attributes shared by `assets/site.css`, `assets/site.js`, `assets/hero-net.js`, `assets/webmcp.js` and `templates/`, the animation catalogue, the print rules, and the accessibility floor in section 6. A name there is the name everywhere; changing it in one place breaks the other two.
 - `docs/template-context.md`: every variable `build.py` hands a template, the enriched role fields, and the `base.html` block contract.
 
-**Content is never edited in a template or in `dist/`.** A fact about Caleb lives in `data/profile.yml`, `experience.yml`, `education.yml`, `courses.yml` or `skills.yml` and nowhere else. `dist/` is deleted on every build. The same goes for `llms.txt`, `llms-full.txt`, each page's `index.md` twin and the MCP corpus in `.docs-index/`: `build.py` renders them from `data/` through `templates/md/`. The README's "Change something" table maps a task to the one file it touches.
+**Content is never edited in a template or in `dist/`.** A fact about Caleb lives in `data/profile.yml`, `experience.yml`, `education.yml`, `courses.yml` or `skills.yml` and nowhere else. `dist/` is deleted on every build. The same goes for `llms.txt`, `llms-full.txt`, each page's `index.md` twin, the MCP corpus in `.docs-index/` and the agent skills in `/.well-known/agent-skills/`: `build.py` renders them from `data/` through `templates/md/`. The README's "Change something" table maps a task to the one file it touches.
 
 Voice: plain, senior engineer, understated. British spelling. No em-dashes in copy (comma, full stop or brackets). No marketing words.
 

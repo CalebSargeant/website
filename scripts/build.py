@@ -11,13 +11,15 @@ other output is .docs-index/, the search corpus CI puts in R2 for the MCP server
 
 The one rule this file exists to enforce: `data/` is the only place a fact
 about Caleb is written down. Every page, every PDF, and every file written for
-assistants (llms.txt, the markdown twins, the corpus) is a rendering of it.
+assistants (llms.txt, the markdown twins, the corpus, the agent skills) is a
+rendering of it.
 """
 
 from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import http.server
 import json
 import os
@@ -170,6 +172,25 @@ CORPUS = [
     {"path": "skills.md", "template": "md/corpus/skills.md", "url": "/#skills"},
     {"path": "contact.md", "template": "md/corpus/contact.md", "url": "/contact/"},
 ]
+
+# Agent Skills (agentskills.io), published for discovery at /.well-known/agent-skills/
+# as github.com/cloudflare/agent-skills-discovery-rfc v0.2.0 lays it out: one SKILL.md
+# per skill and an index.json listing each with the SHA-256 of its bytes. Each skill
+# is rendered from data/ through templates/md/skills/, like llms.txt, and its digest
+# is taken from the bytes this build writes, so neither the words nor the digest can
+# drift. `name` is the directory, the front matter's `name` and the index entry, and
+# agents keep it, so it stays put once published.
+SKILLS = [
+    {"name": "caleb-sargeant-profile", "template": "md/skills/caleb-sargeant-profile.md"},
+    {"name": "calebsargeant-mcp", "template": "md/skills/calebsargeant-mcp.md"},
+]
+SKILLS_PATH = "/.well-known/agent-skills"
+# How a v0.2.0 index identifies itself. Clients match it exactly, so never edit it
+# by hand; a new version of the format is a new URI and a deliberate change.
+SKILLS_SCHEMA = "https://schemas.agentskills.io/discovery/0.2.0/schema.json"
+# agentskills.io/specification: 1 to 64 lowercase letters and digits, joined by
+# single hyphens, none at either end.
+SKILL_NAME = re.compile(r"(?=.{1,64}$)[a-z0-9]+(?:-[a-z0-9]+)*")
 
 # Cloudflare applies at most this many rules from _headers.
 HEADERS_RULE_LIMIT = 100
@@ -816,15 +837,13 @@ def check_anchor(url: str) -> None:
                          f"{page.relative_to(ROOT)} does not have.")
 
 
-def write_agent_files() -> dict:
-    """Write dist/llms.txt, dist/llms-full.txt and the MCP corpus.
+def english_values() -> tuple[Environment, dict, dict]:
+    """The markdown environment, and the English values every file for agents gets.
 
-    English only, as llmstxt.org expects of a root llms.txt. The corpus is
-    English for a different reason: an index holding the same CV twice in two
-    languages splits every match between two copies of one fact. The Dutch
-    site stays reachable through its own twins and a line in llms.txt.
-
-    Runs after render(), because check_anchor reads the built pages.
+    That is the English template context plus `md_pages` (every page that has a
+    twin) and `corpus_urls` (the URL each single corpus document cites, keyed by
+    its path, so llms-full.txt can name the same pages without restating them).
+    Returns (env, values, context).
     """
     locale = next(loc for loc in LOCALES if loc["code"] == DEFAULT_LOCALE)
     context = build_context(locale)
@@ -835,6 +854,23 @@ def write_agent_files() -> dict:
         localise_page(p, load_i18n(DEFAULT_LOCALE), locale["prefix"], context["page_subs"])
         for p in PAGES if has_markdown(p)
     ]
+    values["corpus_urls"] = {spec["path"]: spec["url"] for spec in CORPUS if "each" not in spec}
+    return env, values, context
+
+
+def write_agent_files() -> dict:
+    """Write dist/llms.txt, dist/llms-full.txt and the MCP corpus.
+
+    English only, as llmstxt.org expects of a root llms.txt. The corpus is
+    English for a different reason: an index holding the same CV twice in two
+    languages splits every match between two copies of one fact. The Dutch
+    site stays reachable through its own twins and a line in llms.txt.
+
+    Runs after render(), because check_anchor reads the built pages. Returns
+    the corpus size, plus `documents` (path, title and URL of each) for the
+    skill that tells agents what read_doc can open.
+    """
+    env, values, context = english_values()
 
     for name in ("llms.txt", "llms-full.txt"):
         text = env.get_template(f"md/{name}").render(**values)
@@ -884,7 +920,74 @@ def write_agent_files() -> dict:
     CORPUS_OUT.write_text(
         json.dumps(corpus, sort_keys=True, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8")
-    return {"docs": len(docs), "bytes": CORPUS_OUT.stat().st_size}
+    return {"docs": len(docs), "bytes": CORPUS_OUT.stat().st_size,
+            "documents": [{k: d[k] for k in ("path", "title", "url")} for d in docs]}
+
+
+def skill_meta(text: str, template: str) -> dict:
+    """A SKILL.md's YAML front matter, parsed, or a failed build that says why."""
+    head, sep, _ = text.removeprefix("---\n").partition("\n---\n")
+    if not text.startswith("---\n") or not sep:
+        raise SystemExit(f"error: {template} must open with a '---' YAML front matter block.")
+    try:
+        meta = yaml.safe_load(head)
+    except yaml.YAMLError as exc:
+        raise SystemExit(f"error: {template} front matter is not valid YAML; a colon "
+                         f"followed by a space inside a value is the usual cause.\n{exc}") from None
+    if not isinstance(meta, dict):
+        raise SystemExit(f"error: {template} front matter must be a YAML mapping.")
+    return meta
+
+
+def write_agent_skills(documents: list[dict]) -> int:
+    """Write each SKILLS entry to dist/.well-known/agent-skills/<name>/SKILL.md, then index.json.
+
+    The index is the v0.2.0 discovery format: `$schema`, then one entry per
+    skill with its name, type, description (copied from the front matter, as
+    the RFC asks), path-absolute url and digest. The url is path-absolute so a
+    PR preview's index points at the preview's own files, whose digests are the
+    ones it lists. The digest is SHA-256 over the exact bytes written, which is
+    what a client verifies before it trusts a skill.
+
+    English only, like llms.txt. `documents` is the corpus listing
+    write_agent_files returned. Returns the number of skills.
+    """
+    committed = ROOT / SKILLS_PATH.lstrip("/")
+    if committed.exists():
+        raise SystemExit(f"error: {committed.relative_to(ROOT)}/ is generated by "
+                         "build.py (write_agent_skills). Delete the committed copy.")
+    env, values, _ = english_values()
+    target_dir = OUT / SKILLS_PATH.lstrip("/")
+    entries = []
+    for spec in SKILLS:
+        text = tidy_markdown(env.get_template(spec["template"]).render(
+            corpus_docs=documents, **values))
+        meta = skill_meta(text, spec["template"])
+        name, description = meta.get("name"), meta.get("description")
+        if name != spec["name"] or not SKILL_NAME.fullmatch(str(name)):
+            raise SystemExit(f"error: {spec['template']} names itself {name!r}; SKILLS says "
+                             f"{spec['name']!r}, and a name is 1 to 64 lowercase letters, "
+                             "digits and single hyphens.")
+        if not isinstance(description, str) or not description.strip() or len(description) > 1024:
+            raise SystemExit(f"error: {spec['template']} needs a one-line description of "
+                             "1 to 1024 characters.")
+        data = text.encode("utf-8")
+        path = target_dir / name / "SKILL.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # Bytes rather than write_text: the digest has to be of exactly what is
+        # served, and write_text translates newlines on some platforms.
+        path.write_bytes(data)
+        entries.append({
+            "name": name,
+            "type": "skill-md",
+            "description": description,
+            "url": f"{SKILLS_PATH}/{name}/SKILL.md",
+            "digest": "sha256:" + hashlib.sha256(data).hexdigest(),
+        })
+    index = {"$schema": SKILLS_SCHEMA, "skills": entries}
+    (target_dir / "index.json").write_bytes(
+        (json.dumps(index, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+    return len(entries)
 
 
 def serve(port: int = 8788) -> None:
@@ -911,6 +1014,7 @@ def main() -> int:
     appended, rules = write_headers()
     write_sitemap(dt.date.today().isoformat())
     corpus = write_agent_files()
+    skills = write_agent_skills(corpus["documents"])
 
     count = sum(1 for p in OUT.rglob("*") if p.is_file())
     print(f"Built {count} files into dist/ across {len(LOCALES)} locales")
@@ -918,6 +1022,7 @@ def main() -> int:
           f"({appended} generated for the markdown twins)")
     print(f"  {CORPUS_OUT.relative_to(ROOT)}: {corpus['docs']} documents, "
           f"{corpus['bytes']} bytes")
+    print(f"  {SKILLS_PATH}/: {skills} skills and index.json")
 
     # Untranslated content is a fallback to English, not a failure, so it has to
     # be visible here or it is invisible everywhere.

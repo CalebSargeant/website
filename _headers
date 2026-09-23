@@ -172,6 +172,26 @@
   Content-Type: application/ai-catalog+json
   Access-Control-Allow-Origin: *
 
+# AGENT SKILLS. build.py (write_agent_skills) writes /.well-known/agent-skills/:
+# one SKILL.md per skill, rendered from data/ like llms.txt, and an index.json in
+# the Agent Skills Discovery format (github.com/cloudflare/agent-skills-discovery-rfc,
+# v0.2.0) carrying each file's SHA-256. Public instructions for agents, so any
+# origin may read them, an agent in a browser tab included.
+#
+# SKILL.md already gets text/markdown; charset=utf-8 from the /*.md rule above,
+# which is why the rule below sets no Content-Type and must not: two matching
+# rules setting one header send both values joined. index.json is pinned to the
+# application/json the RFC requires rather than left to inference.
+#
+# No Cache-Control on purpose. The asset server's default (revalidate every time,
+# with an ETag) means a client can never hold an index.json from one deploy and a
+# SKILL.md from another, whose digests would not match.
+/.well-known/agent-skills/*
+  Access-Control-Allow-Origin: *
+
+/.well-known/agent-skills/index.json
+  Content-Type: application/json
+
 # CANONICAL LINKS FOR THE MARKDOWN TWINS are not written here. build.py appends
 # them to dist/_headers (write_headers), one per page per locale, each a
 #     Link: <https://calebsargeant.com/experience/>; rel="canonical"

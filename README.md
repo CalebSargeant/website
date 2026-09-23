@@ -45,12 +45,14 @@ off the site is still fully readable and navigable.
 │       ├── _macros.md           how a role, a credential or a skill reads as markdown
 │       ├── home.md, cv.md ...   one twin per page in the sitemap, same names as the pages
 │       ├── llms*.txt            /llms.txt and /llms-full.txt
-│       └── corpus/              the MCP corpus documents
+│       ├── corpus/              the MCP corpus documents
+│       └── skills/              the agent skills served at /.well-known/agent-skills/
 
 ├── assets/
 │   ├── site.css                 every token and component for the site
 │   ├── site.js                  reveals, nav, command palette, theme, counters
 │   ├── hero-net.js              the hero canvas (network graph), self-pausing
+│   ├── webmcp.js                WebMCP tools for agents in the browser; a no-op without the API
 │   ├── print.css                the print stylesheet, used only by templates/print/*
 │   ├── img/, og/, favicon*      photo, social card, icons (generated but committed)
 │   └── mark.svg
@@ -72,8 +74,9 @@ off the site is still fully readable and navigable.
 └── .docs-index/                 generated: the MCP corpus, index/website.json. Not committed.
 ```
 
-`sitemap.xml`, `llms.txt` and `llms-full.txt` are not in the tree because
-`build.py` writes them from `data/`, so they can never sit stale.
+`sitemap.xml`, `llms.txt`, `llms-full.txt` and `/.well-known/agent-skills/` are
+not in the tree because `build.py` writes them from `data/`, so they can never
+sit stale.
 
 ## Change something
 
@@ -96,6 +99,7 @@ MCP corpus follow from it on the next build.
 | Add a page | `scripts/build.py` and `templates/` | Append an entry to `PAGES` (it drives the nav, the sitemap and the SEO metadata), then add the template it names. A page in the sitemap also needs `templates/md/<name>.md`, its markdown twin. |
 | Change how the markdown copies read | `templates/md/` | `_macros.md` is shared by the twins, `llms-full.txt` and the corpus, so a role changes everywhere at once. Labels come from `t()`, so a new one goes in both `data/i18n/*.yml`. |
 | Add a document to the MCP corpus | `scripts/build.py` and `templates/md/corpus/` | A row in `CORPUS`, and the template it names, opening with `# Title`. Keep paths stable: agents keep them. |
+| Add or change an agent skill | `scripts/build.py` and `templates/md/skills/` | A row in `SKILLS` and the template it names, which opens with YAML front matter (`name` equal to the row's, a one-line `description`). The index and its digests are generated. Keep names stable: agents keep them. |
 | Add a fourth PDF | `scripts/build.py` and `templates/print/` | Add the sheet to `PAGES` with `print: True`, then add it to `PDFS`. `render_pdf.py` imports that list rather than keeping its own copy. |
 | Change a colour, a spacing step or an animation | `assets/site.css` | Read `docs/design-system.md` first. It is the contract the CSS, the JS and the templates all share. |
 
@@ -308,7 +312,7 @@ previews with it. If previews ever stop producing a URL, check that line first.
 
 ### For assistants
 
-Four outputs, all written by `build.py` from `data/` through `templates/md/`,
+Five outputs, all written by `build.py` from `data/` through `templates/md/`,
 which renders with autoescaping off (so "&" stays "&") and shares one set of
 macros, `_macros.md`. None of it is hand-written, so none of it can drift from
 the pages. There used to be a hand-written `llms.txt`; it had already drifted.
@@ -316,8 +320,9 @@ the pages. There used to be a hand-written `llms.txt`; it had already drifted.
 | Output | What it is |
 | --- | --- |
 | `/llms.txt` | The [llmstxt.org](https://llmstxt.org/) map: summary, current roles (the `end: present` ones), every page's markdown twin with its meta description, the PDFs, the docs site and the MCP server, contact. English, root only. |
-| `/llms-full.txt` | The whole CV in one markdown file: profile, every role with highlights, stack and full duties, education, courses, skills, contact. English. |
+| `/llms-full.txt` | The whole CV in one markdown file: profile, every role with highlights, stack and full duties, education, courses, skills, contact. English. Every section names its page on a `Page:` line, which is what gives each `search_site` result (below) a URL. |
 | `<page>index.md` | A twin of every page in the sitemap, in every locale (`/experience/index.md`, `/nl/experience/index.md`), from `templates/md/<page>.md` with the same context as the HTML, so a Dutch twin comes out of the Dutch catalogue. Each page links its twin with `<link rel="alternate" type="text/markdown">`; each twin is served with `Link: <page>; rel="canonical"`, rules `build.py` appends to `dist/_headers`, so search engines index the page and not the copy. |
+| `/.well-known/agent-skills/` | [Agent Skills](https://agentskills.io/) for agents that look for skills per domain ([discovery RFC v0.2.0](https://github.com/cloudflare/agent-skills-discovery-rfc)): `caleb-sargeant-profile` (answering questions about Caleb from the sources on this list) and `calebsargeant-mcp` (connecting to the MCP server and choosing between its tools), one `SKILL.md` each from `templates/md/skills/`, plus `index.json` with each file's SHA-256. The digests are taken from the bytes the build writes, and the URLs are path-absolute so a PR preview's index describes the preview's own files. `_headers` opens the directory to any origin. English. |
 | `.docs-index/index/website.json` | The search corpus for the MCP server at `https://mcp.calebsargeant.com/`: `profile.md` (read first), `experience.md`, one `experience/<role id>.md` per role, `education.md`, `courses.md`, `skills.md` and `contact.md`, each with the canonical URL it came from. English, not served by the site. |
 
 The corpus follows the MCP server's schema 1 (`repo`, `site_url`, `generated`,
@@ -354,10 +359,27 @@ request with `Accept: text/markdown` to the page's twin: the free-plan stand-in 
 Cloudflare's Markdown for Agents, which needs Pro. [isitagentready.com](https://isitagentready.com/),
 the scan behind the dashboard's Agent Readiness page, checks all of the above.
 
+The skills index gets no `Link` header: no link relation for it is registered with
+IANA, and an invented one helps nobody.
+
+### For agents in the browser
+
+`assets/webmcp.js` offers four [WebMCP](https://webmachinelearning.github.io/webmcp/)
+tools to an agent running in the reader's browser: `read_page` (a page's markdown
+twin), `search_site` (the sections of `/llms-full.txt` that match, each with its page
+URL), `get_contact` (from the `data-contact` attribute `base.html` renders from
+`data/profile.yml`) and `open_page` (navigates the tab). It is loaded on every page
+that extends `base.html`, reads only what the site already publishes, and does
+nothing at all unless the browser exposes the API. It registers with
+`document.modelContext` (the spec), `navigator.modelContext` (Chrome's early preview,
+and what isitagentready.com's scanner looks for) or the older `provideContext()`,
+whichever exist, and one `AbortController` unregisters them all when the page is put
+away. It never defines the API itself. Being same-origin, it needs no CSP change.
+
 ## Design
 
 `docs/design-system.md` is the contract between `assets/site.css`,
-`assets/site.js`, `assets/hero-net.js` and the templates: the tokens, the exact
+`assets/site.js`, `assets/hero-net.js`, `assets/webmcp.js` and the templates: the tokens, the exact
 class names, the animation catalogue, the print rules and the accessibility floor.
 A class name in that document is the class name in all three places, so changing
 it in one place breaks the other two.

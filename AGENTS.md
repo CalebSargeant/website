@@ -2,7 +2,7 @@
 
 `CLAUDE.md` is the canonical agent file for this repo. This mirror carries the same essentials for agents that read `AGENTS.md` instead. **Edit the two together**, there is no import mechanism here, so this file restates rather than references.
 
-Caleb Sargeant's personal site and CV (calebsargeant.com). `data/*.yml` is the single source of truth; `scripts/build.py` renders it with Jinja2 into `dist/`, which ships as Cloudflare Workers static assets. The same data renders three A4 print sheets that Playwright prints to the CV, JDs & Duties and cover-letter PDFs. No framework, no bundler: one site stylesheet (`assets/site.css`), one print stylesheet (`assets/print.css`), progressive-enhancement JS only (`assets/site.js`, `assets/hero-net.js`).
+Caleb Sargeant's personal site and CV (calebsargeant.com). `data/*.yml` is the single source of truth; `scripts/build.py` renders it with Jinja2 into `dist/`, which ships as Cloudflare Workers static assets. The same data renders three A4 print sheets that Playwright prints to the CV, JDs & Duties and cover-letter PDFs. No framework, no bundler: one site stylesheet (`assets/site.css`), one print stylesheet (`assets/print.css`), progressive-enhancement JS only (`assets/site.js`, `assets/hero-net.js`, and `assets/webmcp.js`, which offers WebMCP tools to agents in the browser and does nothing without the API).
 
 **Before you start:**
 - Read `docs/design-system.md` if you are touching CSS, JS or markup. It is the contract: tokens, the exact class names / ids / data-attributes shared by the stylesheet, the scripts and the templates, the animation catalogue, the print rules, and the accessibility floor in section 6. A name there is the name in all three places.
@@ -10,7 +10,7 @@ Caleb Sargeant's personal site and CV (calebsargeant.com). `data/*.yml` is the s
 - Read `./PROJECT_INDEX.json` to locate code before searching.
 - Read `.claude/COMMON_MISTAKES.md` for the footguns and `.claude/QUICK_START.md` for the commands.
 
-**Content is never edited in a template or in `dist/`.** A fact about Caleb lives in `data/profile.yml`, `experience.yml`, `education.yml`, `courses.yml` or `skills.yml` and nowhere else. `dist/` is deleted and rewritten on every build. The same goes for `llms.txt`, `llms-full.txt`, each page's `index.md` twin and the MCP corpus in `.docs-index/`: `build.py` renders them from `data/` through `templates/md/`. The README's "Change something" table maps a task to the one file it touches.
+**Content is never edited in a template or in `dist/`.** A fact about Caleb lives in `data/profile.yml`, `experience.yml`, `education.yml`, `courses.yml` or `skills.yml` and nowhere else. `dist/` is deleted and rewritten on every build. The same goes for `llms.txt`, `llms-full.txt`, each page's `index.md` twin, the MCP corpus in `.docs-index/` and the agent skills in `/.well-known/agent-skills/`: `build.py` renders them from `data/` through `templates/md/`. The README's "Change something" table maps a task to the one file it touches.
 
 **Commands** (no test suite; Python 3, `make` is the front door):
 - `make install`: pip install `requirements.txt`, then Playwright's Chromium (a separate download).

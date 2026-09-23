@@ -1,9 +1,9 @@
 # Design system: calebsargeant.com
 
-The contract between `assets/site.css`, `assets/site.js`, `assets/hero-net.js`
-and `templates/`. Everything below is normative: a class name here is the class
-name in the CSS and in the templates. Change it in one place and you break the
-other two.
+The contract between `assets/site.css`, `assets/site.js`, `assets/hero-net.js`,
+`assets/webmcp.js` and `templates/`. Everything below is normative: a class name
+here is the class name in the CSS and in the templates. Change it in one place and
+you break the other two.
 
 House lineage: this borrows the *structure* of magmamoose.com (dark ground,
 mono kickers, reveal-on-scroll, one stylesheet, one JS file, progressive
@@ -133,6 +133,14 @@ the toolbar sets `data-cv-focus` on `.cv-doc`.
 **Injected by JS** (never in a template): `.to-top`, `.scroll-progress`,
 `.cursor-glow`, `.nav-toggle`, `.cmdk` markup is in `base.html` but stays
 `hidden` until JS runs.
+
+**WebMCP**, `assets/webmcp.js`: no markup and no classes of its own, and a no-op
+unless the browser exposes the WebMCP API. It reads two things: the
+`.nav-links a.navlink[href^="/"]` links, which are the pages its tools offer (so the
+external docs link is left out by its `https` href), and `data-contact` on its own
+`<script>` in `base.html`, a JSON object (`name`, `headline`, `location`, `email`,
+`phone`, `booking`, `availability`, `linkedin`, `github`, `credly`, `contact_page`)
+that its `get_contact` tool returns.
 
 ---
 

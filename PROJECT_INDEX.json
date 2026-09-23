@@ -1,6 +1,6 @@
 {
   "generated": "2026-09-23",
-  "summary": "Caleb Sargeant's personal site and CV (calebsargeant.com, apex-canonical). data/*.yml is the single source of truth; scripts/build.py renders it with Jinja2 into dist/, which ships as Cloudflare Workers static assets. The same data renders three A4 print sheets that Playwright prints to the CV, JDs & Duties and cover-letter PDFs, plus the files for assistants: a markdown twin of every page, llms.txt, llms-full.txt, and the MCP search corpus (.docs-index/index/website.json) that CI puts in R2. No framework, no bundler: one site stylesheet, one print stylesheet, progressive-enhancement JS only.",
+  "summary": "Caleb Sargeant's personal site and CV (calebsargeant.com, apex-canonical). data/*.yml is the single source of truth; scripts/build.py renders it with Jinja2 into dist/, which ships as Cloudflare Workers static assets. The same data renders three A4 print sheets that Playwright prints to the CV, JDs & Duties and cover-letter PDFs, plus the files for assistants: a markdown twin of every page, llms.txt, llms-full.txt, the agent skills at /.well-known/agent-skills/ with their digest index, and the MCP search corpus (.docs-index/index/website.json) that CI puts in R2. assets/webmcp.js offers WebMCP tools to agents in the browser. No framework, no bundler: one site stylesheet, one print stylesheet, progressive-enhancement JS only.",
   "entrypoints": [
     "scripts/build.py:main",
     "scripts/render_pdf.py:main",
@@ -29,7 +29,7 @@
     },
     "templates": {
       "path": "templates",
-      "purpose": "Jinja templates, rendered with StrictUndefined so a typo fails the build. Site pages extend base.html and override blocks; the print sheets are standalone documents that link only assets/print.css. templates/md/ is markdown, rendered by a second environment with autoescape off: the page twins, llms.txt, llms-full.txt and the MCP corpus, all sharing md/_macros.md. Layout only, never content.",
+      "purpose": "Jinja templates, rendered with StrictUndefined so a typo fails the build. Site pages extend base.html and override blocks; the print sheets are standalone documents that link only assets/print.css. templates/md/ is markdown, rendered by a second environment with autoescape off: the page twins, llms.txt, llms-full.txt, the MCP corpus and the agent skills, all sharing md/_macros.md. Layout only, never content.",
       "exports": [
         "templates/base.html",
         "templates/home.html",
@@ -50,10 +50,11 @@
         "templates/md/contact.md",
         "templates/md/llms.txt",
         "templates/md/llms-full.txt",
-        "templates/md/corpus/"
+        "templates/md/corpus/",
+        "templates/md/skills/"
       ],
       "files": {
-        "templates/base.html": "Owns doctype, head, the pre-paint theme bootstrap, the sticky nav built from `nav`, the footer, the command-palette markup and the script tags. Derives title and meta description from `page`, so a child never sets them, and links the markdown twin (rel=alternate type=text/markdown) when page.markdown is set.",
+        "templates/base.html": "Owns doctype, head, the pre-paint theme bootstrap, the sticky nav built from `nav`, the footer, the command-palette markup and the script tags. Derives title and meta description from `page`, so a child never sets them, and links the markdown twin (rel=alternate type=text/markdown) when page.markdown is set. Loads assets/webmcp.js with a single-quoted data-contact JSON attribute built from profile.",
         "templates/home.html": "Home: hero with the #hero-net canvas, availability, stats, skill matrix, current roles, links out.",
         "templates/experience.html": "The timeline: every role as a .tl-card, with the full duty list inside a keyboard-operable <details>.",
         "templates/education.html": "Certifications, qualifications, what is in progress, and the course list.",
@@ -67,18 +68,20 @@
         "templates/md/_macros.md": "Shared markdown fragments (role_line, role_detail, role_facts, education_entry/line, course_line, skill_group, stats, contact_direct, profile_links, documents), imported with context. Labels go through t().",
         "templates/md/home.md": "Markdown twins of the five sitemap pages (home, experience, education, cv, contact), one template per page, rendered with the same context as the HTML into <path>index.md in every locale.",
         "templates/md/llms.txt": "/llms.txt per llmstxt.org: summary, current roles, page twins, PDFs, docs site, MCP server, contact, Optional. English, root only.",
-        "templates/md/llms-full.txt": "/llms-full.txt: the whole CV as one markdown file. English.",
-        "templates/md/corpus/": "The MCP corpus documents: profile.md, experience.md, role.md (one per role), education.md, courses.md, skills.md, contact.md. English; each opens with '# Title'."
+        "templates/md/llms-full.txt": "/llms-full.txt: the whole CV as one markdown file. English. Every section names its page on a `Page:` line (top-level ones from corpus_urls, roles from role_facts), which assets/webmcp.js's search_site relies on for URLs.",
+        "templates/md/corpus/": "The MCP corpus documents: profile.md, experience.md, role.md (one per role), education.md, courses.md, skills.md, contact.md. English; each opens with '# Title'.",
+        "templates/md/skills/": "Agent Skills (agentskills.io): caleb-sargeant-profile.md and calebsargeant-mcp.md, each opening with YAML front matter (name, one-line description) that build.py parses. Rendered with the llms.txt values plus corpus_docs into dist/.well-known/agent-skills/<name>/SKILL.md."
       },
       "depends_on": ["data", "assets"]
     },
     "assets": {
       "path": "assets",
-      "purpose": "House style and behaviour, copied into dist/ byte for byte. site.css holds every design token and component; the JS is progressive enhancement only, so the site is complete without it. print.css is a separate stylesheet used only by templates/print/*.",
+      "purpose": "House style and behaviour, copied into dist/ byte for byte. site.css holds every design token and component; the JS is progressive enhancement only, so the site is complete without it. webmcp.js is inert unless the browser has the WebMCP API. print.css is a separate stylesheet used only by templates/print/*.",
       "exports": [
         "assets/site.css",
         "assets/site.js",
         "assets/hero-net.js",
+        "assets/webmcp.js",
         "assets/print.css",
         "assets/mark.svg",
         "assets/favicon.svg",
@@ -100,7 +103,8 @@
         "assets/icon-192.png": "Generated 192x192 circular portrait: the favicon Google shows in results, the web manifest icon, and the docs site's favicon and header logo (copied into CalebSargeant/docs).",
         "assets/icon-512.png": "Generated 512x512 circular portrait for the web manifest.",
         "assets/icon-maskable-512.png": "Generated 512x512 square portrait, the manifest's maskable icon.",
-        "assets/site.webmanifest": "Web app manifest: name, colours and the portrait icons. display is browser, so it is metadata, not an install prompt."
+        "assets/site.webmanifest": "Web app manifest: name, colours and the portrait icons. display is browser, so it is metadata, not an install prompt.",
+        "assets/webmcp.js": "WebMCP tools for an agent in the browser: read_page (a page's markdown twin), search_site (sections of /llms-full.txt with their Page: URLs), get_contact (from base.html's data-contact) and open_page (navigates). Registers with document.modelContext, navigator.modelContext or the older provideContext(), whichever exist; one AbortController unregisters them on pagehide. Never defines the API."
       },
       "depends_on": []
     },
@@ -113,7 +117,7 @@
         "scripts/render_images.py"
       ],
       "files": {
-        "scripts/build.py": "Loads data/*.yml, enriches roles (labels, durations, duties_see resolution, sorting), renders every entry in PAGES into dist/ plus a markdown twin of each sitemap page, copies assets and the root files, appends a canonical Link rule per twin to dist/_headers (failing past 100 rules), writes sitemap.xml, llms.txt and llms-full.txt, and writes the MCP corpus to .docs-index/index/website.json (schema 1, byte-identical for an unchanged build, anchors checked against the built pages). PAGES, PDFS and CORPUS are the page, document and corpus registries. Also serves dist/ with --serve.",
+        "scripts/build.py": "Loads data/*.yml, enriches roles (labels, durations, duties_see resolution, sorting), renders every entry in PAGES into dist/ plus a markdown twin of each sitemap page, copies assets and the root files, appends a canonical Link rule per twin to dist/_headers (failing past 100 rules), writes sitemap.xml, llms.txt and llms-full.txt, writes the MCP corpus to .docs-index/index/website.json (schema 1, byte-identical for an unchanged build, anchors checked against the built pages), then renders SKILLS into dist/.well-known/agent-skills/ with an index.json (Agent Skills Discovery v0.2.0) whose SHA-256 digests are taken from the bytes written. PAGES, PDFS, CORPUS and SKILLS are the page, document, corpus and skill registries. Also serves dist/ with --serve.",
         "scripts/render_pdf.py": "Serves dist/ on an ephemeral localhost port and drives Playwright's Chromium to print the three sheets to dist/downloads/. Awaits document.fonts.ready, prints A4 with zero margins, warns past the MAX_PAGES budget. `--check` asserts the PDFs exist and are non-trivial.",
         "scripts/render_images.py": "Generates the committed images: the OG card from templates/social/og.html and the raster favicons, the manifest icons and favicon.ico, all face-cropped from assets/img/caleb.jpg. Run by hand, not by the build."
       },
@@ -149,7 +153,7 @@
       ],
       "files": {
         "wrangler.toml": "The assets-only Worker: dist/ as the asset directory, 404-page not-found handling, workers_dev off with preview_urls explicitly on, and plain Workers routes for the apex and www. The apex is canonical; www is 301'd to it by a zone Redirect Rule that lives in Cloudflare, not here.",
-        "_headers": "CSP (third parties: Google Fonts, and the Cloudflare Web Analytics beacon the zone injects), HSTS, Permissions-Policy, cache policy and charset=utf-8 on .md and .txt. Authoritative only because the Worker has no code in the request path. build.py appends the per-page and per-twin Link rules in dist/.",
+        "_headers": "CSP (third parties: Google Fonts, and the Cloudflare Web Analytics beacon the zone injects), HSTS, Permissions-Policy, cache policy, charset=utf-8 on .md and .txt, and Access-Control-Allow-Origin on the agent catalogs and /.well-known/agent-skills/ (index.json pinned to application/json). Authoritative only because the Worker has no code in the request path. build.py appends the per-page and per-twin Link rules in dist/.",
         "Makefile": "The front door: install, build, pdf, serve, clean. Everything real is in scripts/build.py.",
         "requirements.txt": "jinja2, pyyaml, playwright. Floors rather than pins, because none of it ships in the built site.",
         "robots.txt": "Content Signals, a Disallow on /print/ so the print sheets do not compete with the pages they mirror, the apex Sitemap line, and comments pointing assistants at llms.txt, llms-full.txt, the twins and the MCP server.",
@@ -174,8 +178,8 @@
   "callgraph_highlights": [
     {
       "caller": "scripts/build.py:main",
-      "calls": ["build_context", "render", "copy_static", "write_headers", "write_sitemap", "write_agent_files", "scripts/render_pdf.py"],
-      "note": "One pass: load the five YAML files, enrich roles, render every entry in PAGES and its markdown twin, copy assets and root files, append the twins' canonical Link rules to dist/_headers, write the sitemap, then llms.txt, llms-full.txt and the MCP corpus from the English context. dist/ is deleted first, so nothing survives a build that was not produced by it. --pdf shells out to render_pdf.py afterwards."
+      "calls": ["build_context", "render", "copy_static", "write_headers", "write_sitemap", "write_agent_files", "write_agent_skills", "scripts/render_pdf.py"],
+      "note": "One pass: load the five YAML files, enrich roles, render every entry in PAGES and its markdown twin, copy assets and root files, append the twins' canonical Link rules to dist/_headers, write the sitemap, then llms.txt, llms-full.txt and the MCP corpus from the English context, then the agent skills and their digest index. dist/ is deleted first, so nothing survives a build that was not produced by it. --pdf shells out to render_pdf.py afterwards."
     },
     {
       "caller": "scripts/render_pdf.py:render_all",
@@ -184,7 +188,7 @@
     },
     {
       "caller": "templates/*.html",
-      "calls": ["templates/base.html", "assets/site.css", "assets/site.js", "assets/hero-net.js"],
+      "calls": ["templates/base.html", "assets/site.css", "assets/site.js", "assets/hero-net.js", "assets/webmcp.js"],
       "note": "Every site page extends base.html and links the one stylesheet and the one script. The print sheets deliberately do not: they are standalone documents linking assets/print.css only, with no JS."
     },
     {
