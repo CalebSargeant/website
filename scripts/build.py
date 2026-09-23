@@ -653,7 +653,7 @@ def copy_static() -> None:
     """
     shutil.copytree(ROOT / "assets", OUT / "assets",
                     ignore=shutil.ignore_patterns(".DS_Store", "__pycache__"))
-    for name in ("robots.txt", "favicon.ico", ".nojekyll", "_headers"):
+    for name in ("robots.txt", "favicon.ico", ".nojekyll", "_headers", "_redirects"):
         src = ROOT / name
         if src.exists():
             shutil.copy2(src, OUT / name)
@@ -668,15 +668,31 @@ def count_header_rules(text: str) -> int:
                if line.strip() and not line[0].isspace() and not line.startswith("#"))
 
 
-def write_headers() -> tuple[int, int]:
-    """Append a canonical Link header for every markdown twin to dist/_headers.
+#: What a locale's home page advertises to an agent in its Link header, beside its
+#: markdown twin: the two catalogs in .well-known/ that point at the MCP server, and
+#: llms.txt. isitagentready.com (the scan behind Cloudflare's Agent Readiness page)
+#: reads the home page's headers for exactly these.
+HOME_LINKS = ('</.well-known/api-catalog>; rel="api-catalog", '
+              '</.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json", '
+              '</llms.txt>; rel="describedby"; type="text/plain"')
 
-    A twin is the same content as its page, so without this a search engine
-    sees two copies of every page and may rank the plain one. The HTTP Link
-    header is the only way a text file can say rel="canonical", and it points
-    each twin back at the page it copies. Generated rather than written into
-    _headers because the set is PAGES x LOCALES: a page or locale added here
-    gets its rule without anyone remembering to add one there.
+
+def write_headers() -> tuple[int, int]:
+    """Append the Link headers that pair every page with its markdown twin.
+
+    On the twin, a canonical Link back to its page. A twin is the same content
+    as its page, so without it a search engine sees two copies of every page and
+    may rank the plain one, and a text file has no <head> to say so in.
+
+    On the page, an alternate Link to its twin plus `Vary: Accept`. The HTML
+    <head> already names the twin, but an agent reads headers before it parses
+    anything, and a Transform Rule on the zone (not in this repo) rewrites a
+    request that asks for `Accept: text/markdown` to the twin, so the same URL
+    answers two ways and caches have to know that.
+
+    Generated rather than written into _headers because the set is PAGES x
+    LOCALES: a page or locale added here gets its rules without anyone
+    remembering to add them there.
 
     Returns (rules appended, rules in total).
     """
@@ -687,10 +703,15 @@ def write_headers() -> tuple[int, int]:
             if twin.get("markdown"):
                 rules.append(f"{twin['markdown']}\n"
                              f"  Link: <{SITE['base_url']}{twin['path']}>; rel=\"canonical\"\n")
+                links = f'<{twin["markdown"]}>; rel="alternate"; type="text/markdown"'
+                if twin["path"] == loc["prefix"] + "/":
+                    links += ", " + HOME_LINKS
+                rules.append(f"{twin['path']}\n  Link: {links}\n  Vary: Accept\n")
     target = OUT / "_headers"
     with target.open("a", encoding="utf-8") as fh:
         fh.write("\n# Appended by scripts/build.py (write_headers): each markdown twin\n"
-                 "# names its page as canonical. Edit the generator, not this.\n")
+                 "# names its page as canonical, and each page names its twin as an\n"
+                 "# alternate. Edit the generator, not this.\n")
         fh.write("\n".join(rules))
     total = count_header_rules(target.read_text(encoding="utf-8"))
     # Better a red build than finding out in production what Cloudflare does

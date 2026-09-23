@@ -1,0 +1,9 @@
+# Redirects for calebsargeant.com, applied by the Workers asset server.
+# https://developers.cloudflare.com/workers/static-assets/redirects/
+#
+# The MCP server's card lives with the server, at <endpoint>/server-card, which is
+# the location the Server Card extension reserves (modelcontextprotocol.io SEP-2127).
+# /.well-known/ai-catalog.json already points there. This line is for the clients
+# and scanners still probing the older per-domain path from the first draft of that
+# proposal: it sends them to the one copy rather than keeping a second one here.
+/.well-known/mcp/server-card.json https://mcp.calebsargeant.com/server-card 302

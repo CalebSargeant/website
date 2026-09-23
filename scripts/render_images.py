@@ -12,9 +12,17 @@ templates/social/og.html.
 Outputs
     assets/og/og-default.png     1200x630, the Open Graph / Twitter card
     assets/apple-touch-icon.png  180x180, square and opaque (iOS masks it itself)
+    assets/icon-512.png          512x512, circular, transparent
+    assets/icon-192.png          192x192, circular, transparent
+    assets/icon-maskable-512.png 512x512, square and opaque, for the manifest
     assets/favicon-32.png        32x32, circular, transparent
     assets/favicon-16.png        16x16, circular, transparent
     favicon.ico                  16+32, at the repo root so /favicon.ico resolves
+
+The two large circles are what Google and the web manifest pick from: Google
+asks for a favicon bigger than 48px, and a 32px one is upscaled into mush in
+its results. CalebSargeant/docs copies icon-192.png and favicon-32.png as its
+own favicon and header logo, so re-copy them there after regenerating.
 
 The favicons are the portrait, not the mark. A photo scaled to 16px is mush
 unless it is cropped to the face first, so FACE_CROP below zooms and re-centres
@@ -133,18 +141,24 @@ def main() -> int:
 
             # Favicons, cropped from the portrait. The tab icon is Caleb's face:
             # on a personal site that identifies the tab faster than a mark does.
-            for size in (180, 32, 16):
-                apple = size == 180
-                name = "apple-touch-icon.png" if apple else f"favicon-{size}.png"
+            #
+            # iOS applies its own rounded mask and composites onto black, so the
+            # touch icon is square and opaque, and so is the manifest's maskable
+            # icon, which Android crops to whatever shape the launcher uses. The
+            # rest are circles on transparency, which is what reads cleanly
+            # beside a favicon row of other sites.
+            icons = (("apple-touch-icon.png", 180, False),
+                     ("icon-512.png", 512, True),
+                     ("icon-192.png", 192, True),
+                     ("icon-maskable-512.png", 512, False),
+                     ("favicon-32.png", 32, True),
+                     ("favicon-16.png", 16, True))
+            for name, size, circular in icons:
                 target = ROOT / "assets" / name
                 page = browser.new_page(viewport={"width": size, "height": size},
                                         device_scale_factor=1)
-                # iOS applies its own rounded mask and composites onto black, so
-                # the touch icon is square and opaque; the tab icons are circles
-                # on transparency, which is what reads cleanly beside a favicon
-                # row of other sites.
-                page.set_content(icon_html(size, circular=not apple), wait_until="load")
-                page.screenshot(path=str(target), omit_background=not apple)
+                page.set_content(icon_html(size, circular=circular), wait_until="load")
+                page.screenshot(path=str(target), omit_background=circular)
                 page.close()
                 print(f"  {target.relative_to(ROOT)}  {size}x{size}")
         finally:

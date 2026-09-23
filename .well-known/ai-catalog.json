@@ -1,0 +1,26 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Caleb Sargeant",
+    "identifier": "calebsargeant.com",
+    "documentationUrl": "https://calebsargeant.com/llms.txt",
+    "logoUrl": "https://calebsargeant.com/assets/icon-192.png"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:calebsargeant.com:mcp:calebsargeant",
+      "displayName": "Caleb Sargeant",
+      "type": "application/mcp-server-card+json",
+      "url": "https://mcp.calebsargeant.com/server-card",
+      "description": "Public, read-only MCP server over Caleb Sargeant's CV, website and technical docs. No sign-in.",
+      "tags": ["cv", "platform engineering", "networking", "security", "kubernetes", "documentation"],
+      "representativeQueries": [
+        "Who is Caleb Sargeant and what does he do?",
+        "What experience does Caleb Sargeant have with Kubernetes, Terraform and Azure?",
+        "Which certifications does Caleb Sargeant hold?",
+        "How do I contact Caleb Sargeant?",
+        "Find Caleb Sargeant's notes on securing a Cisco router"
+      ]
+    }
+  ]
+}
