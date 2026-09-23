@@ -63,11 +63,14 @@
   # origin's /cdn-cgi/rum, which default-src 'self' already covers. Nothing
   # else: no CDN, no embeds.
   #
-  # There is deliberately no connect-src directive, so same-origin fetches
-  # inherit default-src 'self'; if you ever add one, 'self' must be restated in
-  # it or every same-origin fetch (the beacon's /cdn-cgi/rum included) breaks
-  # in a way that looks exactly like the endpoint being down.
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; form-action 'self' mailto:; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
+  # One more origin, and only for fetch: chat.magmamoose.com, the backend of
+  # the Nievah chat widget base.html embeds. Its script and avatars are
+  # vendored under /assets/nievah/, so script-src and img-src stay 'self'; the
+  # widget styles its shadow root with a <style>, which 'unsafe-inline' in
+  # style-src already allows. connect-src restates 'self' on purpose: without
+  # it every same-origin fetch (the beacon's /cdn-cgi/rum included) breaks in a
+  # way that looks exactly like the endpoint being down.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://chat.magmamoose.com; form-action 'self' mailto:; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
 
 # NOTE ON HTML: there is deliberately no Cache-Control rule for pages here.
 # Adding one would have to live on /* , which also matches /assets/* and every
