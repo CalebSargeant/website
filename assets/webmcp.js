@@ -151,8 +151,8 @@
       words.forEach(function (w) { if (low.indexOf(w) >= 0) n += 1; });
       if (n > most || (!best && line.trim())) { if (n > most) most = n; best = line; }
     });
-    best = best.replace(/^[\s#>*-]+/, '').replace(/\s+/g, ' ').trim();
-    return best.length > 280 ? best.slice(0, 279).replace(/\s+\S*$/, '') + '…' : best;
+    best = best.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/^[\s#>*-]+/, '').replace(/\s+/g, ' ').trim();
+    return best.length > 280 ? best.slice(0, 279).replace(/\s+\S*$/, '') + '\u2026' : best;
   }
 
   // Sections matching more of the words come first. Within that, a word in the
