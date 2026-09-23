@@ -551,8 +551,14 @@
   /* base.html sets the initial theme in an inline head script to avoid a
    * flash. This only reads that state and flips it. */
 
+  // The stored choice if there is one, otherwise what the OS asks for, which is
+  // what the CSS is already showing. Reading only data-theme called an OS-light
+  // page "dark": the toggle offered "Switch to the light theme" on a light page,
+  // and its first click changed nothing anyone could see.
   function currentTheme() {
-    return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    var set = root.getAttribute('data-theme');
+    if (set === 'light' || set === 'dark') return set;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
   }
 
   function paintThemeControls(theme) {
