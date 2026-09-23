@@ -90,12 +90,25 @@ Fonts come from Google Fonts (`Space Grotesk` 400/500/600/700, `JetBrains Mono`
 the external docs link and never takes `.active`: it leaves the site, so no page
 id can match it. JS adds `.solid` past
 24px of scroll, injects `.nav-toggle` and sets `.nav-enhanced` on `.site-nav`,
-and toggles `.menu-open`.
+and toggles `.menu-open`. The toggle's two names are `data-label-open` and
+`data-label-close` on `.nav-links`, in the page's language. The bar is one
+height (every `.nav-actions .btn` is 40px) and collapses to the menu at
+**1060px** (the media query and `NAV_COLLAPSE` in `site.js` must agree); up to
+1240px the language switch shows two-letter codes and the palette button drops
+its `<kbd>`. Below 560px the bar holds the brand, the language switch and the
+toggle only, and `.nav-sheet-tools` (a second `[data-theme-toggle]` and
+`[data-cmdk-open]`, inside `.nav-links`) appears at the foot of the open sheet.
+Without JS the links wrap onto their own row instead. Icons inside `.btn` and
+`.brand` are `flex: none; max-width: none`: the base `svg { max-width: 100% }`
+otherwise lets a squeezed flex row shrink them to nothing.
 
 **Buttons**, `.btn` base; variants `.btn-sig` (gradient fill), `.btn-ghost`
 (hairline), `.btn-quiet` (text only). Buttons lift 2px on hover;
 `.btn[data-magnetic]` additionally leans up to 6px toward a fine pointer within
 40px of it, written to `translate` by `site.js` so it composes with the lift.
+`.btn-copy` is the small copy button: `[data-copy]` holds the value,
+`[data-copy-label]` the slot that flashes, and `data-copied` the word it flashes
+(in the page's language).
 
 **Kicker / chips**, `.kicker` (mono, uppercase, tracked), `.chip` (small mono
 pill), `.chip-row`, `.pill-live` (green dot + label).
@@ -126,11 +139,25 @@ Filter buttons are `.filter-btn[data-filter]`; the matrix root carries
 
 **CV page**, `.cv-toolbar` (focus filter + download), `.cv-doc` (the on-screen
 document), `.cv-section`, `.cv-role`. Roles carry `data-focus="platform cloud"`;
-the toolbar sets `data-cv-focus` on `.cv-doc`.
+the toolbar sets `data-cv-focus` on `.cv-doc`. The toolbar sticks under the
+bar (`top: 68px`) above 760px and is static below it, where stuck it filled a
+third of a phone screen.
+
+**Ask an AI page** (`/ai/`), `.copy-line` (a `<code>` and its `.btn-copy`,
+wrapping), `.ai-where` (the mono line naming where a client runs), `.ai-steps`,
+`.ai-note`, `.ai-other`, and `.ai-prompts` → `.ai-prompt` (a question with its
+copy button). `.hero-ask` is the quiet line under the home hero that links it.
+
+**Chat widget**, `<nievah-chat>`, vendored from MagmaMoose/nievah and embedded
+by `base.html`. It sets `data-nievah` on `<html>` (`"open"` while its panel is
+open); `html[data-nievah] .to-top` lifts the arrow above its launcher at each of
+the launcher's sizes (44/56/64px, 22px in), and hides it while the panel is
+open. It is handed `--font-sans: var(--font-display)`.
 
 **Footer**, `.site-foot` → `.foot-inner`, `.foot-links`, `[data-year]`.
 
-**Injected by JS** (never in a template): `.to-top`, `.scroll-progress`,
+**Injected by JS** (never in a template): `.to-top` (named from `<body
+data-label-to-top>`), `.scroll-progress`,
 `.cursor-glow`, `.nav-toggle`, `.cmdk` markup is in `base.html` but stays
 `hidden` until JS runs.
 
@@ -144,7 +171,7 @@ never blank.
 
 | Name | Trigger | Implementation |
 | --- | --- | --- |
-| Reveal | IntersectionObserver | `.reveal` → `.in`; `--d` index for stagger; 1600ms safety net that force-adds `.in` |
+| Reveal | IntersectionObserver | `.reveal` → `.in` once its top is 10% up the viewport (`threshold: 0`, never a fraction: a block taller than the viewport can never show a fixed fraction of itself); `--d` index for stagger; 1600ms safety net that force-adds `.in` |
 | Hero network | rAF loop | `hero-net.js` on `#hero-net`; pauses when off-screen or tab hidden |
 | Typewriter | on load | `[data-typewriter]` types its own `data-typewriter` value |
 | Count-up | reveal | `[data-count-to]`, 1100ms ease-out |

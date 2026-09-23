@@ -13,7 +13,11 @@ ui:
   nav.docs: Docs
   nav.language: Taal
   nav.download_cv: CV downloaden
+  nav.menu_open: Menu
+  nav.menu_close: Menu sluiten
+  nav.search: Doorzoek de site
   common.skip_to_content: Naar de inhoud
+  common.to_top: Terug naar boven
   common.to: tot
   common.verify: Verifiëren
   common.current: Huidig
@@ -187,6 +191,73 @@ ui:
   contact.doc.cover: Motivatiebrief
   contact.doc.cover_note: Eén pagina, algemeen. Vraag om een versie die op jouw rol geschreven is en die
     krijg je.
+  common.copied: Gekopieerd
+  chat.intro: Hoi, ik ben Nievah, de AI-assistent van Magma Moose, de studio die Caleb mede heeft
+    opgericht. Vraag me naar zijn ervaring en vaardigheden, of hij bij je rol past.
+  chat.placeholder: Vraag iets over Caleb…
+  chat.contact_label: mail Caleb
+  chat.suggestions: Past Caleb bij een rol als platform engineer?|Wat heeft Caleb met Kubernetes gedaan?|Wat
+    is Magma Moose?
+  ai.kicker: Vraag het een AI
+  ai.title: Vraag je AI of ik bij de rol pas.
+  ai.lead: Een cv naast een vacaturetekst leggen is precies het soort werk waar een assistent goed in is,
+    dus alles op deze site is ook voor assistenten gepubliceerd, niet alleen voor mensen. Vraag het Nievah
+    hier, of koppel je eigen assistent en stel je vraag met de vacaturetekst erbij.
+  ai.nievah.title: Vraag het Nievah, hier
+  ai.nievah.body: Nievah is de assistent achter de knop rechtsonder op elke pagina. Ze antwoordt op basis van
+    deze site en mijn documentatie, en als assistent van Magma Moose kan ze ook over de studio vertellen.
+    Ze is een AI, zegt dat ook, en weet alleen wat gepubliceerd is.
+  ai.nievah.hint: Niets in te stellen. Open de chat en stel je vraag.
+  ai.own.title: Koppel je eigen assistent
+  ai.own.body: '{server} is een openbare MCP-server die alleen kan lezen: niets te installeren en geen login.
+    Hij doorzoekt deze site (het cv, elke rol volledig, opleidingen, cursussen en vaardigheden) en mijn
+    documentatie, en ziet niets wat daar niet gepubliceerd is.'
+  ai.own.address: Serveradres
+  ai.copy: Kopiëren
+  # Starts with the object so the visible word (Kopiëren) is inside the name.
+  ai.copy_aria: '{what} kopiëren naar het klembord'
+  ai.copy_what.address: het serveradres
+  ai.copy_what.command: het commando
+  ai.copy_what.prompt: de vraag
+  ai.setup.kicker: Instellen
+  ai.setup.title: Eén adres, elke assistent
+  ai.setup.lead: Dit zijn de stappen die elk product vandaag documenteert. Het adres is overal hetzelfde. De
+    menunamen staan erbij zoals de apps ze in het Engels tonen.
+  ai.claude.where: claude.ai en de desktop-app
+  ai.claude.step1: Open Customize, en dan Connectors.
+  ai.claude.step2: Kies +, en dan Add custom connector.
+  ai.claude.step3: Plak het adres en kies Add.
+  ai.claude.step4: Zet hem in een chat aan via het +-menu, onder Connectors.
+  ai.claude.note: Met het gratis abonnement kun je één eigen connector toevoegen. Bij Team en Enterprise
+    voegt een eigenaar hem eerst toe, onder Organization settings.
+  ai.claude_code.where: In een terminal
+  ai.claude_code.note: Voer daarna /mcp uit in een sessie om te zien dat hij verbonden is.
+  ai.codex.where: De CLI, de IDE-extensie en de ChatGPT-desktop-app
+  ai.codex.note: Alle drie delen deze configuratie, dus één commando is genoeg.
+  ai.chatgpt.where: Op het web, met een Plus-, Pro-, Business-, Enterprise- of Edu-abonnement
+  ai.chatgpt.body: Zet Developer mode aan onder Settings, Security and login. Voeg daarna een developer-mode-app
+    toe met het adres hierboven en zonder authenticatie.
+  ai.other.title: Iets anders
+  ai.other.body: Elke client die MCP over Streamable HTTP spreekt, kan hetzelfde adres gebruiken, zonder authenticatie.
+  ai.prompts.kicker: Stel dan je vraag
+  ai.prompts.title: Vragen die de moeite waard zijn
+  ai.prompts.lead: Plak de vacaturetekst bij de eerste. Vraag ook waar ik tekortschiet, niet alleen waar ik
+    pas; die helft is meestal de nuttigste.
+  ai.prompt.fit: 'Vergelijk Caleb Sargeant met behulp van de calebsargeant MCP-server met deze vacaturetekst.
+    Waar past hij, en waar zou hij moeten groeien? [plak de vacaturetekst]'
+  ai.prompt.kubernetes: Wat heeft Caleb met Kubernetes en Terraform gedaan, en in welke rollen?
+  ai.prompt.security: Vat de netwerk- en securityervaring van Caleb samen in vijf regels.
+  ai.prompt.certs: Welke certificeringen heeft Caleb, en waar studeert hij nu voor?
+  ai.team.title: Zoek je een team in plaats van een persoon?
+  ai.team.body: Magma Moose, de development studio die ik mede heb opgericht, doet platform-, cloud-, netwerk-
+    en security-engineering, volledig voor je of samen met je eigen engineers. De tools zijn op dezelfde
+    manier gedocumenteerd, op {server}.
+  ai.team.link: Wat Magma Moose doet
+  ai.home_hint: Op zoek naar iemand? {link}
+  ai.home_link: Vraag je AI of ik bij de rol pas
+  ai.contact_hint: Laat je het cv liever door een assistent lezen? {link}
+  ai.contact_link: Vraag een AI naar mij
+  ai.footer_link: Vraag een AI naar mij
   notfound.kicker: HTTP 404
   notfound.lead: Op dat adres staat niets. Het is verplaatst, of de link die je hierheen stuurde klopte
     niet. Alles op de site is één stap verderop.
@@ -209,7 +280,7 @@ ui:
   print.label.web: Web
   print.label.docs: Docs
   print.label.duties: Taken
-  og.lead: '{headline} in {location}. {years} jaar in IT, {roles} engineeringrollen.'
+  og.lead: "{headline} in {location}. {years}\u00a0jaar in IT, {roles}\u00a0engineeringrollen."
   md.header: Markdownversie van {url}, gegenereerd uit dezelfde data als de pagina.
   md.highlights: Hoofdpunten
   md.duties: Taken
@@ -247,7 +318,7 @@ ui:
 pages:
   home:
     title: '{name} · {headline}'
-    description: Platform-, cloud-, netwerk- en security-engineer in Eindhoven. Kubernetes, Terraform,
+    description: Platform-, cloud-, netwerk- en security-engineer in Limburg. Kubernetes, Terraform,
       Azure en AWS, en de netwerken eronder.
     nav: Home
   experience:
@@ -269,6 +340,10 @@ pages:
     title: Contact · Caleb Sargeant
     description: Mail, telefoon, LinkedIn, GitHub, en een link om een tijdslot te plannen.
     nav: Contact
+  ai:
+    title: Vraag je AI naar mij · Caleb Sargeant
+    description: Koppel Claude, Codex of ChatGPT aan de openbare MCP-server van deze site, of vraag het Nievah
+      hier, en ontdek of ik bij je rol pas. Geen login nodig.
   notfound:
     title: Niet gevonden · Caleb Sargeant
     description: Die pagina bestaat niet.
@@ -282,7 +357,7 @@ pages:
     title: Caleb Sargeant, Motivatiebrief
     description: ''
 profile:
-  location: Eindhoven, Nederland
+  location: Limburg, Nederland
   tagline: Platform, cloud, netwerk en security engineering sinds 2012.
   summary: Ik werk sinds 2012 in de IT, gespecialiseerd in platform engineering, automatisering, infrastructure
     as code, netwerken en security. Ik heb van alles beheerd, van bare-metal serverruimtes tot gevirtualiseerde

@@ -40,6 +40,8 @@
       <p class="kicker">{{ t('contact.kicker') }}</p>
       <h1>{{ t('contact.title') }}</h1>
       <p class="lead">{{ t('contact.lead') }}</p>
+      {% set ai_link %}<a href="{{ url('/ai/') }}">{{ t('ai.contact_link') }}</a>{% endset %}
+      <p>{{ (t('ai.contact_hint') | e).format(link=ai_link) }}</p>
       {% if profile.availability.show %}
       {# One label per state, so a `closed` note never renders in the live green. #}
       {% set state_labels = {
@@ -68,7 +70,7 @@
           {# data-copy-label is the slot site.js swaps for "Copied", so the flash
              never eats the rest of the button. #}
           <button type="button" class="btn btn-ghost" data-copy="{{ profile.contact.email }}"
-                  aria-label="{{ t('contact.copy_aria') }}">
+                  data-copied="{{ t('common.copied') }}" aria-label="{{ t('contact.copy_aria') }}">
             <span data-copy-label>{{ t('contact.copy') }}</span>
           </button>
         </p>
