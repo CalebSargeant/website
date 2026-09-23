@@ -39,6 +39,8 @@ This is {{ profile.name }}'s CV site. Every page and document on it is generated
 - {{ md.link('Docs', profile.links.docs) }}: Notes and runbooks, written as they are worked out.
 - {{ md.link('Docs llms.txt', profile.links.docs ~ 'llms.txt') }}: The docs site's own map for assistants.
 - {{ md.link('MCP server', profile.links.mcp) }}: Public, read-only MCP endpoint over Streamable HTTP, no authentication. It searches this site and the docs.
+- {{ md.link('MCP server card', profile.links.mcp ~ 'server-card') }}: The server's name, endpoint and protocol versions, readable before connecting.
+- {{ md.link('AI catalog', md.abs('/.well-known/ai-catalog.json')) }}: The MCP server listed for agents that discover tools per domain. {{ md.link('API catalog', md.abs('/.well-known/api-catalog')) }} says the same as an RFC 9727 linkset.
 
 ## Contact and profiles
 

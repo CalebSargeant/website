@@ -153,10 +153,30 @@
 /*.txt
   Content-Type: text/plain; charset=utf-8
 
+# AGENT DISCOVERY. Two catalogs that point at https://mcp.calebsargeant.com/, for
+# clients that look for tools per domain rather than being told the URL. Both are
+# public, read-only metadata, so any origin may read them.
+#
+# /.well-known/api-catalog is RFC 9727: a Linkset, whose media type carries the
+# RFC's profile, and a Link naming itself as the api-catalog, which the RFC wants on
+# a HEAD. It has no file extension, so without this rule it would go out as
+# application/octet-stream.
+/.well-known/api-catalog
+  Content-Type: application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"
+  Link: </.well-known/api-catalog>; rel="api-catalog"
+  Access-Control-Allow-Origin: *
+
+# The AI Catalog (github.com/Agent-Card/ai-catalog), which the MCP Server Card
+# extension uses for domain-level discovery. Its media type is its own.
+/.well-known/ai-catalog.json
+  Content-Type: application/ai-catalog+json
+  Access-Control-Allow-Origin: *
+
 # CANONICAL LINKS FOR THE MARKDOWN TWINS are not written here. build.py appends
 # them to dist/_headers (write_headers), one per page per locale, each a
 #     Link: <https://calebsargeant.com/experience/>; rel="canonical"
-# on its twin, so search engines index the page and not its plain copy. They
+# on its twin, so search engines index the page and not its plain copy, plus the
+# reverse on each page (an alternate Link to its twin, and Vary: Accept). They
 # are generated because the set is PAGES x LOCALES; a list kept by hand here
 # would fall behind the first time a page was added. The build prints the total
 # rule count and fails if it passes Cloudflare's 100.

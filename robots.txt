@@ -42,6 +42,11 @@ Allow: /
 Disallow: /print/
 Disallow: /nl/print/
 
+# The AI Catalog, for agent registries that read robots.txt for it (the
+# Agentmap line from the Agentic Resource Discovery draft). It lists the MCP
+# server; crawlers that do not know the directive ignore it.
+Agentmap: https://calebsargeant.com/.well-known/ai-catalog.json
+
 # One sitemap for the whole site. It lists every page in every locale, each
 # entry naming the others as hreflang alternates, so there is nothing per
 # language to point at from here.

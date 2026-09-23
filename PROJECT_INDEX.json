@@ -142,15 +142,21 @@
         "requirements.txt",
         "robots.txt",
         ".well-known/security.txt",
+        ".well-known/ai-catalog.json",
+        ".well-known/api-catalog",
+        "_redirects",
         "favicon.ico"
       ],
       "files": {
         "wrangler.toml": "The assets-only Worker: dist/ as the asset directory, 404-page not-found handling, workers_dev off with preview_urls explicitly on, and plain Workers routes for the apex and www. The apex is canonical; www is 301'd to it by a zone Redirect Rule that lives in Cloudflare, not here.",
-        "_headers": "CSP (third parties: Google Fonts, and the Cloudflare Web Analytics beacon the zone injects), HSTS, Permissions-Policy, cache policy and charset=utf-8 on .md and .txt. Authoritative only because the Worker has no code in the request path. build.py appends the per-twin canonical Link rules in dist/.",
+        "_headers": "CSP (third parties: Google Fonts, and the Cloudflare Web Analytics beacon the zone injects), HSTS, Permissions-Policy, cache policy and charset=utf-8 on .md and .txt. Authoritative only because the Worker has no code in the request path. build.py appends the per-page and per-twin Link rules in dist/.",
         "Makefile": "The front door: install, build, pdf, serve, clean. Everything real is in scripts/build.py.",
         "requirements.txt": "jinja2, pyyaml, playwright. Floors rather than pins, because none of it ships in the built site.",
         "robots.txt": "Content Signals, a Disallow on /print/ so the print sheets do not compete with the pages they mirror, the apex Sitemap line, and comments pointing assistants at llms.txt, llms-full.txt, the twins and the MCP server.",
         ".well-known/security.txt": "RFC 9116 disclosure contact. Its Expires is hand-set; nothing stamps it.",
+        ".well-known/ai-catalog.json": "AI Catalog (Agent-Card/ai-catalog) listing the MCP server's card at mcp.calebsargeant.com/server-card, with ARD representativeQueries. Named by robots.txt's Agentmap line and the home pages' Link header.",
+        ".well-known/api-catalog": "RFC 9727 linkset pointing at the MCP server, its card (service-desc) and its guide page (service-doc). _headers sets its linkset+json media type.",
+        "_redirects": "One redirect: the legacy /.well-known/mcp/server-card.json probe to the card on the MCP host.",
         "favicon.ico": "Generated 16+32 icon at the repo root so /favicon.ico resolves. Committed."
       },
       "depends_on": ["scripts"]

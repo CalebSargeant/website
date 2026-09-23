@@ -1,0 +1,28 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://calebsargeant.com/.well-known/api-catalog",
+      "item": [
+        {
+          "href": "https://mcp.calebsargeant.com/",
+          "title": "calebsargeant: a public, read-only MCP server over calebsargeant.com and docs.calebsargeant.com"
+        }
+      ]
+    },
+    {
+      "anchor": "https://mcp.calebsargeant.com/",
+      "service-desc": [
+        {
+          "href": "https://mcp.calebsargeant.com/server-card",
+          "type": "application/mcp-server-card+json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://mcp.calebsargeant.com/",
+          "type": "text/html"
+        }
+      ]
+    }
+  ]
+}

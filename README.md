@@ -66,6 +66,7 @@ off the site is still fully readable and navigable.
 ├── wrangler.toml                the assets-only Worker and its apex + www routes
 ├── _headers                     CSP, HSTS, cache policy, charset on text
 ├── robots.txt · .well-known/security.txt   crawl and disclosure surface
+├── .well-known/ai-catalog.json · api-catalog · _redirects   agent discovery (see Discoverability)
 ├── .github/workflows/deploy.yml production deploys, the corpus publish, PR previews
 ├── dist/                        generated. Deleted and rewritten on every build. Not committed.
 └── .docs-index/                 generated: the MCP corpus, index/website.json. Not committed.
@@ -335,6 +336,23 @@ Wrangler 4 writes to a local simulation and exits 0. The token needs
 `_headers` adds `charset=utf-8` to `.md` and `.txt`. Production serves them as
 bare `text/markdown` and `text/plain`, and `wrangler dev` adds the charset on
 its own, so a missing charset never shows up locally.
+
+### For agents that discover tools per domain
+
+Committed, not generated, because they describe the MCP server rather than the CV:
+
+| File | What it is |
+| --- | --- |
+| `.well-known/ai-catalog.json` | An [AI Catalog](https://github.com/Agent-Card/ai-catalog) with one entry, the MCP server's card at `https://mcp.calebsargeant.com/server-card`, plus the `representativeQueries` [ARD](https://agenticresourcediscovery.org/) registries index. `robots.txt` names it on an `Agentmap:` line. |
+| `.well-known/api-catalog` | The same pointer as an [RFC 9727](https://www.rfc-editor.org/rfc/rfc9727) linkset. `_headers` gives it its media type, which it cannot get from a file extension. |
+| `_redirects` | Sends the older `/.well-known/mcp/server-card.json` probe to the card on the MCP host, so there is one copy of it. |
+
+`build.py` also gives every page a `Link` header naming its twin, with `Vary: Accept`,
+and the two home pages a `Link` to both catalogs and `llms.txt`. The `Vary` is there
+because a Transform Rule on the zone (in Cloudflare, not in this repo) rewrites a
+request with `Accept: text/markdown` to the page's twin: the free-plan stand-in for
+Cloudflare's Markdown for Agents, which needs Pro. [isitagentready.com](https://isitagentready.com/),
+the scan behind the dashboard's Agent Readiness page, checks all of the above.
 
 ## Design
 
