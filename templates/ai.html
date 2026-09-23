@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{#
+  /ai: how to ask an assistant about Caleb. Two routes: Nievah, the chat widget
+  on every page, and the public MCP server, which any MCP client can be pointed
+  at. Every address and command is plain text first, with a copy button beside
+  it, so the page is complete with JavaScript off.
+
+  Not in the nav (see PAGES in build.py). Linked from the home hero, the contact
+  page and the footer.
+
+  The client steps are the ones each product documents, checked 2026-09-23:
+  Claude's custom connectors (support.claude.com), Claude Code's `claude mcp add`
+  (code.claude.com/docs/en/mcp), Codex's `codex mcp add` (the Codex MCP docs)
+  and ChatGPT's developer mode (developers.openai.com). Menu names drift; when
+  one does, the fix is a string in data/i18n/, not this file.
+#}
+{% block body_class %}page-ai{% endblock %}
+
+{% set mcp_host = profile.links.mcp | replace('https://', '') | trim('/') %}
+{% set mm_mcp_host = profile.links.magmamoose_mcp | replace('https://', '') | trim('/') %}
+{% set claude_cmd = 'claude mcp add --transport http calebsargeant ' ~ profile.links.mcp %}
+{% set codex_cmd = 'codex mcp add calebsargeant --url ' ~ profile.links.mcp %}
+
+{# data-copied is the word site.js flashes in the button, in the page's
+   language. The aria-label names what is copied and contains the visible word,
+   so voice control can still say "click Copy". #}
+{% macro copy_button(value, what) -%}
+<button type="button" class="btn btn-ghost btn-copy" data-copy="{{ value }}" data-copied="{{ t('common.copied') }}"
+        aria-label="{{ t('ai.copy_aria', what=t('ai.copy_what.' ~ what)) }}">
+  <span data-copy-label>{{ t('ai.copy') }}</span>
+</button>
+{%- endmacro %}
+
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <header class="section-head reveal" style="--d:0">
+      <p class="kicker">{{ t('ai.kicker') }}</p>
+      <h1>{{ t('ai.title') }}</h1>
+      <p class="lead">{{ t('ai.lead') }}</p>
+    </header>
+
+    <div class="grid-2">
+      <article class="card reveal" style="--d:0">
+        <h2>{{ t('ai.nievah.title') }}</h2>
+        <p>{{ t('ai.nievah.body') }}</p>
+        <p class="ai-note">{{ t('ai.nievah.hint') }}</p>
+      </article>
+
+      <article class="card reveal" style="--d:1">
+        <h2>{{ t('ai.own.title') }}</h2>
+        {% set server_link %}<a href="{{ profile.links.mcp }}" rel="noopener">{{ mcp_host }}</a>{% endset %}
+        <p>{{ (t('ai.own.body') | e).format(server=server_link) }}</p>
+        <p class="kicker">{{ t('ai.own.address') }}</p>
+        <div class="copy-line">
+          <code>{{ profile.links.mcp }}</code>
+          {{ copy_button(profile.links.mcp, 'address') }}
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="setup">
+  <div class="wrap">
+    <div class="section-head reveal" style="--d:0">
+      <p class="kicker">{{ t('ai.setup.kicker') }}</p>
+      <h2>{{ t('ai.setup.title') }}</h2>
+      <p>{{ t('ai.setup.lead') }}</p>
+    </div>
+
+    <div class="grid-2">
+      <article class="card reveal" style="--d:0">
+        <h3>Claude</h3>
+        <p class="ai-where mono">{{ t('ai.claude.where') }}</p>
+        <ol class="ai-steps">
+          <li>{{ t('ai.claude.step1') }}</li>
+          <li>{{ t('ai.claude.step2') }}</li>
+          <li>{{ t('ai.claude.step3') }}</li>
+          <li>{{ t('ai.claude.step4') }}</li>
+        </ol>
+        <p class="ai-note">{{ t('ai.claude.note') }}</p>
+      </article>
+
+      <article class="card reveal" style="--d:1">
+        <h3>Claude Code</h3>
+        <p class="ai-where mono">{{ t('ai.claude_code.where') }}</p>
+        <div class="copy-line">
+          <code>{{ claude_cmd }}</code>
+          {{ copy_button(claude_cmd, 'command') }}
+        </div>
+        <p class="ai-note">{{ t('ai.claude_code.note') }}</p>
+      </article>
+
+      <article class="card reveal" style="--d:2">
+        <h3>Codex</h3>
+        <p class="ai-where mono">{{ t('ai.codex.where') }}</p>
+        <div class="copy-line">
+          <code>{{ codex_cmd }}</code>
+          {{ copy_button(codex_cmd, 'command') }}
+        </div>
+        <p class="ai-note">{{ t('ai.codex.note') }}</p>
+      </article>
+
+      <article class="card reveal" style="--d:3">
+        <h3>ChatGPT</h3>
+        <p class="ai-where mono">{{ t('ai.chatgpt.where') }}</p>
+        <p>{{ t('ai.chatgpt.body') }}</p>
+      </article>
+    </div>
+
+    <p class="ai-other reveal"><strong>{{ t('ai.other.title') }}.</strong> {{ t('ai.other.body') }}</p>
+  </div>
+</section>
+
+<section class="section" id="ask">
+  <div class="wrap">
+    <div class="section-head reveal" style="--d:0">
+      <p class="kicker">{{ t('ai.prompts.kicker') }}</p>
+      <h2>{{ t('ai.prompts.title') }}</h2>
+      <p>{{ t('ai.prompts.lead') }}</p>
+    </div>
+
+    <ul class="ai-prompts">
+      {% for key in ['fit', 'kubernetes', 'security', 'certs'] %}
+      <li class="ai-prompt reveal" style="--d:{{ loop.index0 }}">
+        <p>{{ t('ai.prompt.' ~ key) }}</p>
+        {{ copy_button(t('ai.prompt.' ~ key), 'prompt') }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    {# The way back to the studio. mcp.magmamoose.com is text, not a link: it
+       answers a browser with a 405, and a link that errors is worse than none. #}
+    <article class="card reveal">
+      <h2>{{ t('ai.team.title') }}</h2>
+      {% set mm_server %}<code>{{ mm_mcp_host }}</code>{% endset %}
+      <p>{{ (t('ai.team.body') | e).format(server=mm_server) }}</p>
+      <div class="cta-row">
+        <a class="btn btn-ghost" href="{{ profile.links.magmamoose_services }}" rel="noopener" target="_blank">{{ t('ai.team.link') }}</a>
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

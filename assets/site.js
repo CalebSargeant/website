@@ -183,6 +183,10 @@
 
   var siteNav = null;
 
+  // The width at and below which the link row becomes a menu. The same number
+  // is the max-width of the collapse media query in site.css; keep them equal.
+  var NAV_COLLAPSE = 1060;
+
   function initNav() {
     siteNav = $('.site-nav');
     if (!siteNav) return;
@@ -198,10 +202,15 @@
 
     if (!links.id) links.id = 'nav-links';
 
+    // The button's two names come from the template, in the page's language.
+    // English is only the fallback for a page that does not supply them.
+    var labelOpen = links.getAttribute('data-label-open') || 'Menu';
+    var labelClose = links.getAttribute('data-label-close') || 'Close menu';
+
     var toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.className = 'nav-toggle';
-    toggle.setAttribute('aria-label', 'Menu');
+    toggle.setAttribute('aria-label', labelOpen);
     toggle.setAttribute('aria-expanded', 'false');
     toggle.setAttribute('aria-controls', links.id);
     toggle.innerHTML = '<span class="nav-toggle-bar"></span>' +
@@ -215,24 +224,36 @@
     function setMenu(open) {
       siteNav.classList.toggle('menu-open', open);
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Menu');
+      toggle.setAttribute('aria-label', open ? labelClose : labelOpen);
     }
     function isOpen() { return siteNav.classList.contains('menu-open'); }
+
+    // The palette can be opened from inside the sheet on a phone. While it is
+    // up, the sheet stays open underneath it, so closing the palette hands
+    // focus back to the button that opened it rather than to a hidden one.
+    function outside(target) {
+      return !siteNav.contains(target) && !closest(target, '.cmdk');
+    }
 
     on(toggle, 'click', function (e) { e.preventDefault(); setMenu(!isOpen()); });
     on(links, 'click', function (e) { if (closest(e.target, 'a')) setMenu(false); });
 
+    // Registered before the palette's own Escape handler, so it runs first and
+    // leaves an Escape that belongs to the palette alone.
     on(document, 'keydown', function (e) {
-      if (e.key === 'Escape' && isOpen()) { setMenu(false); toggle.focus(); }
+      if (e.key === 'Escape' && isOpen() && !root.classList.contains('cmdk-open')) {
+        setMenu(false);
+        toggle.focus();
+      }
     });
     on(document, 'click', function (e) {
-      if (isOpen() && !siteNav.contains(e.target)) setMenu(false);
+      if (isOpen() && outside(e.target)) setMenu(false);
     });
     on(document, 'touchstart', function (e) {
-      if (isOpen() && !siteNav.contains(e.target)) setMenu(false);
+      if (isOpen() && outside(e.target)) setMenu(false);
     }, true);
     on(window, 'resize', function () {
-      if (window.innerWidth > 820 && isOpen()) setMenu(false);
+      if (window.innerWidth > NAV_COLLAPSE && isOpen()) setMenu(false);
     }, true);
   }
 
@@ -244,11 +265,13 @@
     rail.setAttribute('aria-hidden', 'true');
     document.body.appendChild(rail);
 
+    // The chevron is drawn by .to-top::after, so the button has no text of its
+    // own. It used to carry a "↑" as well, which drew two arrows on top of each
+    // other. The name comes from <body>, in the page's language.
     var toTop = document.createElement('button');
     toTop.type = 'button';
     toTop.className = 'to-top';
-    toTop.setAttribute('aria-label', 'Back to top');
-    toTop.innerHTML = '<span aria-hidden="true">↑</span>';
+    toTop.setAttribute('aria-label', document.body.getAttribute('data-label-to-top') || 'Back to top');
     document.body.appendChild(toTop);
 
     on(toTop, 'click', function () {
@@ -322,6 +345,12 @@
     }
 
     var delivered = false;
+    // threshold 0, not a fraction: "show it once its top edge is 10% up the
+    // screen" has to hold for a block of any height. With 0.08 an element had to
+    // be 8% on screen at once, which a block taller than 12.5 screens can never
+    // be. On a phone the CV's experience section is about 9,800px against a
+    // 600px root, so it peaked at 6%, never revealed, and took every role inside
+    // it with it: a screen-sized blank gap for most of the page's length.
     var observer = new IntersectionObserver(function (entries, obs) {
       delivered = true;
       each(entries, function (entry) {
@@ -329,7 +358,7 @@
         obs.unobserve(entry.target);
         show(entry.target);
       });
-    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0 });
 
     var vh = window.innerHeight;
     each(reveals, function (el) {
@@ -522,22 +551,32 @@
   /* base.html sets the initial theme in an inline head script to avoid a
    * flash. This only reads that state and flips it. */
 
+  // The stored choice if there is one, otherwise what the OS asks for, which is
+  // what the CSS is already showing. Reading only data-theme called an OS-light
+  // page "dark": the toggle offered "Switch to the light theme" on a light page,
+  // and its first click changed nothing anyone could see.
   function currentTheme() {
-    return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    var set = root.getAttribute('data-theme');
+    if (set === 'light' || set === 'dark') return set;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
   }
 
   function paintThemeControls(theme) {
     var next = theme === 'dark' ? 'light' : 'dark';
-    var label = 'Switch to ' + next + ' theme';
     each($$('[data-theme-toggle]'), function (btn) {
       btn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
       btn.setAttribute('data-theme-state', theme);   // icon swap hook for the CSS
+      // The mode word comes from the button, in the page's language, and goes
+      // into the translated sentence around it. Writing a fixed "Light" here
+      // put English, capitalised, in the middle of the Dutch sentence.
+      var slot = btn.querySelector('[data-theme-label]');
+      if (slot) slot.textContent = btn.getAttribute('data-label-' + next) || next;
+      var sentence = slot && slot.parentNode ? slot.parentNode.textContent : '';
+      var label = sentence.replace(/\s+/g, ' ').trim() || ('Switch to ' + next + ' theme');
       btn.setAttribute('title', label);
       // Only name the button when it has no visible text of its own: an
       // aria-label that disagrees with a visible label breaks voice control.
       if (!(btn.textContent || '').replace(/\s/g, '')) btn.setAttribute('aria-label', label);
-      var slot = btn.querySelector('[data-theme-label]');
-      if (slot) slot.textContent = next === 'light' ? 'Light' : 'Dark';
     });
   }
 
@@ -883,9 +922,11 @@
       on(btn, 'click', function (e) {
         e.preventDefault();
         var value = btn.getAttribute('data-copy') || '';
+        // data-copied is the word in the page's language; the template sets it.
+        var copied = btn.getAttribute('data-copied') || 'Copied';
         copyText(value);
-        flashLabel(btn, 'Copied', 1400);
-        announce('Copied ' + value);
+        flashLabel(btn, copied, 1400);
+        announce(copied + ': ' + value);
       });
     });
   }

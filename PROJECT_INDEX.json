@@ -37,6 +37,7 @@
         "templates/education.html",
         "templates/cv.html",
         "templates/contact.html",
+        "templates/ai.html",
         "templates/404.html",
         "templates/print/cv.html",
         "templates/print/jds.html",
@@ -48,17 +49,19 @@
         "templates/md/education.md",
         "templates/md/cv.md",
         "templates/md/contact.md",
+        "templates/md/ai.md",
         "templates/md/llms.txt",
         "templates/md/llms-full.txt",
         "templates/md/corpus/"
       ],
       "files": {
-        "templates/base.html": "Owns doctype, head, the pre-paint theme bootstrap, the sticky nav built from `nav`, the footer, the command-palette markup and the script tags. Derives title and meta description from `page`, so a child never sets them, and links the markdown twin (rel=alternate type=text/markdown) when page.markdown is set.",
+        "templates/base.html": "Owns doctype, head, the pre-paint theme bootstrap, the sticky nav built from `nav` (with the phone-only theme and palette rows in .nav-sheet-tools), the footer, the command-palette markup, the script tags and the <nievah-chat> embed. Derives title and meta description from `page`, so a child never sets them, and links the markdown twin (rel=alternate type=text/markdown) when page.markdown is set.",
         "templates/home.html": "Home: hero with the #hero-net canvas, availability, stats, skill matrix, current roles, links out.",
         "templates/experience.html": "The timeline: every role as a .tl-card, with the full duty list inside a keyboard-operable <details>.",
         "templates/education.html": "Certifications, qualifications, what is in progress, and the course list.",
         "templates/cv.html": "The CV on screen, with the focus filter toolbar and a link to the PDF.",
         "templates/contact.html": "Email, phone, LinkedIn, GitHub, docs and the booking link.",
+        "templates/ai.html": "/ai/: how to ask an assistant about Caleb. Nievah (the embedded chat widget), and the steps to point Claude, Claude Code, Codex or ChatGPT at the public MCP server, with copyable commands and questions. Not in the nav; linked from the home hero, contact, the footer and the palette.",
         "templates/404.html": "Not-found page, served with a real 404 by the Worker.",
         "templates/print/cv.html": "A4 CV sheet, two columns, budgeted at 1 to 2 pages. Printed to Caleb_Sargeant_CV.pdf.",
         "templates/print/jds.html": "A4 job-descriptions sheet: contents page plus every role's full duty list. Grows with the data by design.",
@@ -83,7 +86,8 @@
         "assets/mark.svg",
         "assets/favicon.svg",
         "assets/og/og-default.png",
-        "assets/img/caleb.jpg"
+        "assets/img/caleb.jpg",
+        "assets/nievah/nievah-chat.js"
       ],
       "files": {
         "assets/site.css": "Every token (dark default, light theme override) and every component in docs/design-system.md. One stylesheet for the whole site.",
@@ -94,6 +98,7 @@
         "assets/favicon.svg": "The mark as an SVG. Deliberately not linked as an icon: browsers prefer an SVG icon over every PNG, which would override the portrait favicons.",
         "assets/og/og-default.png": "Generated 1200x630 social card, committed. Re-render it after editing templates/social/og.html.",
         "assets/img/caleb.jpg": "Portrait, with caleb-320.jpg as the small variant.",
+        "assets/nievah/nievah-chat.js": "The Nievah chat widget (<nievah-chat>), vendored with its three avatars from MagmaMoose/nievah by `make widget`. Never edited here. Its backend, chat.magmamoose.com, grounds her on this site for this origin.",
         "assets/apple-touch-icon.png": "Generated 180x180 touch icon, committed.",
         "assets/favicon-32.png": "Generated 32x32 icon, committed; also packed into favicon.ico.",
         "assets/favicon-16.png": "Generated 16x16 icon, committed; also packed into favicon.ico.",

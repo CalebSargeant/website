@@ -73,6 +73,9 @@
       <a class="btn btn-quiet" href="{{ profile.links.github }}" rel="me noopener" target="_blank">GitHub</a>
     </div>
 
+    {% set ai_link %}<a href="{{ url('/ai/') }}">{{ t('ai.home_link') }}</a>{% endset %}
+    <p class="hero-ask reveal" style="--d: 3">{{ (t('ai.home_hint') | e).format(link=ai_link) }}</p>
+
     {# Each typed line carries its text as content as well as in data-typewriter:
        site.js retypes it, and with JavaScript off the terminal still reads.
        The shell prompt and the two command words are not translated: they are
@@ -80,7 +83,7 @@
     <div class="hero-terminal term reveal" style="--d: 4">
       <div class="term-bar">
         <span class="term-dots" aria-hidden="true"></span>
-        <span class="term-title mono">caleb@eindhoven: ~</span>
+        <span class="term-title mono">caleb@limburg: ~</span>
         {# Reports this terminal's own state, nothing invented: site.js pulses
            --lit once per character typed and adds .is-linked when the last line
            lands. Decorative to a screen reader, which has the text itself. #}
@@ -90,7 +93,7 @@
       </div>
       <div class="term-body">
         <p class="term-line">
-          <span class="term-ps1">caleb@eindhoven:~$</span>
+          <span class="term-ps1">caleb@limburg:~$</span>
           <span class="term-out" data-typewriter="whoami">whoami</span>
         </p>
         <p class="term-line">
@@ -101,7 +104,7 @@
           <span class="term-out" data-typewriter="{{ term_years }}">{{ term_years }}</span>
         </p>
         <p class="term-line">
-          <span class="term-ps1">caleb@eindhoven:~$</span>
+          <span class="term-ps1">caleb@limburg:~$</span>
           <span class="term-out" data-typewriter="jobs">jobs</span>
         </p>
         {% for role in current_roles %}

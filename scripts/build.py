@@ -84,7 +84,7 @@ PAGES = [
      "nav": "Home", "title": "{name} · {headline}",
      # Under the ~155 characters a search result shows before it cuts a
      # description off; the sentence about the CV build was the part lost.
-     "description": "Platform, cloud, network and security engineer in Eindhoven, "
+     "description": "Platform, cloud, network and security engineer in Limburg, "
                     "Netherlands. Kubernetes, Terraform, Azure and AWS, and the "
                     "networks underneath them."},
     {"id": "experience", "template": "experience.html", "out": "experience/index.html",
@@ -102,6 +102,13 @@ PAGES = [
     {"id": "contact", "template": "contact.html", "out": "contact/index.html",
      "path": "/contact/", "nav": "Contact", "title": "Contact · Caleb Sargeant",
      "description": "Email, phone, LinkedIn, GitHub, and a link to book a slot."},
+    # Not in the nav on purpose: most visitors will never want it, and the ones
+    # who do arrive from the home page hint, the contact page or the footer.
+    {"id": "ai", "template": "ai.html", "out": "ai/index.html", "path": "/ai/",
+     "title": "Ask your AI about me · Caleb Sargeant",
+     "description": "Connect Claude, Codex or ChatGPT to the public MCP server for "
+                    "this site, or ask Nievah here, and find out whether I fit "
+                    "your role. No sign-in."},
     {"id": "notfound", "template": "404.html", "out": "404.html", "path": "/404.html",
      "title": "Not found · Caleb Sargeant", "description": "That page does not exist.",
      "sitemap": False},

@@ -36,6 +36,7 @@ off the site is still fully readable and navigable.
 │   ├── education.html           certifications, qualifications and courses
 │   ├── cv.html                  the CV on screen, with the focus filter
 │   ├── contact.html             email, phone, links, booking
+│   ├── ai.html                  /ai/: ask Nievah, or point your own assistant at the MCP server
 │   ├── 404.html                 served with a real 404 status
 │   ├── print/cv.html            A4 sheet, printed to Caleb_Sargeant_CV.pdf
 │   ├── print/jds.html           A4 sheet, printed to Caleb_Sargeant_JDs_and_Duties.pdf
@@ -53,6 +54,7 @@ off the site is still fully readable and navigable.
 │   ├── hero-net.js              the hero canvas (network graph), self-pausing
 │   ├── print.css                the print stylesheet, used only by templates/print/*
 │   ├── img/, og/, favicon*      photo, social card, icons (generated but committed)
+│   ├── nievah/                  the vendored Nievah chat widget and its avatars (`make widget`)
 │   └── mark.svg
 ├── scripts/
 │   ├── build.py                 the hub: loads data, renders every page, writes dist/
@@ -61,7 +63,7 @@ off the site is still fully readable and navigable.
 ├── docs/
 │   ├── design-system.md         tokens, exact class names, animation catalogue. Normative.
 │   └── template-context.md      what build.py hands templates, and base.html's blocks
-├── Makefile                     install / build / pdf / serve / clean
+├── Makefile                     install / build / pdf / images / widget / serve / clean
 ├── requirements.txt             jinja2, pyyaml, playwright
 ├── wrangler.toml                the assets-only Worker and its apex + www routes
 ├── _headers                     CSP, HSTS, cache policy, charset on text
@@ -98,6 +100,9 @@ MCP corpus follow from it on the next build.
 | Add a document to the MCP corpus | `scripts/build.py` and `templates/md/corpus/` | A row in `CORPUS`, and the template it names, opening with `# Title`. Keep paths stable: agents keep them. |
 | Add a fourth PDF | `scripts/build.py` and `templates/print/` | Add the sheet to `PAGES` with `print: True`, then add it to `PDFS`. `render_pdf.py` imports that list rather than keeping its own copy. |
 | Change a colour, a spacing step or an animation | `assets/site.css` | Read `docs/design-system.md` first. It is the contract the CSS, the JS and the templates all share. |
+| Change what the chat widget says first | `data/i18n/*.yml` | `chat.intro`, `chat.suggestions` (three openers, `\|`-separated, each sent as-is when clicked), `chat.placeholder`, `chat.contact_label`. An opener has to be a question the chat backend grounds on the CV: run it past the caleb gate in MagmaMoose/nievah (`chat/tests/surfaces.test.mjs`) first. |
+| Update the chat widget | `make widget`, then commit `assets/nievah/` | It downloads the release www.magmamoose.com serves. If a new release moves a launcher breakpoint, move the `html[data-nievah] .to-top` offsets in `site.css` with it. |
+| Change the "ask your AI" instructions | `data/i18n/*.yml` (`ai.*`) and `templates/ai.html` | The steps are each product's own documented ones; a renamed menu is a string change. The commands are built from `profile.links.mcp`. |
 
 ## Local development
 
@@ -353,6 +358,25 @@ because a Transform Rule on the zone (in Cloudflare, not in this repo) rewrites 
 request with `Accept: text/markdown` to the page's twin: the free-plan stand-in for
 Cloudflare's Markdown for Agents, which needs Pro. [isitagentready.com](https://isitagentready.com/),
 the scan behind the dashboard's Agent Readiness page, checks all of the above.
+
+### Asking about Caleb
+
+Two routes, both explained on `/ai/` (in both languages, linked from the home
+hero, the contact page, the footer and the command palette, but deliberately not
+from the nav):
+
+- **Nievah**, the chat widget `base.html` embeds on every page. She is Magma
+  Moose's assistant, served by `chat.magmamoose.com` (MagmaMoose/nievah,
+  `chat/`), which recognises this origin and grounds her on the CV first and on
+  docs.calebsargeant.com and the studio's pages after. Its script and three
+  avatars under `assets/nievah/` are vendored; `make widget` refreshes them from
+  the public copy on www.magmamoose.com. It makes no request until someone sends
+  a message and writes nothing to the device. `_headers` allows the backend in
+  `connect-src`, and `.to-top` moves above the launcher whenever `<html>` carries
+  `data-nievah`.
+- **The MCP server** at `https://mcp.calebsargeant.com/`, for anyone who would
+  rather ask their own Claude, Claude Code, Codex or ChatGPT. `/ai/` has each
+  product's steps and some questions worth asking.
 
 ## Design
 
