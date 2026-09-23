@@ -14,6 +14,9 @@
 #   duties        The long-form record, grouped. Only the JDs & Duties PDF and
 #                 the expandable panel on /experience render these.
 #   stack         Chips shown on the role card. Keep to ~10 of the real ones.
+#   url           Optional. The organisation's own site. Only set it for a site
+#                 that publishes an Organization node at <url>#organization:
+#                 base.html links the Person to that @id as worksFor.
 # ═══════════════════════════════════════════════════════════════════════════
 
 roles:
@@ -39,6 +42,7 @@ roles:
 
   - id: magma-moose-co-founder
     company: Magma Moose
+    url: https://www.magmamoose.com/
     title: Co-Founder
     location: Remote · Netherlands
     start: 2023-03

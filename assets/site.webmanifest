@@ -1,0 +1,15 @@
+{
+  "name": "Caleb Sargeant",
+  "short_name": "Caleb",
+  "description": "Platform, cloud, network and security engineering since 2012.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "theme_color": "#080B10",
+  "background_color": "#080B10",
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

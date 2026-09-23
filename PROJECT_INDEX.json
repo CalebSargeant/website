@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-22",
+  "generated": "2026-09-23",
   "summary": "Caleb Sargeant's personal site and CV (calebsargeant.com, apex-canonical). data/*.yml is the single source of truth; scripts/build.py renders it with Jinja2 into dist/, which ships as Cloudflare Workers static assets. The same data renders three A4 print sheets that Playwright prints to the CV, JDs & Duties and cover-letter PDFs, plus the files for assistants: a markdown twin of every page, llms.txt, llms-full.txt, and the MCP search corpus (.docs-index/index/website.json) that CI puts in R2. No framework, no bundler: one site stylesheet, one print stylesheet, progressive-enhancement JS only.",
   "entrypoints": [
     "scripts/build.py:main",
@@ -91,12 +91,16 @@
         "assets/hero-net.js": "The hero canvas (#hero-net): a small animated network graph, DPR-scaled to its parent, capped at about 34 nodes, paused when off-screen or the tab is hidden, one static frame under reduced motion.",
         "assets/print.css": "Print-only stylesheet: light ground, @page A4 with zero margin, a 210x297mm .sheet with its own 14mm padding, and the break-inside rules. No dark tokens, no animation.",
         "assets/mark.svg": "The personal mark used in the nav brand and the OG card.",
-        "assets/favicon.svg": "Favicon source. The PNG icons and favicon.ico are generated from it by scripts/render_images.py.",
+        "assets/favicon.svg": "The mark as an SVG. Deliberately not linked as an icon: browsers prefer an SVG icon over every PNG, which would override the portrait favicons.",
         "assets/og/og-default.png": "Generated 1200x630 social card, committed. Re-render it after editing templates/social/og.html.",
         "assets/img/caleb.jpg": "Portrait, with caleb-320.jpg as the small variant.",
         "assets/apple-touch-icon.png": "Generated 180x180 touch icon, committed.",
         "assets/favicon-32.png": "Generated 32x32 icon, committed; also packed into favicon.ico.",
-        "assets/favicon-16.png": "Generated 16x16 icon, committed; also packed into favicon.ico."
+        "assets/favicon-16.png": "Generated 16x16 icon, committed; also packed into favicon.ico.",
+        "assets/icon-192.png": "Generated 192x192 circular portrait: the favicon Google shows in results, the web manifest icon, and the docs site's favicon and header logo (copied into CalebSargeant/docs).",
+        "assets/icon-512.png": "Generated 512x512 circular portrait for the web manifest.",
+        "assets/icon-maskable-512.png": "Generated 512x512 square portrait, the manifest's maskable icon.",
+        "assets/site.webmanifest": "Web app manifest: name, colours and the portrait icons. display is browser, so it is metadata, not an install prompt."
       },
       "depends_on": []
     },
@@ -111,7 +115,7 @@
       "files": {
         "scripts/build.py": "Loads data/*.yml, enriches roles (labels, durations, duties_see resolution, sorting), renders every entry in PAGES into dist/ plus a markdown twin of each sitemap page, copies assets and the root files, appends a canonical Link rule per twin to dist/_headers (failing past 100 rules), writes sitemap.xml, llms.txt and llms-full.txt, and writes the MCP corpus to .docs-index/index/website.json (schema 1, byte-identical for an unchanged build, anchors checked against the built pages). PAGES, PDFS and CORPUS are the page, document and corpus registries. Also serves dist/ with --serve.",
         "scripts/render_pdf.py": "Serves dist/ on an ephemeral localhost port and drives Playwright's Chromium to print the three sheets to dist/downloads/. Awaits document.fonts.ready, prints A4 with zero margins, warns past the MAX_PAGES budget. `--check` asserts the PDFs exist and are non-trivial.",
-        "scripts/render_images.py": "Generates the committed images: the OG card from templates/social/og.html and the raster favicons plus favicon.ico from assets/favicon.svg. Run by hand, not by the build."
+        "scripts/render_images.py": "Generates the committed images: the OG card from templates/social/og.html and the raster favicons, the manifest icons and favicon.ico, all face-cropped from assets/img/caleb.jpg. Run by hand, not by the build."
       },
       "depends_on": ["data", "templates", "assets"]
     },

@@ -71,12 +71,17 @@
 
 {# The tab icon is the portrait, generated from assets/img/caleb.jpg by
    scripts/render_images.py. No SVG icon: browsers prefer it over every
-   PNG here, which would quietly override the photo. Asset paths are never
-   locale-prefixed: there is one copy of assets/, shared by every language. #}
+   PNG here, which would quietly override the photo. The 192px one is for
+   Google, which shows a favicon beside each result and asks for one larger
+   than 48px; browsers still pick the 16 and 32 for the tab. Asset paths are
+   never locale-prefixed: there is one copy of assets/, shared by every
+   language. #}
 <link rel="icon" href="/assets/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="icon" href="/assets/favicon-16.png" type="image/png" sizes="16x16">
+<link rel="icon" href="/assets/icon-192.png" type="image/png" sizes="192x192">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/assets/site.webmanifest">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -124,7 +129,41 @@
       "sameAs": [
         {{ profile.links.github | tojson }},
         {{ profile.links.linkedin | tojson }},
-        {{ profile.links.credly | tojson }}
+        {{ profile.links.credly | tojson }},
+        {{ profile.links.udemy | tojson }}
+      ],
+      {# The current employers. One that publishes its own Organization node
+         (a role with `url`, see data/experience.yml) is referenced by that
+         node's @id, which joins the two sites' graphs instead of only naming
+         the company. #}
+      "worksFor": [
+        {% for role in current_roles %}
+        {
+          "@type": "Organization",
+          {% if role.get('url') %}
+          "@id": {{ (role.url ~ '#organization') | tojson }},
+          "url": {{ role.url | tojson }},
+          {% endif %}
+          "name": {{ role.company | tojson }}
+        }{{ "," if not loop.last else "" }}
+        {% endfor %}
+      ],
+      "hasCredential": [
+        {% for item in education if item.kind in ('certification', 'qualification') %}
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": {{ (item.get('credential') or item.title) | tojson }},
+          {% if item.get('verify') %}
+          "url": {{ item.verify | tojson }},
+          {% endif %}
+          "credentialCategory": {{ item.kind | tojson }}
+        }{{ "," if not loop.last else "" }}
+        {% endfor %}
+      ],
+      "alumniOf": [
+        {% for school in education | selectattr('kind', 'in', ['qualification', 'schooling']) | map(attribute='institution') | unique %}
+        { "@type": "EducationalOrganization", "name": {{ school | tojson }} }{{ "," if not loop.last else "" }}
+        {% endfor %}
       ],
       "knowsAbout": [
         {% for skill in cv_skills[:10] %}
