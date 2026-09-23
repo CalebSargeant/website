@@ -61,7 +61,9 @@ command-palette markup and the script tags. Child templates override blocks:
 
 `base.html` derives `<title>` and `<meta name="description">` from `page`, so a
 child never sets them. It also emits `<link rel="alternate" type="text/markdown">`
-when `page.markdown` is set. Print templates do **not** extend `base.html`: they
+when `page.markdown` is set, and loads `assets/webmcp.js` with a `data-contact`
+JSON attribute built from `profile` (single-quoted, because `tojson` leaves `"`
+unescaped; see `docs/design-system.md` section 3 for its keys). Print templates do **not** extend `base.html`: they
 are standalone documents that link only `assets/print.css`.
 
 ## Markdown templates (`templates/md/`)
@@ -76,12 +78,16 @@ serve them as HTML.
 | Template | Output | Context |
 | --- | --- | --- |
 | `md/<page>.md` (`home`, `experience`, `education`, `cv`, `contact`) | `<page.path>index.md` in every locale | exactly what the HTML page gets, `page` and `alternates` included |
-| `md/llms.txt`, `md/llms-full.txt` | `dist/llms.txt`, `dist/llms-full.txt` | the English globals, plus `md_pages`: every localised page that has a twin |
+| `md/llms.txt`, `md/llms-full.txt` | `dist/llms.txt`, `dist/llms-full.txt` | the English globals, plus `md_pages`: every localised page that has a twin, and `corpus_urls`: `{corpus path: URL path}` for the single corpus documents (`profile.md` -> `/`), which is where llms-full.txt's `Page:` lines come from |
+| `md/skills/<name>.md` | `dist/.well-known/agent-skills/<name>/SKILL.md`, listed in `index.json` there | the same as llms.txt, plus `corpus_docs`: `[{path, title, url}]` for every corpus document, as the corpus was just written |
 | `md/corpus/*.md` | the documents in `.docs-index/index/website.json` | the English globals, plus `role` (the enriched role for `corpus/role.md`, else `None`), `role_docs` (`{role id: corpus path}`) and `corpus_paths` (the other documents' paths) |
 
 A page in the sitemap must have a twin template of the same name, or the build
 fails with `TemplateNotFound`. Every corpus document must open with `# Title`:
-that line becomes the document's `title`.
+that line becomes the document's `title`. Every skill must open with YAML front
+matter whose `name` is its `SKILLS` row's and whose `description` is one line of
+at most 1024 characters with no colon followed by a space; the build parses it and
+fails on anything else.
 
 `md/_macros.md` is imported `with context`: `abs`, `link`, `h`, `role_line`,
 `role_detail`, `role_facts`, `education_entry`, `education_line`,

@@ -26,6 +26,9 @@
 #                       and /nl/experience/index.md. Each is served with a
 #                       Link rel="canonical" back to its page, so search engines
 #                       index the page, not the copy.
+#   /.well-known/agent-skills/index.json
+#                       Agent Skills for answering questions about Caleb and
+#                       for connecting to the MCP server
 # and an MCP server, https://mcp.calebsargeant.com/ (public, read-only, no
 # authentication), that searches this site and the docs.
 User-agent: *

@@ -3,6 +3,11 @@
   wants everything in one fetch rather than following llms.txt's links. Built
   from the same macros as the twins and the corpus, so a role reads the same
   in all three. English only.
+
+  Every section names the page it comes from on a `Page:` line, the top-level
+  ones from `corpus_urls` (the same URLs the corpus cites, anchors checked by
+  build.py) and each role in role_facts. That line is how assets/webmcp.js's
+  search_site gives every match a URL to cite, so keep one under each `##`.
 #}
 {% import "md/_macros.md" as md with context %}
 # {{ profile.name }}
@@ -12,6 +17,8 @@
 The whole CV in one file, generated from the same data as {{ md.abs('/') }} on every deploy, so it says exactly what the pages and the PDFs say. The short map is {{ md.abs('/llms.txt') }}.
 
 ## Profile
+
+Page: {{ md.abs(corpus_urls['profile.md']) }}
 
 {{ profile.summary }}
 
@@ -25,6 +32,8 @@ The whole CV in one file, generated from the same data as {{ md.abs('/') }} on e
 {{ md.stats() }}
 ## {{ t('experience.title') }}
 
+Page: {{ md.abs(corpus_urls['experience.md']) }}
+
 {{ roles | length }} roles since {{ career_start_year }}, newest first, {{ current_roles | length }} of them current.
 
 {% for role in roles %}
@@ -36,6 +45,8 @@ The whole CV in one file, generated from the same data as {{ md.abs('/') }} on e
 {{ md.role_detail(role, 4) }}
 {% endfor %}
 ## {{ t('cv.section.education') }}
+
+Page: {{ md.abs(corpus_urls['education.md']) }}
 
 {% if in_progress %}
 ### {{ t('education.in_progress') }}
@@ -50,11 +61,15 @@ The whole CV in one file, generated from the same data as {{ md.abs('/') }} on e
 {% endfor %}
 ## {{ t('education.training_title') }}
 
+Page: {{ md.abs(corpus_urls['courses.md']) }}
+
 {% for course in courses %}
 {{ md.course_line(course) }}
 {% endfor %}
 
 ## {{ t('skills.kicker') }}
+
+Page: {{ md.abs(corpus_urls['skills.md']) }}
 
 {{ t('skills.lead') }}
 
@@ -68,6 +83,8 @@ The whole CV in one file, generated from the same data as {{ md.abs('/') }} on e
 {% endfor %}
 
 ## {{ t('contact.kicker') }}
+
+Page: {{ md.abs(corpus_urls['contact.md']) }}
 
 {{ md.contact_direct() }}
 {{ md.profile_links() }}

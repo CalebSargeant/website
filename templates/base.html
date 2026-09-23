@@ -407,6 +407,25 @@
 
 <script src="/assets/site.js" defer></script>
 <script src="/assets/hero-net.js" defer></script>
+{# WebMCP tools for an agent in the browser (assets/webmcp.js), a no-op unless the
+   browser has the API. data-contact is what its get_contact tool answers with,
+   rendered here from data/profile.yml because the script cannot read data/.
+   Single-quoted on purpose: tojson escapes < > & and ' but not ", so a
+   double-quoted attribute would end at the first key. #}
+{% set webmcp_contact = {
+     "name": profile.name,
+     "headline": profile.headline,
+     "location": profile.location,
+     "email": profile.contact.email,
+     "phone": profile.contact.phone,
+     "booking": profile.links.booking,
+     "availability": profile.availability.text if profile.availability.show else none,
+     "linkedin": profile.links.linkedin,
+     "github": profile.links.github,
+     "credly": profile.links.credly,
+     "contact_page": site.base_url ~ url('/contact/'),
+   } %}
+<script src="/assets/webmcp.js" defer data-contact='{{ webmcp_contact | tojson }}'></script>
 {% block scripts %}{% endblock %}
 
 </body>
