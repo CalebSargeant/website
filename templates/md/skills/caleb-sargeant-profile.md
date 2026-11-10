@@ -30,7 +30,7 @@ Everything below is published by him and generated from one set of data files on
 3. {{ md.link('llms-full.txt', md.abs('/llms-full.txt')) }}: the whole CV in one markdown file. Every role with its highlights, stack and full duty list, then education, courses, skills and contact. Each role names its page.
 4. One page as markdown, at the page's URL plus `index.md`:
 {% for p in md_pages %}
-   - {{ md.link(p.nav, md.abs(p.markdown)) }}: {{ p.description }}
+   - {{ md.link(p.get('nav') or p.title, md.abs(p.markdown)) }}: {{ p.description }}
 {% endfor %}
 {% for loc in locales if loc.code != default_locale %}
 5. The same site in {{ loc.native }} ({{ loc.html_lang }}) under {{ md.abs(loc.prefix ~ '/') }}, with the same markdown copies under {{ loc.prefix }}/. Same facts, translated.
