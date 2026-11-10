@@ -27,7 +27,7 @@ This is {{ profile.name }}'s CV site. Every page and document on it is generated
 ## Pages
 
 {% for p in md_pages %}
-- {{ md.link(p.nav, md.abs(p.markdown)) }}: {{ p.description }} Markdown copy of <{{ md.abs(p.path) }}>.
+- {{ md.link(p.get('nav') or p.title, md.abs(p.markdown)) }}: {{ p.description }} Markdown copy of <{{ md.abs(p.path) }}>.
 {% endfor %}
 
 ## Documents

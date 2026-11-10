@@ -11,7 +11,13 @@ name: Caleb Sargeant
 headline: Platform, Network & Security Engineer
 # The one-line positioning used in <title>, OG cards and the CV header.
 tagline: Platform, cloud, network and security engineering since 2012.
-location: Eindhoven, Netherlands
+location: Limburg, Netherlands
+# The structured form of `location`, for the Person's PostalAddress in the
+# JSON-LD. A region and not a town: Limburg is a province (Caleb lives in
+# Venray, which the site does not publish). ISO 3166 country code.
+address:
+  region: Limburg
+  country: NL
 nationality_note: EU work-authorised (living and working in the Netherlands)
 
 contact:
@@ -33,6 +39,12 @@ links:
   # Named in llms.txt so an assistant can find it. Its corpus from this repo is
   # written by scripts/build.py and put in R2 by the production deploy.
   mcp: https://mcp.calebsargeant.com/
+  # Magma Moose, the studio Caleb co-founded. /ai/ and the chat widget point
+  # visitors back at it, and its own MCP server searches the studio's public
+  # documentation the way the one above searches this site.
+  magmamoose: https://www.magmamoose.com/
+  magmamoose_services: https://www.magmamoose.com/services/
+  magmamoose_mcp: https://mcp.magmamoose.com/
   github: https://github.com/CalebSargeant
   linkedin: https://www.linkedin.com/in/calebsargeant/
   credly: https://www.credly.com/users/calebsargeant/badges

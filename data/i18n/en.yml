@@ -30,7 +30,11 @@ ui:
   nav.docs: Docs
   nav.language: Language
   nav.download_cv: Download CV
+  nav.menu_open: Menu
+  nav.menu_close: Close menu
+  nav.search: Search the site
   common.skip_to_content: Skip to content
+  common.to_top: Back to top
   common.to: to
   common.verify: Verify
   common.current: Current
@@ -202,6 +206,73 @@ ui:
   contact.doc.cover: Cover letter
   contact.doc.cover_note: One page, general purpose. Ask for a version written for your role and you will
     get one.
+  common.copied: Copied
+  chat.intro: Hi, I'm Nievah, the AI assistant from Magma Moose, the studio Caleb co-founded. Ask
+    me about his experience and skills, or whether he fits your role.
+  chat.placeholder: Ask about Caleb…
+  chat.contact_label: email Caleb
+  # Three openers, |-separated. Each one is sent as-is when clicked, so each must be a
+  # question the chat backend grounds on his CV (MagmaMoose/nievah, chat/tests).
+  chat.suggestions: Is Caleb a good fit for a platform engineering role?|What has Caleb done with
+    Kubernetes?|What is Magma Moose?
+  ai.kicker: Ask an AI
+  ai.title: Ask your AI whether I fit the role.
+  ai.lead: Reading a CV against a job description is the kind of work an assistant does well, so everything
+    on this site is published for assistants as well as for people. Ask Nievah here, or connect your own
+    and ask it with the job description in hand.
+  ai.nievah.title: Ask Nievah, here
+  ai.nievah.body: Nievah is the assistant behind the button at the bottom right of every page. She answers
+    from this site and my documentation, and as the Magma Moose assistant she can tell you about the studio
+    too. She is an AI, says so, and only knows what is published.
+  ai.nievah.hint: Nothing to set up. Open the chat and ask.
+  ai.own.title: Connect your own assistant
+  ai.own.body: '{server} is a public, read-only MCP server: nothing to install and no sign-in. It searches this
+    site (the CV, every role in full, education, courses and skills) and my documentation, and it cannot
+    see anything that is not published there.'
+  ai.own.address: Server address
+  ai.copy: Copy
+  ai.copy_aria: Copy {what} to the clipboard
+  ai.copy_what.address: the server address
+  ai.copy_what.command: the command
+  ai.copy_what.prompt: the question
+  ai.setup.kicker: Set it up
+  ai.setup.title: One address, any assistant
+  ai.setup.lead: These are the steps each product documents today. The address is the same in all of them.
+  ai.claude.where: claude.ai and the desktop app
+  ai.claude.step1: Open Customize, then Connectors.
+  ai.claude.step2: Choose +, then Add custom connector.
+  ai.claude.step3: Paste the address and choose Add.
+  ai.claude.step4: In a chat, switch it on from the + menu, under Connectors.
+  ai.claude.note: The Free plan allows one custom connector. On Team and Enterprise an owner adds it first,
+    under Organization settings.
+  ai.claude_code.where: In a terminal
+  ai.claude_code.note: Then run /mcp in a session to see it connected.
+  ai.codex.where: The CLI, the IDE extension and the ChatGPT desktop app
+  ai.codex.note: All three share this configuration, so one command covers them.
+  ai.chatgpt.where: On the web, on a Plus, Pro, Business, Enterprise or Edu plan
+  ai.chatgpt.body: Turn on Developer mode under Settings, Security and login. Then add a developer-mode app
+    with the address above and no authentication.
+  ai.other.title: Anything else
+  ai.other.body: Any client that speaks MCP over Streamable HTTP can use the same address, with no authentication.
+  ai.prompts.kicker: Then ask
+  ai.prompts.title: Questions worth asking
+  ai.prompts.lead: Put the job description in with the first one. Ask where I fall short as well as where
+    I fit; that half is usually the more useful one.
+  ai.prompt.fit: 'Using the calebsargeant MCP server, compare Caleb Sargeant with this job description. Where
+    does he fit, and where would he need to grow? [paste the job description]'
+  ai.prompt.kubernetes: What has Caleb done with Kubernetes and Terraform, and in which roles?
+  ai.prompt.security: Summarise Caleb's network and security experience in five lines.
+  ai.prompt.certs: Which certifications does Caleb hold, and what is he studying now?
+  ai.team.title: Hiring a team rather than a person?
+  ai.team.body: Magma Moose, the development studio I co-founded, takes on platform, cloud, network and
+    security engineering, run end to end for you or alongside your own engineers. Its tools are documented
+    the same way, on {server}.
+  ai.team.link: What Magma Moose does
+  ai.home_hint: Hiring? {link}
+  ai.home_link: Ask your AI whether I fit the role
+  ai.contact_hint: Would rather have an assistant read the CV for you? {link}
+  ai.contact_link: Ask an AI about me
+  ai.footer_link: Ask an AI about me
   notfound.kicker: HTTP 404
   notfound.lead: There is nothing at that address. It has either moved, or the link that sent you here
     was wrong. Everything on the site is one hop away.
@@ -223,7 +294,9 @@ ui:
   print.label.web: Web
   print.label.docs: Docs
   print.label.duties: Duties
-  og.lead: '{headline} in {location}. {years} years in IT, {roles} engineering roles.'
+  # \u00a0 keeps the number with its noun: "13" alone at the end of the first
+  # line of the OG card, with "years" starting the second, read as a stray.
+  og.lead: "{headline} in {location}. {years}\u00a0years in IT, {roles}\u00a0engineering roles."
   # The markdown twins (templates/md/). {url} arrives already wrapped as <url>.
   md.header: Markdown copy of {url}, generated from the same data as the page.
   md.highlights: Highlights
@@ -262,7 +335,7 @@ ui:
 pages:
   home:
     title: '{name} · {headline}'
-    description: Platform, cloud, network and security engineer in Eindhoven, Netherlands. Kubernetes,
+    description: Platform, cloud, network and security engineer in Limburg, Netherlands. Kubernetes,
       Terraform, Azure and AWS, and the networks underneath them.
     nav: Home
   experience:
@@ -284,6 +357,10 @@ pages:
     title: Contact · Caleb Sargeant
     description: Email, phone, LinkedIn, GitHub, and a link to book a slot.
     nav: Contact
+  ai:
+    title: Ask your AI about me · Caleb Sargeant
+    description: Connect Claude, Codex or ChatGPT to the public MCP server for this site, or ask Nievah here,
+      and find out whether I fit your role. No sign-in.
   notfound:
     title: Not found · Caleb Sargeant
     description: That page does not exist.

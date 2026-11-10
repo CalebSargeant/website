@@ -23,7 +23,8 @@
   "telephone": {{ profile.contact.phone | tojson }},
   "address": {
     "@type": "PostalAddress",
-    "addressLocality": {{ profile.location | tojson }}
+    "addressRegion": {{ profile.address.region | tojson }},
+    "addressCountry": {{ profile.address.country | tojson }}
   },
   "sameAs": {{ [profile.links.github, profile.links.linkedin,
                 profile.links.credly, profile.links.website] | tojson }},
