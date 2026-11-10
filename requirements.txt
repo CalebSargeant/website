@@ -19,4 +19,4 @@ pyyaml>=6.0.3
 # Headless Chromium, used twice: scripts/render_pdf.py prints the three print
 # sheets to PDF, and scripts/render_images.py generates the OG card and the
 # raster favicons. Needs `playwright install chromium` as a separate step.
-playwright>=1.62.0
+playwright>=1.63.0
